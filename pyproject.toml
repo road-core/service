@@ -107,6 +107,7 @@ dependencies = [
     "urllib3==2.2.2",
     "nltk==3.9.1",
     "aiohttp==3.10.2",
+    "pyroscope-io>=0.8.7",
 ]
 requires-python = "==3.11.*"
 readme = "README.md"

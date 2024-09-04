@@ -4,6 +4,7 @@ import logging
 import os
 import tempfile
 import threading
+import pyroscope
 from pathlib import Path
 
 import certifi
@@ -14,6 +15,15 @@ from ols import config
 from ols.utils.auth_dependency import K8sClientSingleton
 from ols.utils.logging import configure_logging
 
+
+pyroscope.configure(
+    application_name    = "lightspeed-service", # replace this with some name for your application
+    server_address      = "http://pyroscope.pyroscope.svc.cluster.local:4040", # replace this with the address of your Pyroscope server
+    sample_rate         = 100, # default is 100
+    oncpu               = True, # report cpu time only; default is True
+    gil_only            = True, # only include traces for threads that are holding on to the Global Interpreter Lock; default is True
+    enable_logging      = True, # does enable logging facility; default is False
+)
 
 def configure_hugging_face_envs(ols_config) -> None:
     """Configure HuggingFace library environment variables."""
@@ -109,37 +119,39 @@ def start_uvicorn():
 
 if __name__ == "__main__":
 
-    cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
-    config.reload_from_yaml_file(cfg_file)
+    with pyroscope.tag_wrapper({ "main": "main_method" }):
 
-    configure_logging(config.ols_config.logging_config)
-    logger = logging.getLogger(__name__)
-    logger.info(f"Config loaded from {Path(cfg_file).resolve()}")
+        cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
+        config.reload_from_yaml_file(cfg_file)
 
-    configure_gradio_ui_envs()
+        configure_logging(config.ols_config.logging_config)
+        logger = logging.getLogger(__name__)
+        logger.info(f"Config loaded from {Path(cfg_file).resolve()}")
 
-    # NOTE: We import config here to avoid triggering import of anything
-    # else via our code before other envs are set (mainly the gradio).
-    from ols import config
+        configure_gradio_ui_envs()
 
-    configure_hugging_face_envs(config.ols_config)
+        # NOTE: We import config here to avoid triggering import of anything
+        # else via our code before other envs are set (mainly the gradio).
+        from ols import config
 
-    # add extra certificates if defined
-    for certificate_path in config.ols_config.extra_ca:
-        add_ca_to_certifi(certificate_path)
+        configure_hugging_face_envs(config.ols_config)
 
-    # Initialize the K8sClientSingleton with cluster id during module load.
-    # We want the application to fail early if the cluster ID is not available.
-    cluster_id = K8sClientSingleton.get_cluster_id()
-    logger.info(f"running on cluster with ID '{cluster_id}'")
+        # add extra certificates if defined
+        for certificate_path in config.ols_config.extra_ca:
+            add_ca_to_certifi(certificate_path)
 
-    # init loading of query redactor
-    config.query_redactor
+        # Initialize the K8sClientSingleton with cluster id during module load.
+        # We want the application to fail early if the cluster ID is not available.
+        cluster_id = K8sClientSingleton.get_cluster_id()
+        logger.info(f"running on cluster with ID '{cluster_id}'")
 
-    # create and start the rag_index_thread - allows loading index in
-    # parallel with starting the Uvicorn server
-    rag_index_thread = threading.Thread(target=load_index)
-    rag_index_thread.start()
+        # init loading of query redactor
+        config.query_redactor
 
-    # start the Uvicorn server
-    start_uvicorn()
+        # create and start the rag_index_thread - allows loading index in
+        # parallel with starting the Uvicorn server
+        rag_index_thread = threading.Thread(target=load_index)
+        rag_index_thread.start()
+
+        # start the Uvicorn server
+        start_uvicorn()

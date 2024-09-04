@@ -214,7 +214,9 @@ cffi==1.17.0 \
     --hash=sha256:f3e0992f23bbb0be00a921eae5363329253c3b86287db27092461c887b791e5e \
     --hash=sha256:f9338cc05451f1942d0d8203ec2c346c830f8e86469903d5126c1f0a13a2bcbb \
     --hash=sha256:ffef8fd58a36fb5f1196919638f73dd3ae0db1a878982b27a9a5a176ede4ba91
-    # via cryptography
+    # via
+    #   cryptography
+    #   pyroscope-io
 charset-normalizer==3.3.2 \
     --hash=sha256:06435b539f889b1f6f4ac1758871aae42dc3a8c0e24ac9e60c2384973ad73027 \
     --hash=sha256:06a81e93cd441c56a9b65d8e1d043daeb97a3d0856d177d5c90ba85acb3db087 \
@@ -436,7 +438,6 @@ filelock==3.15.4 \
     #   pdm
     #   torch
     #   transformers
-    #   triton
     #   virtualenv
 findpython==0.6.1 \
     --hash=sha256:1fb4d709205de185b0561900267dfff64a841c910fe28d6038b2394ff925a81a \
@@ -1764,6 +1765,12 @@ pyproject-hooks==1.1.0 \
     --hash=sha256:4b37730834edbd6bd37f26ece6b44802fb1c1ee2ece0e54ddff8bfc06db86965 \
     --hash=sha256:7ceeefe9aec63a1064c18d939bdc3adf2d8aa1988a510afec15151578b232aa2
     # via pdm
+pyroscope-io==0.8.7 \
+    --hash=sha256:33897f08168d808848ff821af5e919b7af5503083ad26c293c9577ad79c373c8 \
+    --hash=sha256:7b6ad0fc538fbdf5bb8849ee70bd731631a5fea7df40ab4ba860e2c369bf1720 \
+    --hash=sha256:8eac84e2e34f84a9ad4c369c573b1c463ccb77eacd4b1907ea695d100fe76bc5 \
+    --hash=sha256:a6535c8b07e6f1ad0fc2337a30ae263749b4e9a889266d9329615dfb400ee372
+    # via ols (pyproject.toml)
 pytest==8.3.2 \
     --hash=sha256:4ba08f9ae7dcf84ded419494d229b48d0903ea6407b030eaec46df5e6a73bba5 \
     --hash=sha256:c132345d12ce551242c87269de812483f5bcc87cdbb4722e48487ba194f9fdce
@@ -2457,14 +2464,6 @@ transformers==4.44.2 \
     --hash=sha256:1c02c65e7bfa5e52a634aff3da52138b583fc6f263c1f28d547dc144ba3d412d \
     --hash=sha256:36aa17cc92ee154058e426d951684a2dab48751b35b49437896f898931270826
     # via sentence-transformers
-triton==2.3.1 \
-    --hash=sha256:1d968264523c7a07911c8fb51b4e0d1b920204dae71491b1fe7b01b62a31e124 \
-    --hash=sha256:3c84595cbe5e546b1b290d2a58b1494df5a2ef066dd890655e5b8a8a92205c33 \
-    --hash=sha256:63381e35ded3304704ea867ffde3b7cfc42c16a55b3062d41e017ef510433d66 \
-    --hash=sha256:b13bf35a2b659af7159bf78e92798dc62d877aa991de723937329e2d382f1991 \
-    --hash=sha256:c9d64ae33bcb3a7a18081e3a746e8cf87ca8623ca13d2c362413ce7a486f893e \
-    --hash=sha256:eaf80e8761a9e3498aa92e7bf83a085b31959c61f5e8ac14eedd018df6fccd10
-    # via torch
 truststore==0.9.2 \
     --hash=sha256:04559916f8810cc1a5ecc41f215eddc988746067b754fc0995da7a2ceaf54735 \
     --hash=sha256:a1dee0d0575ff22d2875476343783a5d64575419974e228f3248772613c3d993
