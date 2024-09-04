@@ -5,6 +5,7 @@ import os
 import tempfile
 import threading
 import pyroscope
+import requests
 from pathlib import Path
 
 import certifi
@@ -16,14 +17,27 @@ from ols.utils.auth_dependency import K8sClientSingleton
 from ols.utils.logging import configure_logging
 
 
-pyroscope.configure(
-    application_name    = "lightspeed-service", # replace this with some name for your application
-    server_address      = "http://pyroscope.pyroscope.svc.cluster.local:4040", # replace this with the address of your Pyroscope server
-    sample_rate         = 100, # default is 100
-    oncpu               = True, # report cpu time only; default is True
-    gil_only            = True, # only include traces for threads that are holding on to the Global Interpreter Lock; default is True
-    enable_logging      = True, # does enable logging facility; default is False
-)
+logger = logging.getLogger(__name__)
+server_url = "http://pyroscope.pyroscope.svc.cluster.local:4040"
+
+try:
+    response = requests.get(server_url)
+    if response.status_code == 200:
+        logger.info(f"Pyroscope server is reachable at {server_url}")
+        
+        pyroscope.configure(
+            application_name    = "lightspeed-service", # replace this with some name for your application
+            server_address      = server_url, # replace this with the address of your Pyroscope server
+            sample_rate         = 100, # default is 100
+            oncpu               = True, # report cpu time only; default is True
+            gil_only            = True, # only include traces for threads that are holding on to the Global Interpreter Lock; default is True
+            enable_logging      = True, # does enable logging facility; default is False
+        )
+    else:
+        logger.info(f"Failed to reach Pyroscope server. Status code: {response.status_code}")
+except requests.exceptions.RequestException as e:
+    logger.info(f"Error connecting to Pyroscope server: {e}")
+
 
 def configure_hugging_face_envs(ols_config) -> None:
     """Configure HuggingFace library environment variables."""
@@ -125,7 +139,6 @@ if __name__ == "__main__":
         config.reload_from_yaml_file(cfg_file)
 
         configure_logging(config.ols_config.logging_config)
-        logger = logging.getLogger(__name__)
         logger.info(f"Config loaded from {Path(cfg_file).resolve()}")
 
         configure_gradio_ui_envs()

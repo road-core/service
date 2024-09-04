@@ -9,7 +9,7 @@ ARG VERSION
 ARG APP_ROOT=/app-root
 
 RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.11 python3.11-devel python3.11-pip shadow-utils \
+    python3.11 python3.11-devel python3.11-pip shadow-utils logrotate \
     && microdnf clean all --enablerepo='*'
 
 # PYTHONDONTWRITEBYTECODE 1 : disable the generation of .pyc
@@ -25,6 +25,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR ${APP_ROOT}
 
+COPY scripts/logrotate.conf /etc/logrotate.d/memray
 COPY --from=lightspeed-rag-content /rag/vector_db/ocp_product_docs ./vector_db/ocp_product_docs
 COPY --from=lightspeed-rag-content /rag/embeddings_model ./embeddings_model
 
@@ -35,6 +36,10 @@ RUN pip3.11 install --no-cache-dir --upgrade pip pdm \
     && pdm config python.use_venv false \
     && pdm sync --global --prod -p ${APP_ROOT}
 
+# Create a logrotate status file location where the non-root user has write access
+RUN mkdir -p /app-root/logrotate-status \
+    && chown -R 1001:0 /app-root/logrotate-status \
+    && chown -R 1001:0 ${APP_ROOT} && chmod -R g+rwX ${APP_ROOT}
 
 COPY ols ./ols
 
@@ -44,7 +49,7 @@ COPY LICENSE /licenses/
 # Run the application
 EXPOSE 8080
 EXPOSE 8443
-CMD ["python3.11", "runner.py"]
+CMD ["/bin/sh", "-c", "(logrotate -s /app-root/logrotate-status/logrotate.status -f /etc/logrotate.d/memray &); python3.11 -m memray run -o ./output.bin runner.py"]
 
 LABEL io.k8s.display-name="OpenShift LightSpeed Service" \
       io.k8s.description="AI-powered OpenShift Assistant Service." \
@@ -54,7 +59,6 @@ LABEL io.k8s.display-name="OpenShift LightSpeed Service" \
       com.redhat.component=openshift-lightspeed-service \
       name=openshift-lightspeed-service \
       vendor="Red Hat, Inc."
-
 
 # no-root user is checked in Konflux 
 USER 1001

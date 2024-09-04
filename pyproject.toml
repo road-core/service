@@ -108,6 +108,7 @@ dependencies = [
     "nltk==3.9.1",
     "aiohttp==3.10.2",
     "pyroscope-io>=0.8.7",
+    "memray>=1.13.4",
 ]
 requires-python = "==3.11.*"
 readme = "README.md"
