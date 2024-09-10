@@ -17,7 +17,7 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
     * [7. Configure OLS Authentication](#7-configure-ols-authentication)
     * [8. Configure OLS TLS communication](#8-configure-ols-tls-communication)
     * [9. (Optional) Configure the local document store](#9-optional-configure-the-local-document-store)
-    * [10.  (Optional) Configure conversation cache](#10--optional-configure-conversation-cache)
+    * [10. (Optional) Configure conversation cache](#10--optional-configure-conversation-cache)
     * [11. (Optional) Incorporating additional CA(s). You have the option to include an extra TLS certificate into the OLS trust store as follows.](#11-optional-incorporating-additional-cas-you-have-the-option-to-include-an-extra-tls-certificate-into-the-ols-trust-store-as-follows)
     * [12. Registering new LLM provider](#12-registering-new-llm-provider)
 * [Usage](#usage)
@@ -135,9 +135,9 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
               - name: granite-7b-lab
       ```
 
-    Note: to use RHOAI (Red Hat OpenShiftAI) as provider, the following
-    configuration can be utilized (`mistral-7b-instruct` model is supported by
-    RHOAI, as well as other models):
+   Note: to use RHOAI (Red Hat OpenShiftAI) as provider, the following
+   configuration can be utilized (`mistral-7b-instruct` model is supported by
+   RHOAI, as well as other models):
 
       ```yaml
           - name: my_rhoai
@@ -148,6 +148,11 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
               - name: mistral-7b-instruct
       ```
 
+   Note: it is possible to configure the service to use local *ollama* server.
+   Please look into an
+   [examples/olsconfig-local-ollama.yaml](examples/olsconfig-local-ollama.yaml)
+   file that describes all required steps.
+
    1. Common providers configuration options
 
        - `name`: unique name, can be any proper YAML literal
@@ -155,6 +160,11 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
        - `url`: URL to be used to call LLM via REST API
        - `api_key`: path to secret (token) used to call LLM via REST API
        - `models`: list of models configuration (model name + model-specific parameters)
+
+            Notes: 
+            - `Context window size` varies based on provider/model.
+            - `Max response tokens` depends on user need and should be in reasonable proportion to context window size. If value is too less then there is a risk of response truncation. If we set it too high then we will reserve too much for response & truncate history/rag context unnecessarily.
+            - These are optional setting, if not set; then default will be used (which may be incorrect and may cause truncation & potentially error by exceeding context window).
 
    2. Specific configuration options for WatsonX
 
@@ -272,10 +282,10 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
    make get-rag
    ```
 
-## 10.  (Optional) Configure conversation cache
+## 10. (Optional) Configure conversation cache
    Conversation cache can be stored in memory (it's content will be lost after shutdown) or in PostgreSQL database. It is possible to specify storage type in `olsconfig.yaml` configuration file.
    
-      1. Cache stored in memory:
+   1. Cache stored in memory:
          ```yaml
          ols_config:
             conversation_cache:
@@ -283,7 +293,7 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
                memory:
                max_entries: 1000
          ```
-      2. Cache stored in PostgreSQL:
+   2. Cache stored in PostgreSQL:
          ```yaml
          conversation_cache:
             type: postgres
@@ -299,20 +309,17 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
          In this case, file `postgres_password.txt` contains password required to connect to PostgreSQL. Also CA certificate can be specified using `postgres_ca_cert.crt` to verify trusted TLS connection with the server. All these files needs to be accessible. 
 
 ## 11. (Optional) Incorporating additional CA(s). You have the option to include an extra TLS certificate into the OLS trust store as follows.
-
-      ```yaml
+```yaml
       ols_config:
          extra_ca:
             - "path/to/cert_1.crt"
             - "path/to/cert_2.crt"
-      ```
+```
 
-      > This action may be required for self-hosted LLMs.
+ > This action may be required for self-hosted LLMs.
 
 ## 12. Registering new LLM provider
-    Please look info this
-    [contributing guide chapter](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel)
-    for more info.
+   Please look [here](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel) for more info.
 
 # Usage
 
@@ -497,3 +504,4 @@ The context window size is limited for all supported LLMs which means that token
 
 # License
 Published under the Apache 2.0 License
+

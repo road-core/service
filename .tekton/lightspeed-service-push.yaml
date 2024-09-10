@@ -30,6 +30,10 @@ spec:
       value: "{{revision}}"
     - name: build-source-image
       value: "true"
+    - name: prefetch-input
+      value: '{"type": "pip", "path": ".", "allow_binary": "true"}'
+    - name: hermetic-build
+      value: "true"
   pipelineSpec:
     finally:
       - name: show-sbom
@@ -193,7 +197,7 @@ spec:
             - name: name
               value: prefetch-dependencies
             - name: bundle
-              value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:058a59f72997c9cf1be20978eb6a145d8d4d436c6098f2460bd96766bb363b20
+              value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:fd1fda0dcf53938860ae6fcba37f5572ae25ae02dba44c15754fb7ba7549fb5c
             - name: kind
               value: task
           resolver: bundles
@@ -233,9 +237,9 @@ spec:
         taskRef:
           params:
             - name: name
-              value: buildah-8gb
+              value: buildah-10gb
             - name: bundle
-              value: quay.io/konflux-ci/tekton-catalog/task-buildah-8gb:0.2@sha256:6b727ecc0401f641175f60f141cc6841fe0764a321d187a61652332c2cc5823b
+              value: quay.io/konflux-ci/tekton-catalog/task-buildah-10gb:0.2@sha256:8f6faf9c96bd395936a52e2762aa5f5bb251c8b7f06a51ee965bde0c5567da67
             - name: kind
               value: task
           resolver: bundles
@@ -377,28 +381,6 @@ spec:
               value: clamav-scan
             - name: bundle
               value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1@sha256:7bb17b937c9342f305468e8a6d0a22493e3ecde58977bd2ffc8b50e2fa234d58
-            - name: kind
-              value: task
-          resolver: bundles
-        when:
-          - input: $(params.skip-checks)
-            operator: in
-            values:
-              - "false"
-      - name: sbom-json-check
-        params:
-          - name: IMAGE_URL
-            value: $(tasks.build-container.results.IMAGE_URL)
-          - name: IMAGE_DIGEST
-            value: $(tasks.build-container.results.IMAGE_DIGEST)
-        runAfter:
-          - build-container
-        taskRef:
-          params:
-            - name: name
-              value: sbom-json-check
-            - name: bundle
-              value: quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1@sha256:2c5de51ec858fc8d47e41c65b20c83fdac249425d67ed6d1058f9f3e0b574500
             - name: kind
               value: task
           resolver: bundles
