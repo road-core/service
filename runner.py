@@ -18,9 +18,10 @@ from ols.utils.logging import configure_logging
 
 
 logger = logging.getLogger(__name__)
-server_url = "http://pyroscope.pyroscope.svc.cluster.local:4040"
 
 try:
+    # Requires hosting a pyroscope server on openshift
+    server_url = "http://pyroscope.pyroscope.svc.cluster.local:4040"
     response = requests.get(server_url)
     if response.status_code == 200:
         logger.info(f"Pyroscope server is reachable at {server_url}")
