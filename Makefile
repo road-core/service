@@ -51,12 +51,8 @@ run: ## Run the service locally
 memray-run: ## Run the service locally using memray
 	python -m memray run -o ./memory_profile.bin runner.py
 
-memray-flamegraph: ## Extract flamegraph from memray output
-	@if [ -f ./memory_profile.bin ]; then \
-		python -m memray flamegraph ./memory_profile.bin; \
-	else \
-		echo "./memory_profile.bin doesn't exist. please restart the service using make memray-run"; \
-	fi
+memray-flamegraph: memray-run
+	python -m memray flamegraph ./memory_profile.bin
 
 test: test-unit test-integration test-e2e ## Run all tests
 

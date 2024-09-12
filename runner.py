@@ -4,8 +4,6 @@ import logging
 import os
 import tempfile
 import threading
-import pyroscope
-import requests
 from pathlib import Path
 
 import certifi
@@ -17,30 +15,7 @@ from ols.utils.auth_dependency import K8sClientSingleton
 from ols.utils.logging import configure_logging
 
 
-logger = logging.getLogger(__name__)
-
-try:
-    # Requires hosting a pyroscope server on openshift
-    server_url = "http://pyroscope.pyroscope.svc.cluster.local:4040"
-    response = requests.get(server_url)
-    if response.status_code == 200:
-        logger.info(f"Pyroscope server is reachable at {server_url}")
-        
-        pyroscope.configure(
-            application_name    = "lightspeed-service", # replace this with some name for your application
-            server_address      = server_url, # replace this with the address of your Pyroscope server
-            sample_rate         = 100, # default is 100
-            oncpu               = True, # report cpu time only; default is True
-            gil_only            = True, # only include traces for threads that are holding on to the Global Interpreter Lock; default is True
-            enable_logging      = True, # does enable logging facility; default is False
-        )
-    else:
-        logger.info(f"Failed to reach Pyroscope server. Status code: {response.status_code}")
-except requests.exceptions.RequestException as e:
-    logger.info(f"Error connecting to Pyroscope server: {e}")
-
-
-def configure_hugging_face_envs(ols_config) -> None:
+def configure_hugging_face_envs(ols_config: config_model.OLSConfig) -> None:
     """Configure HuggingFace library environment variables."""
     if (
         ols_config
@@ -144,56 +119,73 @@ def start_uvicorn():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
 
-    with pyroscope.tag_wrapper({ "main": "main_method" }):
-
-        cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
-        config.reload_from_yaml_file(cfg_file)
-
-        configure_logging(config.ols_config.logging_config)
-        logger.info(f"Config loaded from {Path(cfg_file).resolve()}")
-=======
     # First of all, configure environment variables for Gradio before
     # import config and initializing config module.
     configure_gradio_ui_envs()
->>>>>>> main
 
-        configure_gradio_ui_envs()
+    # NOTE: We import config here to avoid triggering import of anything
+    # else via our code before other envs are set (mainly the gradio).
+    from ols import config
 
-<<<<<<< HEAD
-        # NOTE: We import config here to avoid triggering import of anything
-        # else via our code before other envs are set (mainly the gradio).
-        from ols import config
-
-        configure_hugging_face_envs(config.ols_config)
-=======
     cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
     config.reload_from_yaml_file(cfg_file)
 
-    configure_logging(config.ols_config.logging_config)
     logger = logging.getLogger("ols")
-    logger.info(f"Config loaded from {Path(cfg_file).resolve()}")
+    configure_logging(config.ols_config.logging_config)
 
+    logger.info(f"Config loaded from {Path(cfg_file).resolve()}")
     configure_hugging_face_envs(config.ols_config)
 
     # generate certificates file from all certificates from certifi package
     # merged with explicitly specified certificates
     generate_certificates_file(logger, config.ols_config)
->>>>>>> main
 
-        # add extra certificates if defined
-        for certificate_path in config.ols_config.extra_ca:
-            add_ca_to_certifi(certificate_path)
+    # Initialize the K8sClientSingleton with cluster id during module load.
+    # We want the application to fail early if the cluster ID is not available.
+    cluster_id = K8sClientSingleton.get_cluster_id()
+    logger.info(f"running on cluster with ID '{cluster_id}'")
 
-        # Initialize the K8sClientSingleton with cluster id during module load.
-        # We want the application to fail early if the cluster ID is not available.
-        cluster_id = K8sClientSingleton.get_cluster_id()
-        logger.info(f"running on cluster with ID '{cluster_id}'")
+    # init loading of query redactor
+    config.query_redactor
 
-        # init loading of query redactor
-        config.query_redactor
+    if config.dev_config.pyroscope_url:
+        try:
+            import requests
 
+            response = requests.get(config.dev_config.pyroscope_url, timeout=60)
+            if requests.codes.ok:
+                logger.info(
+                    f"Pyroscope server is reachable at {config.dev_config.pyroscope_url}"
+                )
+                import pyroscope
+
+                pyroscope.configure(
+                    application_name="lightspeed-service",
+                    server_address=config.dev_config.pyroscope_url,
+                    oncpu=True,
+                    gil_only=True,
+                    enable_logging=True,
+                )
+                with pyroscope.tag_wrapper({"main": "main_method"}):
+                    # create and start the rag_index_thread - allows loading index in
+                    # parallel with starting the Uvicorn server
+                    rag_index_thread = threading.Thread(target=load_index)
+                    rag_index_thread.start()
+
+                    # start the Uvicorn server
+                    start_uvicorn()
+            else:
+                logger.info(
+                    f"Failed to reach Pyroscope server. Status code: {response.status_code}"
+                )
+        except requests.exceptions.RequestException as e:
+            logger.info(f"Error connecting to Pyroscope server: {e}")
+    else:
+        logger.info(
+            "Pyroscope url is not specified. To enable profiling please set `pyroscope_url` "
+            "in the `dev_config` section of the configuration file."
+        )
         # create and start the rag_index_thread - allows loading index in
         # parallel with starting the Uvicorn server
         rag_index_thread = threading.Thread(target=load_index)
