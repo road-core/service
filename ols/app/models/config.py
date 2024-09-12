@@ -141,15 +141,11 @@ class ModelConfig(BaseModel):
             data, constants.CREDENTIALS_PATH_SELECTOR, constants.API_TOKEN_FILENAME
         )
 
-        # if the context window size is not set explicitly, use value
-        # set for given provider + model, or default value for model without
-        # size setup (note that at this stage, provider is always correct)
-        default = constants.DEFAULT_CONTEXT_WINDOW_SIZE
-        if data.get("provider") in constants.CONTEXT_WINDOW_SIZES:
-            default = constants.CONTEXT_WINDOW_SIZES.get(data["provider"]).get(
-                data["name"] or "", constants.DEFAULT_CONTEXT_WINDOW_SIZE
-            )
-        data["context_window_size"] = data.get("context_window_size", default)
+        # if the context window size is not set explicitly, use default value.
+        # Note that it is important to set a correct value; default may not be accurate.
+        data["context_window_size"] = data.get(
+            "context_window_size", constants.DEFAULT_CONTEXT_WINDOW_SIZE
+        )
         return data
 
     @field_validator("options")
@@ -878,6 +874,7 @@ class OLSConfig(BaseModel):
     user_data_collection: UserDataCollection = UserDataCollection()
 
     extra_ca: list[FilePath] = []
+    certificate_directory: Optional[str] = None
 
     def __init__(
         self, data: Optional[dict] = None, ignore_missing_certs: bool = False
@@ -911,6 +908,9 @@ class OLSConfig(BaseModel):
         )
 
         self.extra_ca = data.get("extra_ca", [])
+        self.certificate_directory = data.get(
+            "certificate_directory", constants.DEFAULT_CERTIFICATE_DIRECTORY
+        )
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
@@ -924,6 +924,7 @@ class OLSConfig(BaseModel):
                 and self.query_filters == other.query_filters
                 and self.query_validation_method == other.query_validation_method
                 and self.tls_config == other.tls_config
+                and self.certificate_directory == other.certificate_directory
             )
         return False
 
