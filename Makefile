@@ -51,8 +51,8 @@ run: ## Run the service locally
 memray-run: ## Run the service locally using memray
 	python -m memray run -o ./memory_profile.bin runner.py
 
-memray-flamegraph: memray-run
-	python -m memray flamegraph ./memory_profile.bin
+memray-flamegraph: ./memory_profile.bin
+	memray flamegraph ./memory_profile.bin
 
 test: test-unit test-integration test-e2e ## Run all tests
 
