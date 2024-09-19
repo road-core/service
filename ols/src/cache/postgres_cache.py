@@ -118,10 +118,9 @@ class PostgresCache(Cache):
         with self.conn.cursor() as cursor:
             try:
                 value = PostgresCache._select(cursor, user_id, conversation_id)
-                if value is not None:
-                    return [CacheEntry.from_dict(cache_entry) for cache_entry in value]
-                else:
+                if value is None:
                     return []
+                return [CacheEntry.from_dict(cache_entry) for cache_entry in value]
             except psycopg2.DatabaseError as e:
                 logger.error(f"PostgresCache.get {e}")
                 raise CacheError("PostgresCache.get", e)
@@ -150,14 +149,14 @@ class PostgresCache(Cache):
                         cursor,
                         user_id,
                         conversation_id,
-                        json.dumps(old_value),
+                        json.dumps(old_value).encode("utf-8"),
                     )
                 else:
                     PostgresCache._insert(
                         cursor,
                         user_id,
                         conversation_id,
-                        json.dumps([value]),
+                        json.dumps([value]).encode("utf-8"),
                     )
                     PostgresCache._cleanup(cursor, self.capacity)
                 # commit is implicit at this point
