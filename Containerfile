@@ -1,5 +1,5 @@
 # vim: set filetype=dockerfile
-ARG LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/openshift-lightspeed/lightspeed-rag-content@sha256:a1d6907dc9f9d5abe0a4d91ae96314c66459e037a7ea8ead6bb3497bd8f0d273
+ARG LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/openshift-lightspeed/lightspeed-rag-content@sha256:a68c8f41862b0a58f6610d64820269568ae1595fe3bc8cf5172a953570927021
 
 FROM ${LIGHTSPEED_RAG_CONTENT_IMAGE} as lightspeed-rag-content
 
@@ -31,7 +31,7 @@ COPY --from=lightspeed-rag-content /rag/embeddings_model ./embeddings_model
 # Add explicit files and directories
 # (avoid accidental inclusion of local directories or env files or credentials)
 COPY pyproject.toml pdm.lock runner.py ./
-RUN pip3.11 install --no-cache-dir --upgrade pip pdm \
+RUN pip3.11 install --no-cache-dir --upgrade pip pdm==2.18.1 \
     && pdm config python.use_venv false \
     && pdm sync --global --prod -p ${APP_ROOT}
 

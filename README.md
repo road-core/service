@@ -1,6 +1,18 @@
 # About The Project
 
-OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and provides answers to product questions using backend LLM services.
+OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift
+and provides answers to product questions using backend LLM services. Currently
+[OpenAI](https://openai.com/), [Azure
+OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service),
+[OpenShift
+AI](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai),
+[RHEL
+AI](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux/ai),
+and [Watsonx](https://www.ibm.com/watsonx) are officially supported as
+backends. Other providers, even ones that are not fully supported, can be used
+as well. For example, it is possible to use BAM (IBM's research environment).
+It is also possible to run [InstructLab](https://instructlab.ai/) locally,
+configure model, and connect to it.
 
 
 <!-- the following line is used by tool to autogenerate Table of Content when the document is changed -->
@@ -11,13 +23,26 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
     * [1. Clone the repo](#1-clone-the-repo)
     * [2. Install python packages](#2-install-python-packages)
     * [3. Get API keys](#3-get-api-keys)
+        * [OpenAI](#openai)
+        * [Azure OpenAI](#azure-openai)
+        * [WatsonX](#watsonx)
+        * [OpenShift AI](#openshift-ai)
+        * [RHEL AI](#rhel-ai)
+        * [BAM (not officially supported)](#bam-not-officially-supported)
+        * [Locally running InstructLab](#locally-running-instructlab)
     * [4. Store local copies of API keys securely](#4-store-local-copies-of-api-keys-securely)
     * [5. Configure OpenShift LightSpeed (OLS)](#5-configure-openshift-lightspeed-ols)
     * [6. Configure LLM providers](#6-configure-llm-providers)
+        * [OpenAI provider](#openai-provider)
+        * [Azure OpenAI](#azure-openai-1)
+        * [WatsonX](#watsonx-1)
+        * [RHEL AI provider](#rhel-ai-provider)
+        * [Red Hat OpenShift AI](#red-hat-openshift-ai)
+        * [Local *ollama* server](#local-ollama-server)
     * [7. Configure OLS Authentication](#7-configure-ols-authentication)
     * [8. Configure OLS TLS communication](#8-configure-ols-tls-communication)
     * [9. (Optional) Configure the local document store](#9-optional-configure-the-local-document-store)
-    * [10. (Optional) Configure conversation cache](#10--optional-configure-conversation-cache)
+    * [10. (Optional) Configure conversation cache](#10-optional-configure-conversation-cache)
     * [11. (Optional) Incorporating additional CA(s). You have the option to include an extra TLS certificate into the OLS trust store as follows.](#11-optional-incorporating-additional-cas-you-have-the-option-to-include-an-extra-tls-certificate-into-the-ols-trust-store-as-follows)
     * [12. Registering new LLM provider](#12-registering-new-llm-provider)
 * [Usage](#usage)
@@ -47,11 +72,10 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
 # Prerequisites
 
 * Python 3.11
+    - please note that currently Python 3.12 is not officially supported, because OLS LightSpeed depends on some packages that can not be used in this Python version
 * Git, pip and [PDM](https://github.com/pdm-project/pdm?tab=readme-ov-file#installation)
-* An LLM api key, currently OpenAI, Azure OpenAI, OpenShift AI, RHEL AI, and Watsonx are officially supported as backends.
-  Other providers, that are not fully supported, can be used as well. For example, it is possible to use
-  BAM (IBM's research environment). It is also possible
-  to run Instructlab locally, configure model, and connect to it.
+* An LLM API key or API secret (in case of Azure OpenAI)
+* (Optional) extra certificates to access LLM API
 
 # Installation
 
@@ -66,20 +90,39 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
    ```
 ## 3. Get API keys
 
-   a. OpenAI provided LLM ([OpenAI api key](https://platform.openai.com/api-keys))
+   This step depends on provider type
 
-   b. Azure OpenAI provided LLM
-       Please look at following articles describing how to retrieve API key or secret from Azure: [Get subscription and tenant IDs in the Azure portal](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) and [How to get client id and client secret in Azure Portal](https://azurelessons.com/how-to-get-client-id-and-client-secret-in-azure-portal/)
+### OpenAI
 
-   c. BAM provided LLM (not officially supported)
-      1. Get a BAM API Key at [https://bam.res.ibm.com](https://bam.res.ibm.com)
-         * Login with your IBM W3 Id credentials.
-         * Copy the API Key from the Documentation section.
-         ![BAM API Key](docs/bam_api_key.png)
-      2. BAM API URL: https://bam-api.res.ibm.com
+Please look into ([OpenAI api key](https://platform.openai.com/api-keys))
 
-   d. Locally running Instructlab
-      Depends on configuration, usually not needed to generate or use API key.
+### Azure OpenAI
+
+Please look at following articles describing how to retrieve API key or secret from Azure: [Get subscription and tenant IDs in the Azure portal](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) and [How to get client id and client secret in Azure Portal](https://azurelessons.com/how-to-get-client-id-and-client-secret-in-azure-portal/). Currently it is possible to use both ways to auth. to Azure OpenAI: by API key or by using secret
+
+### WatsonX
+
+Please look at into [Generating API keys for authentication](https://www.ibm.com/docs/en/watsonx/watsonxdata/1.0.x?topic=started-generating-api-keys)
+
+### OpenShift AI
+
+(TODO: to be updated)
+
+### RHEL AI
+
+(TODO: to be updated)
+
+### BAM (not officially supported)
+    1. Get a BAM API Key at [https://bam.res.ibm.com](https://bam.res.ibm.com)
+        * Login with your IBM W3 Id credentials.
+        * Copy the API Key from the Documentation section.
+        ![BAM API Key](docs/bam_api_key.png)
+    2. BAM API URL: https://bam-api.res.ibm.com
+
+### Locally running InstructLab
+
+Depends on configuration, but usually it is not needed to generate or use API key.
+
 
 ## 4. Store local copies of API keys securely
 
@@ -104,15 +147,9 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
 
 ## 6. Configure LLM providers
 
-   The example configuration file defines providers for six LLM providers: BAM,
-   OpenAI, Azure OpenAI, Watsonx, OpenShift AI VLLM (RHOAI VLLM), and RHELAI
-   (RHEL AI), but defines BAM as the default provider. If you prefer to use a
-   different LLM provider than BAM, such as OpenAI, ensure that the provider
-   definition points to a file containing a valid OpenAI, Watsonx etc. API key,
-   and change the `default_model` and `default_provider` values to reference
-   the selected provider and model.
+   The example configuration file defines providers for six LLM providers: BAM, OpenAI, Azure OpenAI, Watsonx, OpenShift AI VLLM (RHOAI VLLM), and RHELAI (RHEL AI), but defines BAM as the default provider. If you prefer to use a different LLM provider than BAM, such as OpenAI, ensure that the provider definition points to a file containing a valid OpenAI, Watsonx etc. API key, and change the `default_model` and `default_provider` values to reference the selected provider and model.
 
-   The example configuration also defines locally running provider instructlab which is OpenAI-compatible and can use
+   The example configuration also defines locally running provider InstructLab which is OpenAI-compatible and can use
    several models. Please look at [instructlab pages](https://github.com/instructlab/instructlab/tree/main) for detailed
    information on how to set up and run this provider.
 
@@ -121,34 +158,82 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
 
    Note: there are two supported methods to provide credentials for Azure OpenAI. The first method is compatible with other providers, i.e. `credentials_path` contains a directory name containing one file with API token. In the second method, that directory should contain three files named `tenant_id`, `client_id`, and `client_secret`. Please look at following articles describing how to retrieve this information from Azure: [Get subscription and tenant IDs in the Azure portal](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) and [How to get client id and client secret in Azure Portal](https://azurelessons.com/how-to-get-client-id-and-client-secret-in-azure-portal/).
 
-   Note: it is possible to use RHELAI as a provider too. It is OpenAI-compatible
+### OpenAI provider
+
+   Multiple models can be configured, but `default_model` will be used, unless specified differently via REST API request:
+
+
+  ```yaml
+    type: openai
+    url: "https://api.openai.com/v1"
+    credentials_path: openai_api_key.txt
+    models:
+      - name: gpt-4-1106-preview
+      - name: gpt-3.5-turbo
+  ```
+
+### Azure OpenAI
+
+   Make sure the `url` and `deployment_name` are set correctly.
+
+  ```yaml
+  - name: my_azure_openai
+    type: azure_openai
+    url: "https://myendpoint.openai.azure.com/"
+    credentials_path: azure_openai_api_key.txt
+    deployment_name: my_azure_openai_deployment_name
+    models:
+      - name: gpt-3.5-turbo
+  ```
+
+### WatsonX
+
+   Make sure the `project_id` is set up correctly.
+
+  ```yaml
+  - name: my_watsonx
+    type: watsonx
+    url: "https://us-south.ml.cloud.ibm.com"
+    credentials_path: watsonx_api_key.txt
+    project_id: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    models:
+      - name: ibm/granite-13b-chat-v2
+  ```
+
+### RHEL AI provider
+
+   It is possible to use RHELAI as a provider too. That provider is OpenAI-compatible
    and can be configured the same way as other OpenAI providers. For example if
-   RHELAI is running as EC2 instance and `granite-7b-lab` model is used, the
+   RHEL AI is running as EC2 instance and `granite-7b-lab` model is deployed, the
    configuration might look like:
 
-      ```yaml
-          - name: my_rhelai
-            type: openai
-            url: "http://{PATH}.amazonaws.com:8000/v1/"
-            credentials_path: openai_api_key.txt
-            models:
-              - name: granite-7b-lab
-      ```
+  ```yaml
+      - name: my_rhelai
+        type: openai
+        url: "http://{PATH}.amazonaws.com:8000/v1/"
+        credentials_path: openai_api_key.txt
+        models:
+          - name: granite-7b-lab
+  ```
 
-   Note: to use RHOAI (Red Hat OpenShiftAI) as provider, the following
+### Red Hat OpenShift AI
+
+   To use RHOAI (Red Hat OpenShiftAI) as provider, the following
    configuration can be utilized (`mistral-7b-instruct` model is supported by
    RHOAI, as well as other models):
 
-      ```yaml
-          - name: my_rhoai
-            type: openai
-            url: "http://{PATH}:8000/v1/"
-            credentials_path: openai_api_key.txt
-            models:
-              - name: mistral-7b-instruct
-      ```
+  ```yaml
+      - name: my_rhoai
+        type: openai
+        url: "http://{PATH}:8000/v1/"
+        credentials_path: openai_api_key.txt
+        models:
+          - name: mistral-7b-instruct
+  ```
 
-   Note: it is possible to configure the service to use local *ollama* server.
+### Local *ollama* server
+
+   It is possible to configure the service to use local *ollama* server.
    Please look into an
    [examples/olsconfig-local-ollama.yaml](examples/olsconfig-local-ollama.yaml)
    file that describes all required steps.
@@ -186,6 +271,8 @@ OpenShift LightSpeed (OLS) is an AI powered assistant that runs on OpenShift and
 
 
 ## 7. Configure OLS Authentication
+
+   NOTE: Currently, only K8S-based authentication can be used. In future versions, more authentication mechanisms will be configurable.
 
    This section provides guidance on how to configure authentication within OLS. It includes instructions on enabling or disabling authentication, configuring authentication through OCP RBAC, overriding authentication configurations, and specifying a static authentication token in development environments.
 
