@@ -1,0 +1,13 @@
+name: Pydocstyle
+
+on: [push, pull_request]
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pydocstyle install
+        run: pip install --user pydocstyle
+      - name: Python docstring checks
+        run: pydocstyle -v .
