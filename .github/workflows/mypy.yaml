@@ -1,0 +1,15 @@
+name: Type checks
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mypy install
+        run: pip install --user mypy
+      - name: Type checks
+        run: make check-types
