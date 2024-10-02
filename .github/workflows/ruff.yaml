@@ -6,3 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: chartboost/ruff-action@v1
+        with:
+          args: 'check . --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101'
+
