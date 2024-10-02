@@ -5,11 +5,11 @@ on:
   - pull_request
 
 jobs:
-  shellcheck:
-    runs-on: ubuntu-20.04
+  mypy:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Mypy install
-        run: pip install --user mypy
+        run: pip install --user mypy pydantic
       - name: Type checks
-        run: make check-types
+        run: mypy --explicit-package-bases --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --ignore-missing-imports --disable-error-code attr-defined ols/
