@@ -1,4 +1,4 @@
-name: Lint
+name: Radon
 
 on: [push, pull_request]
 
