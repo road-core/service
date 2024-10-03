@@ -1,0 +1,17 @@
+name: Unit tests
+
+on: [push, pull_request]
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PDM installation
+        run: pip install --user pdm
+      - name: Install dependencies
+        run: pdm install
+      - name: Install devel dependencies
+        run: pdm install --dev
+      - name: Run unit tests
+        run: pdm run python -m pytest tests/unit --cov=ols --cov=runner --cov-report term-missing
