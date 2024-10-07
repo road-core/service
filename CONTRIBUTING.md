@@ -48,10 +48,10 @@ The development requires [Python 3.11](https://docs.python.org/3/whatsnew/3.11.h
 
 ```bash
 # clone your fork
-git clone https://github.com/YOUR-GIT-PROFILE/lightspeed-service.git
+git clone https://github.com/YOUR-GIT-PROFILE/service.git
 
 # move into the directory
-cd lightspeed-service
+cd service
 
 # setup your environment with pdm
 pdm install
