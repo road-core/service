@@ -31,6 +31,7 @@ from tests.e2e.utils.postgres import (
     read_conversation_history_count,
     retrieve_connection,
 )
+from tests.e2e.utils.retry import retry_until_timeout_or_success
 from tests.e2e.utils.wait_for_ols import wait_for_ols
 from tests.scripts.must_gather import must_gather
 
@@ -55,19 +56,6 @@ OLS_READY = False
 
 OC_COMMAND_RETRY_COUNT = 120
 OC_COMMAND_RETRY_DELAY = 5
-
-
-def retry_until_timeout_or_success(attempts, interval, func):
-    """Retry the function until timeout or success."""
-    for attempt in range(1, attempts + 1):
-        print(f"Attempt {attempt} of {attempts}")
-        try:
-            if func():
-                return True
-        except Exception as e:
-            print(f"Attempt {attempt} failed with exception {e}")
-        time.sleep(interval)
-    return False
 
 
 def install_ols() -> tuple[str, str, str]:
@@ -162,6 +150,24 @@ def install_ols() -> tuple[str, str, str]:
 
     # create the llm api key secret ols will mount
     keypath = os.getenv("PROVIDER_KEY_PATH")
+    try:
+        cluster_utils.run_oc(
+            [
+                "get",
+                "secret",
+                "llmcreds",
+            ],
+        )
+        print("Secret llmcreds already exists")
+        cluster_utils.run_oc(
+            [
+                "delete",
+                "secret",
+                "llmcreds",
+            ],
+        )
+    except subprocess.CalledProcessError:
+        print("llmcreds secret does not yet exist. Creating it.")
     cluster_utils.run_oc(
         [
             "create",
@@ -189,6 +195,25 @@ def install_ols() -> tuple[str, str, str]:
         )
 
     # create the olsconfig operand
+    try:
+        cluster_utils.run_oc(
+            [
+                "get",
+                "olsconfig",
+                "cluster",
+            ],
+        )
+        print("OLSconfig already exists")
+        cluster_utils.run_oc(
+            [
+                "delete",
+                "olsconfig",
+                "cluster",
+            ],
+        )
+    except subprocess.CalledProcessError:
+        print("olsconfig does not yet exist. Creating it.")
+
     cluster_utils.run_oc(
         [
             "create",
@@ -414,6 +439,7 @@ def postgres_connection():
     return retrieve_connection()
 
 
+@pytest.mark.smoketest()
 @retry(max_attempts=3, wait_between_runs=10)
 def test_readiness():
     """Test handler for /readiness REST API endpoint."""
@@ -425,6 +451,7 @@ def test_readiness():
         assert response.json() == {"ready": True, "reason": "service is ready"}
 
 
+@pytest.mark.smoketest()
 def test_liveness():
     """Test handler for /liveness REST API endpoint."""
     endpoint = "/liveness"
@@ -612,6 +639,7 @@ def test_too_long_question() -> None:
         assert json_response["detail"]["response"] == "Prompt is too long"
 
 
+@pytest.mark.smoketest()
 @pytest.mark.rag()
 def test_valid_question() -> None:
     """Check the REST API /v1/query with POST HTTP method for valid question and no yaml."""
