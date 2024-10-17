@@ -2,20 +2,20 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: https://github.com/ansible/ansible-chatbot-service?rev={{revision}}
-    build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    build.appstudio.openshift.io/repo: https://github.com/openshift/lightspeed-service?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "main"
+    pipelinesascode.tekton.dev/on-cel-expression: "event == \"push\" && \ntarget_branch == \"main\"\n"
     build.appstudio.openshift.io/build-nudge-files: |
       .*Dockerfile.*, bundle/manifests/lightspeed-operator.clusterserviceversion.yaml, config/default/kustomization.yaml, lightspeed-catalog-4.15/index.yaml, lightspeed-catalog-4.16/index.yaml
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: ansible-chatbot-service
-    appstudio.openshift.io/component: ansible-chatbot-service
+    appstudio.openshift.io/application: ols
+    appstudio.openshift.io/component: lightspeed-service
     pipelines.appstudio.openshift.io/type: build
-  name: ansible-chatbot-service-on-push
-  namespace: ansible-lightspeed-tenant
+  name: lightspeed-service-on-push
+  namespace: crt-nshift-lightspeed-tenant
 spec:
   params:
     - name: dockerfile
@@ -23,19 +23,39 @@ spec:
     - name: git-url
       value: "{{source_url}}"
     - name: output-image
-      value: quay.io/ansible/ansible-chatbot-service:{{revision}}
+      value: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-service:{{revision}}
     - name: path-context
       value: .
     - name: revision
       value: "{{revision}}"
+    - name: build-source-image
+      value: "true"
+    - name: prefetch-input
+      value: '[{"type": "rpm", "path": "."}, {"type": "pip", "path": ".", "allow_binary": "true"}]'
+    - name: hermetic
+      value: "true"
   taskRunSpecs:
+    - pipelineTaskName: build-source-image
+      computeResources:
+        requests:
+          cpu: '1'
+          memory: 1Gi
+        limits:
+          memory: 4Gi
     - pipelineTaskName: clair-scan
       computeResources:
         requests:
           cpu: '1'
-          memory: 8Gi
+          memory: 1Gi
         limits:
-          memory: 16Gi
+          memory: 8Gi
+    - pipelineTaskName: ecosystem-cert-preflight-checks
+      computeResources:
+        requests:
+          cpu: '1'
+          memory: 1Gi
+        limits:
+          memory: 8Gi
   pipelineSpec:
     finally:
       - name: show-sbom
@@ -47,7 +67,7 @@ spec:
             - name: name
               value: show-sbom
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-show-sbom:0.1@sha256:8062d5b13b5236030407cbd620a75cb7c091f43be178eeefea58d2e3dddcaa74
+              value: quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
             - name: kind
               value: task
           resolver: bundles
@@ -66,51 +86,13 @@ spec:
             - name: name
               value: summary
             - name: bundle
-              value: quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:870d9a04d9784840a90b7bf6817cd0d0c4edfcda04b1ba1868cae625a3c3bfcc
+              value: quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
             - name: kind
               value: task
           resolver: bundles
         workspaces:
           - name: workspace
             workspace: workspace
-      - name: slack-notification-when-failed
-        params:
-          - name: message
-            value: Konflux https://console.redhat.com/application-pipeline/workspaces/ansible-lightspeed/applications/ansible-chatbot-service/pipelineruns/$(context.pipelineRun.name) status=$(tasks.status)
-          - name: secret-name
-            value: slack-webhook-urls
-          - name: key-name
-            value: team-wisdom-eng
-        taskRef:
-          params:
-            - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-slack-webhook-notification:0.1
-            - name: name
-              value: slack-webhook-notification
-            - name: kind
-              value: Task
-          resolver: bundles
-        when:
-          - input: $(tasks.status)
-            operator: in
-            values: [ "Failed" ]
-      - name: slack-notification
-        params:
-          - name: message
-            value: Konflux https://console.redhat.com/application-pipeline/workspaces/ansible-lightspeed/applications/ansible-chatbot-service/pipelineruns/$(context.pipelineRun.name) status=$(tasks.status)
-          - name: secret-name
-            value: slack-webhook-urls
-          - name: key-name
-            value: wisdom-cicd-events
-        taskRef:
-          params:
-            - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-slack-webhook-notification:0.1
-            - name: name
-              value: slack-webhook-notification
-            - name: kind
-              value: Task
-          resolver: bundles
     params:
       - description: Source Repository URL
         name: git-url
@@ -157,6 +139,10 @@ spec:
         description: Build a source image.
         name: build-source-image
         type: string
+      - default: []
+        description: Array of --build-arg values ("arg=value" strings) for buildah
+        name: build-args
+        type: array
       - default: ""
         description: Path to a file with build arguments for buildah, see https://www.mankier.com/1/buildah-build#--build-arg-file
         name: build-args-file
@@ -191,7 +177,7 @@ spec:
             - name: name
               value: init
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-init:0.2@sha256:07b8eb6a9533525a397c296246d3eb6ec4771b520a1bfee817ce2b7ede25c43d
+              value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:092c113b614f6551113f17605ae9cb7e822aa704d07f0e37ed209da23ce392cc
             - name: kind
               value: task
           resolver: bundles
@@ -208,7 +194,7 @@ spec:
             - name: name
               value: git-clone
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-git-clone:0.1@sha256:a3e22f57fbf8398fbe93fbeeb38e03756cd073182d6d109fe8e8cde57b561603
+              value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:2cccdf8729ad4d5adf65e8b66464f8efa1e1c87ba16d343b4a6c621a2a40f7e1
             - name: kind
               value: task
           resolver: bundles
@@ -235,7 +221,7 @@ spec:
             - name: name
               value: prefetch-dependencies
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-prefetch-dependencies:0.1@sha256:cdf98845bbed169e488daef426d1cfdde85c586655abcf89c61da6538d93f70c
+              value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:fe7234e3824d1e65d6a7aac352e7a6bbce623d90d8d7da9aceeee108ad2c61be
             - name: kind
               value: task
           resolver: bundles
@@ -244,10 +230,6 @@ spec:
             operator: notin
             values:
               - ""
-          - input: $(params.hermetic)
-            operator: in
-            values:
-              - "true"
         workspaces:
           - name: source
             workspace: workspace
@@ -269,12 +251,11 @@ spec:
             value: $(params.image-expires-after)
           - name: COMMIT_SHA
             value: $(tasks.clone-repository.results.commit)
-          - name: BUILD_ARGS_FILE
-            value: $(params.build-args-file)
-          - name: TARGET_STAGE
-            value: production
           - name: BUILD_ARGS
-            value: [ "IMAGE_TAGS=latest 1.0.$(tasks.git-metadata.results.commit-timestamp)", "GIT_COMMIT=$(tasks.clone-repository.results.commit)", "RAG_CONTENTS_SUB_FOLDER=vector_db/aap_product_docs", "LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ansible/aap-rag-content:latest", "LIGHTSPEED_RAG_EMBEDDINGS_IMAGE=quay.io/ansible/aap-rag-embeddings-image:latest"]
+            value:
+              - $(params.build-args[*])
+          - name: BUILD_ARGS_FILE
+            value: build.args
         runAfter:
           - prefetch-dependencies
         taskRef:
@@ -282,7 +263,7 @@ spec:
             - name: name
               value: buildah-10gb
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-buildah-10gb:0.2
+              value: quay.io/konflux-ci/tekton-catalog/task-buildah-10gb:0.2@sha256:fe86b7c7e746f0d0a5ee6791d29eae5569138a5d31df42fadebcb6a9d2722ccb
             - name: kind
               value: task
           resolver: bundles
@@ -294,42 +275,6 @@ spec:
         workspaces:
           - name: source
             workspace: workspace
-      - name: apply-tags
-        params:
-          - name: IMAGE
-            value: $(tasks.build-container.results.IMAGE_URL)
-          - name: ADDITIONAL_TAGS
-            value: [ "latest", "1.0.$(tasks.git-metadata.results.commit-timestamp)" ]
-        runAfter:
-          - build-container
-        taskRef:
-          params:
-            - name: name
-              value: apply-tags
-            - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-apply-tags:0.1
-            - name: kind
-              value: task
-          resolver: bundles
-      - name: git-metadata
-        runAfter:
-          - clone-repository
-        workspaces:
-          - name: source
-            workspace: workspace
-        taskSpec:
-          workspaces:
-            - name: source
-          steps:
-            - name: get-commit-timestamp
-              image: alpine/git
-              script: |
-                #!/bin/sh
-                set -euo pipefail
-                cd "$(workspaces.source.path)/source"
-                echo -n $(date -d @$(git log -1 --format=%at) "+%Y%m%d%H%M") > $(results.commit-timestamp.path)
-          results:
-            - name: commit-timestamp
       - name: build-source-image
         params:
           - name: BINARY_IMAGE
@@ -341,7 +286,7 @@ spec:
             - name: name
               value: source-build
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-source-build:0.1@sha256:c07c3f9813e87832468fc72912c6e8ef995a442a32248cc35d77b8c0f5e516e2
+              value: quay.io/konflux-ci/tekton-catalog/task-source-build:0.1@sha256:21cb5ebaff7a9216903cf78933dc4ec4dd6283a52636b16590a5f52ceb278269
             - name: kind
               value: task
           resolver: bundles
@@ -370,7 +315,7 @@ spec:
             - name: name
               value: deprecated-image-check
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-deprecated-image-check:0.4@sha256:566ae0df80f8447558595a996627bf0b5482dc0eaa9fbc33b8154587aed51a05
+              value: quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.4@sha256:b4f9599f5770ea2e6e4d031224ccc932164c1ecde7f85f68e16e99c98d754003
             - name: kind
               value: task
           resolver: bundles
@@ -392,7 +337,7 @@ spec:
             - name: name
               value: clair-scan
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-clair-scan:0.2@sha256:bcc01fe4689fbb87ca335d7efea88ec800e05d8796f0828fca984349b7844b09
+              value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.2@sha256:28fee4bf5da87f2388c973d9336086749cad8436003f9a514e22ac99735e056b
             - name: kind
               value: task
           resolver: bundles
@@ -412,7 +357,7 @@ spec:
             - name: name
               value: ecosystem-cert-preflight-checks
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-ecosystem-cert-preflight-checks:0.1@sha256:13a1013abebdd8dc398c41d2c72da41664086d390ea6ab9912905c1dfee08fbf
+              value: quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1@sha256:5131cce0f93d0b728c7bcc0d6cee4c61d4c9f67c6d619c627e41e3c9775b497d
             - name: kind
               value: task
           resolver: bundles
@@ -429,7 +374,7 @@ spec:
             - name: name
               value: sast-snyk-check
             - name: bundle
-              value: quay.io/redhat-appstudio-tekton-catalog/task-sast-snyk-check:0.3@sha256:4ada9949fd195b50e33605ef06bb52a9bfb523d88529392972ac7a051d5bb549
+              value: quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.2@sha256:c1ea706405f9ae146e31baef4abfea49b1e855a75bfc44c33eb0eb29516831b3
             - name: kind
               value: task
           resolver: bundles
@@ -459,7 +404,7 @@ spec:
             - name: name
               value: clamav-scan
             - name: bundle
-              value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1@sha256:b4f450f1447b166da671f1d5819ab5a1485083e5c27ab91f7d8b7a2ff994c8c2
+              value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1@sha256:1e29eebe916b81b7100138d62db0e03e22d03657274d37041c59cbaca5fdbf7d
             - name: kind
               value: task
           resolver: bundles
@@ -468,6 +413,21 @@ spec:
             operator: in
             values:
               - "false"
+      - name: apply-tags
+        params:
+          - name: IMAGE
+            value: $(tasks.build-container.results.IMAGE_URL)
+        runAfter:
+          - build-container
+        taskRef:
+          params:
+            - name: name
+              value: apply-tags
+            - name: bundle
+              value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.1@sha256:f485e250fb060060892b633c495a3d7e38de1ec105ae1be48608b0401530ab2c
+            - name: kind
+              value: task
+          resolver: bundles
     workspaces:
       - name: workspace
       - name: git-auth
