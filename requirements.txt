@@ -379,8 +379,10 @@ nvidia-cuda-nvrtc-cu12==12.1.105; platform_system == "Linux" and platform_machin
     --hash=sha256:339b385f50c309763ca65456ec75e17bbefcbbf2893f462cb8b90584cd27a1c2
 nvidia-cuda-runtime-cu12==12.1.105; platform_system == "Linux" and platform_machine == "x86_64" \
     --hash=sha256:6e258468ddf5796e25f1dc591a31029fa317d97a0a94ed93468fc86301d61e40
-nvidia-cudnn-cu12==9.1.0.70; platform_system == "Linux" and platform_machine == "x86_64" \
-    --hash=sha256:165764f44ef8c61fcdfdfdbe769d687e06374059fbb388b6c89ecb0e28793a6f
+nvidia-cudnn-cu12==9.5.0.50; platform_system == "Linux" and platform_machine == "x86_64" \
+    --hash=sha256:508c801f70baa8496e79b3338a55f7816488da815c0d55158a7adfc4e073a11e \
+    --hash=sha256:518d6cffad7d707871dfb9af667ddb619144f78d85b07f64c1e52449e6da6b9c \
+    --hash=sha256:d513b671c2ac19d679fdaaf5d3f723e0a85f412917e6b03a82f5f01bf61ef5a0
 nvidia-cufft-cu12==11.0.2.54; platform_system == "Linux" and platform_machine == "x86_64" \
     --hash=sha256:794e3948a1aa71fd817c3775866943936774d1c14e7628c74f6f7417224cdf56
 nvidia-curand-cu12==10.3.2.106; platform_system == "Linux" and platform_machine == "x86_64" \
