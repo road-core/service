@@ -433,10 +433,17 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 
  > This action may be required for self-hosted LLMs.
 
-## 8. Registering a new LLM provider
+## 8. (Optional) Configure the number of workers 
+   By default the number of workers is set to 1, you can increase the number of workers to scale up the REST api by modifying the max_workers config option in olsconfig.yaml.
+   ```yaml
+         ols_config:
+           max_workers: 4
+   ```
+
+## 9. Registering a new LLM provider
    Please look [here](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel) for more info.
 
-## 9. Fine tuning
+## 10. Fine tuning
    The service uses the, so called, system prompt to put the question into context before the question is sent to the selected LLM. The default system prompt is fine tuned for questions about OpenShift and Kubernetes. It is possible to use a different system prompt via the configuration option `system_prompt_path` in the `ols_config` section. That option must contain the path to the text file with the actual system prompt (can contain multiple lines). An example of such configuration:
 
 ```yaml
