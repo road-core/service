@@ -3,7 +3,7 @@ ARG LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/openshift-lightspeed/lightspeed-rag-con
 
 FROM ${LIGHTSPEED_RAG_CONTENT_IMAGE} as lightspeed-rag-content
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest AS production
 
 ARG VERSION
 # todo: this is overriden by the image ubi9/python-311, we hard coded WORKDIR below to /app-root
