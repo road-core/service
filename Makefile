@@ -9,7 +9,7 @@ SUITE_ID := $(if $(SUITE_ID),$(SUITE_ID),"nosuite")
 PROVIDER := $(if $(PROVIDER),$(PROVIDER),"openai")
 MODEL := $(if $(MODEL),$(MODEL),"gpt-3.5-turbo")
 
-images: requirements.txt ## Build container images
+images: ## Build container images
 	scripts/build-container.sh
 
 install-tools:	install-woke ## Install required utilities/tools
@@ -113,6 +113,7 @@ schema:	## Generate OpenAPI schema file
 
 requirements.txt:	pyproject.toml pdm.lock ## Generate requirements.txt file containing hashes for all non-devel packages
 	pdm export --prod --format requirements --output requirements.txt
+	./scripts/generate_packages_to_prefetch.py
 
 verify-packages-completeness:	requirements.txt ## Verify that requirements.txt file contains complete list of packages
 	pip download -d /tmp/ --use-pep517 --verbose -r requirements.txt
@@ -123,6 +124,7 @@ get-rag: ## Download a copy of the RAG embedding model and vector database
 	podman cp tmp-rag-container:/rag/vector_db vector_db
 	podman cp tmp-rag-container:/rag/embeddings_model embeddings_model
 	podman rm tmp-rag-container
+
 
 help: ## Show this help screen
 	@echo 'Usage: make <OPTIONS> ... <TARGETS>'
