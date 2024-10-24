@@ -161,7 +161,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    72906953      4 -rw-------   1 username username       52 Feb  6 16:45 /home/username/.openai/key
    $ ls -l openai_api_key.txt
    lrwxrwxrwx. 1 username username 26 Feb  6 17:41 openai_api_key.txt -> /home/username/.openai/key
-   $ grep openai_api_key.txt olsconfig.yaml
+   $ grep openai_api_key.txt rcsconfig.yaml
     credentials_path: openai_api_key.txt
    ```
 
@@ -169,8 +169,8 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 
 ## 1. Configure Road Core Service (RCS)
 
-   Service configuration is in YAML format. It is loaded from a file referred to by the `OLS_CONFIG_FILE` environment variable and defaults to `olsconfig.yaml` in the current directory.
-   You can find a example configuration in the [examples/olsconfig.yaml](examples/olsconfig.yaml) file in this repository.
+   Service configuration is in YAML format. It is loaded from a file referred to by the `RCS_CONFIG_FILE` environment variable and defaults to `rcsconfig.yaml` in the current directory.
+   You can find a example configuration in the [examples/rcsconfig.yaml](examples/rcsconfig.yaml) file in this repository.
 
 ## 2. Configure LLM providers
 
@@ -181,7 +181,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    information on how to set up and run this provider.
 
    API credentials are in turn loaded from files specified in the config YAML by the `credentials_path` attributes. If these paths are relative,
-   they are relative to the current working directory. To use the example olsconfig.yaml as is, place your BAM API Key into a file named `bam_api_key.txt` in your working directory.
+   they are relative to the current working directory. To use the example rcsconfig.yaml as is, place your BAM API Key into a file named `bam_api_key.txt` in your working directory.
 
    Note: there are two supported methods to provide credentials for Azure OpenAI. The first method is compatible with other providers, i.e. `credentials_path` contains a directory name containing one file with API token. In the second method, that directory should contain three files named `tenant_id`, `client_id`, and `client_secret`. Please look at following articles describing how to retrieve this information from Azure: [Get subscription and tenant IDs in the Azure portal](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) and [How to get client id and client secret in Azure Portal](https://azurelessons.com/how-to-get-client-id-and-client-secret-in-azure-portal/).
 
@@ -398,7 +398,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    ```
 
 ## 6. (Optional) Configure conversation cache
-   Conversation cache can be stored in memory (it's content will be lost after shutdown) or in PostgreSQL database. It is possible to specify storage type in `olsconfig.yaml` configuration file.
+   Conversation cache can be stored in memory (it's content will be lost after shutdown) or in PostgreSQL database. It is possible to specify storage type in `rcsconfig.yaml` configuration file.
    
    1. Cache stored in memory:
          ```yaml
@@ -434,7 +434,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
  > This action may be required for self-hosted LLMs.
 
 ## 8. (Optional) Configure the number of workers 
-   By default the number of workers is set to 1, you can increase the number of workers to scale up the REST api by modifying the max_workers config option in olsconfig.yaml.
+   By default the number of workers is set to 1, you can increase the number of workers to scale up the REST api by modifying the max_workers config option in rcsconfig.yaml.
    ```yaml
          ols_config:
            max_workers: 4
@@ -488,7 +488,7 @@ key file(s) (eg: `credentials_path: config/openai_api_key.txt`)
 
    ```sh
     podman run -it --rm -v `/path/to/config:/app-root/config:Z \
-    -e OLS_CONFIG_FILE=/app-root/config/olsconfig.yaml -p 8080:8080 \
+    -e RCS_CONFIG_FILE=/app-root/config/rcsconfig.yaml -p 8080:8080 \
     quay.io/openshift-lightspeed/lightspeed-service-api:latest
     ```
 
@@ -497,7 +497,7 @@ In the `examples` folder is a set of YAML manifests,
 `openshift-lightspeed.yaml`. This includes all the resources necessary to get
 Road Core Service running in a cluster. It is configured expecting to only
 use OpenAI as the inference endpoint, but you can easily modify these manifests,
-looking at the `olsconfig.yaml` to see how to alter it to work with BAM as the
+looking at the `rcsconfig.yaml` to see how to alter it to work with BAM as the
 provider.
 
 There is a commented-out OpenShift Route with TLS Edge termination available if
@@ -553,7 +553,7 @@ curl 'http://127.0.0.1:8080/metrics'
 
 ### Gradio UI
 
-There is a minimal Gradio UI you can use when running the OLS server locally.  To use it, it is needed to enable UI in `olsconfig.yaml` file:
+There is a minimal Gradio UI you can use when running the OLS server locally.  To use it, it is needed to enable UI in `rcsconfig.yaml` file:
 
 ```yaml
 dev_config:

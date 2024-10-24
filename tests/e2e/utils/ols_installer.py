@@ -255,7 +255,7 @@ def install_ols() -> tuple[str, str, str]:
     # modify olsconfig configmap
     configmap_yaml = cluster_utils.run_oc(["get", "cm/olsconfig", "-o", "yaml"]).stdout
     configmap = yaml.safe_load(configmap_yaml)
-    olsconfig = yaml.safe_load(configmap["data"]["olsconfig.yaml"])
+    olsconfig = yaml.safe_load(configmap["data"]["rcsconfig.yaml"])
 
     # one of our libs logs a secrets in debug mode which causes the pod
     # logs beying redacted/removed completely - we need log at info level
@@ -270,7 +270,7 @@ def install_ols() -> tuple[str, str, str]:
         "ingress_env": "stage",
         "cp_offline_token": os.getenv("CP_OFFLINE_TOKEN", ""),
     }
-    configmap["data"]["olsconfig.yaml"] = yaml.dump(olsconfig)
+    configmap["data"]["rcsconfig.yaml"] = yaml.dump(olsconfig)
     updated_configmap = yaml.dump(configmap)
 
     cluster_utils.run_oc(["delete", "configmap", "olsconfig"])

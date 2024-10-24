@@ -124,8 +124,8 @@ spec:
         imagePullPolicy: Always
         name: lightspeed-w-rag
         env:
-          - name: OLS_CONFIG_FILE
-            value: /app-root/config/olsconfig.yaml
+          - name: RCS_CONFIG_FILE
+            value: /app-root/config/rcsconfig.yaml
         ports:
         - containerPort: 8443
           protocol: TCP
@@ -200,7 +200,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  olsconfig.yaml: |
+  rcsconfig.yaml: |
     llm_providers:
       - name: openai
         url: "https://api.openai.com/v1"

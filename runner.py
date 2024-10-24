@@ -143,7 +143,7 @@ if __name__ == "__main__":
     # else via our code before other envs are set (mainly the gradio).
     from ols import config
 
-    cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
+    cfg_file = os.environ.get("RCS_CONFIG_FILE", "rcsconfig.yaml")
     config.reload_from_yaml_file(cfg_file)
 
     configure_logging(config.ols_config.logging_config)

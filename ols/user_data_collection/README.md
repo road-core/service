@@ -47,7 +47,7 @@ The only secret required in this entire process is the one used to authenticate 
     - For production: https://access.redhat.com/management/api
     - For staging: https://access.stage.redhat.com/management/api
 
-    Once you have an "offline token", you can provide it to the data collection script via `olsconfig.yaml`, eg.
+    Once you have an "offline token", you can provide it to the data collection script via `rcsconfig.yaml`, eg.
     ```yaml
     user_data_collector_config:
         cp_offline_token: fake_token
@@ -68,9 +68,9 @@ For staging: https://sso.stage.redhat.com
 
 
 ## How to test locally
-To test locally, use or tweak this configuration from `olsconfig.yaml`:
+To test locally, use or tweak this configuration from `rcsconfig.yaml`:
 ```yaml
-# rest of the olsconfig.yaml
+# rest of the rcsconfig.yaml
 user_data_collector_config:
   data_storage: "some/path"
   log_level: debug

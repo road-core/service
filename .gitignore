@@ -12,7 +12,7 @@ venv
 
 # ignore local configuration
 .env
-/olsconfig.yaml
+/rcsconfig.yaml
 scratch
 
 # ignore locally significant directories

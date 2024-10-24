@@ -94,6 +94,6 @@ def test_load_llm_no_provider_config():
     config.config.llm_providers = None
 
     with pytest.raises(
-        LLMConfigurationError, match="Providers configuration missing in olsconfig.yaml"
+        LLMConfigurationError, match="Providers configuration missing in rcsconfig.yaml"
     ):
         load_llm(provider="fake-provider", model="model")

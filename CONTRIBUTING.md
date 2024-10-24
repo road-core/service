@@ -444,7 +444,7 @@ For further guidance, see the rest of our codebase, or check sources online. The
 
 It is possible to create an interface for a new provider. That interface should be
 added into `ols/src/llms/providers/` Then the provider should be registered and
-referenced from `olsconfig.yaml` file the same way as other existing providers.
+referenced from `rcsconfig.yaml` file the same way as other existing providers.
 
 To add a new provider, follow these steps:
 
@@ -455,7 +455,7 @@ To add a new provider, follow these steps:
 
 Please note that your custom provider must adhere to the interface defined by `AbstractLLMProvider` to ensure proper integration. Specifically, you must define a `default_params` property and a `load` method in your custom provider class.
 
-You'll also need to modify your `olsconfig.yaml` file to include an appropriate entry for your new provider.
+You'll also need to modify your `rcsconfig.yaml` file to include an appropriate entry for your new provider.
 
 Once you've created and registered your new provider as described above, no further code modifications are necessary. Our discovery mechanism will automatically locate your provider. After that, you'll be able to use it as needed.
 
