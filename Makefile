@@ -13,7 +13,7 @@ MODEL := $(if $(MODEL),$(MODEL),"gpt-4o-mini")
 PYTHON_REGISTRY = testpypi
 
 
-images: requirements.txt ## Build container images
+images: ## Build container images
 	scripts/build-container.sh
 
 install-tools:	install-woke ## Install required utilities/tools
