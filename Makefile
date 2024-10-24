@@ -9,7 +9,7 @@ SUITE_ID := $(if $(SUITE_ID),$(SUITE_ID),"nosuite")
 PROVIDER := $(if $(PROVIDER),$(PROVIDER),"openai")
 MODEL := $(if $(MODEL),$(MODEL),"gpt-3.5-turbo")
 
-images: ## Build container images
+images: requirements.txt ## Build container images
 	scripts/build-container.sh
 
 install-tools:	install-woke ## Install required utilities/tools
