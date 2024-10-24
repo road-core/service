@@ -19,4 +19,16 @@ jobs:
       - name: Install devel dependencies
         run: pdm install --dev
       - name: Run unit tests
-        run: pdm run python -m pytest tests/unit --cov=ols --cov=runner --cov-report term-missing
+        run: pdm run python -m pytest tests/unit --cov=ols --cov=runner --cov-report xml
+
+      - name: Upload coverage reports to Codecov with GitHub Action (with token = main repo)
+        if: |
+          github.event_name == 'push' && github.repository == 'road-core/service' ||
+          github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'road-core/service'
+        uses: codecov/codecov-action@v4.2.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage reports to Codecov with GitHub Action (without token = forks)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != 'road-core/service'
+        uses: codecov/codecov-action@v4.2.0
