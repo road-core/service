@@ -1,4 +1,4 @@
-# olsconfig.yaml sample for local ollama server
+# rcsconfig.yaml sample for local ollama server
 #
 # 1. install local ollama server from https://ollama.com/
 # 2. install llama3.1:latest model with:

@@ -109,7 +109,7 @@ def must_gather():
             "-o",
             "yaml",
         ],
-        f"{cluster_dir.as_posix()}/olsconfig.yaml",
+        f"{cluster_dir.as_posix()}/rcsconfig.yaml",
     )
 
     # clusterserviceversion

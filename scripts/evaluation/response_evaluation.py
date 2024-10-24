@@ -71,7 +71,7 @@ class ResponseEvaluation:
         if len(set(self._args.eval_modes) - {"ols"}) > 0:
             # load config separately
             # Use OLS config file to set provider/model related config. Ex: credential/url
-            cfg_file = os.environ.get("OLS_CONFIG_FILE", DEFAULT_CONFIG_FILE)
+            cfg_file = os.environ.get("RCS_CONFIG_FILE", DEFAULT_CONFIG_FILE)
             config.reload_from_yaml_file(cfg_file)
 
         if "ols_rag" in self._args.eval_modes:

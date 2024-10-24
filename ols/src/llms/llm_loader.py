@@ -80,7 +80,7 @@ def load_llm(
     """
     providers_config = config.config.llm_providers
     if providers_config is None:
-        raise LLMConfigurationError("Providers configuration missing in olsconfig.yaml")
+        raise LLMConfigurationError("Providers configuration missing in rcsconfig.yaml")
     llm_providers_reg = LLMProvidersRegistry
 
     provider_config = resolve_provider_config(provider, model, providers_config)

@@ -357,7 +357,7 @@ class ProviderConfig(BaseModel):
             else:
                 raise
 
-        # OLS-622: Provider-specific configuration parameters in olsconfig.yaml
+        # OLS-622: Provider-specific configuration parameters in rcsconfig.yaml
         self.project_id = data.get("project_id", None)
         if self.type == constants.PROVIDER_WATSONX and self.project_id is None:
             raise InvalidConfigurationError(
