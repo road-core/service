@@ -326,5 +326,4 @@ class LLMProvider(AbstractLLMProvider):
         """Construct HTTPX client instance to be used to communicate with LLM."""
         if use_custom_certificate_store:
             return httpx.Client(verify=self.provider_config.certificates_store)
-        else:
-            return httpx.Client()
+        return httpx.Client()
