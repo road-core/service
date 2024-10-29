@@ -110,8 +110,8 @@ configure model, and connect to it.
 
 ## 1. Clone the repo
    ```sh
-   git clone https://github.com/openshift/lightspeed-service.git
-   cd lightspeed-service
+   git clone https://github.com/road-core/service.git
+   cd service
    ```
 ## 2. Install python packages
    ```sh
@@ -159,7 +159,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    It keeps copies of files containing API keys from getting scattered around and forgotten:
 
    ```
-   $ cd <lightspeed-service local git repo root>
+   $ cd <road-core/service local git repo root>
    $ find ~/.openai -ls
    72906922      0 drwx------   1 username username        6 Feb  6 16:45 /home/username/.openai
    72906953      4 -rw-------   1 username username       52 Feb  6 16:45 /home/username/.openai/key
@@ -296,21 +296,21 @@ Depends on configuration, but usually it is not needed to generate or use API ke
          provider+model is specified in REST API calls, the default provider and model are used:
 
          ```yaml
-            ols_config:
+            rcs_config:
               default_provider: my_bam
               default_model: ibm/granite-13b-chat-v2
          ```
 
 
-## 3. Configure OLS Authentication
+## 3. Configure RCS Authentication
 
    NOTE: Currently, only K8S-based authentication can be used. In future versions, more authentication mechanisms will be configurable.
 
-   This section provides guidance on how to configure authentication within OLS. It includes instructions on enabling or disabling authentication, configuring authentication through OCP RBAC, overriding authentication configurations, and specifying a static authentication token in development environments.
+   This section provides guidance on how to configure authentication within RCS. It includes instructions on enabling or disabling authentication, configuring authentication through OCP RBAC, overriding authentication configurations, and specifying a static authentication token in development environments.
 
    1. Enabling and Disabling Authentication
    
-      Authentication is enabled by default in OLS. To disable authentication, modify the `dev_config` in your configuration file as shown below:
+      Authentication is enabled by default in RCS. To disable authentication, modify the `dev_config` in your configuration file as shown below:
 
       ```yaml
          dev_config:
@@ -319,7 +319,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 
    2. Configuring Authentication with OCP RBAC
 
-      OLS utilizes OCP RBAC for authentication, necessitating connectivity to an OCP cluster. It automatically selects the configuration from the first available source, either an in-cluster configuration or a KubeConfig file.
+      RCS utilizes OCP RBAC for authentication, necessitating connectivity to an OCP cluster. It automatically selects the configuration from the first available source, either an in-cluster configuration or a KubeConfig file.
 
    3. Overriding Authentication Configuration
 
@@ -332,7 +332,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
       To apply any of these overrides, update your configuration file as follows:
 
       ```yaml
-         ols_config:
+         rcs_config:
             authentication_config:
                k8s_cluster_api: "https://api.example.com:6443"
                k8s_ca_cert_path: "/Users/home/ca.crt"
@@ -349,14 +349,14 @@ Depends on configuration, but usually it is not needed to generate or use API ke
       ```
       **Note:** using static token will require you to set the `k8s_cluster_api` mentioned in section 6.4, as this will disable the loading of OCP config from in-cluster/kubeconfig.
 
-## 4. Configure OLS TLS communication
+## 4. Configure RCS TLS communication
 
-   This section provides instructions on configuring TLS (Transport Layer Security) for the OLS Application, enabling secure connections via HTTPS. TLS is enabled by default; however, if necessary, it can be disabled through the `dev_config` settings.
+   This section provides instructions on configuring TLS (Transport Layer Security) for the RCS Application, enabling secure connections via HTTPS. TLS is enabled by default; however, if necessary, it can be disabled through the `dev_config` settings.
 
 
    1. Enabling and Disabling TLS
    
-      By default, TLS is enabled in OLS. To disable TLS, adjust the `dev_config` in your configuration file as shown below:
+      By default, TLS is enabled in RCS. To disable TLS, adjust the `dev_config` in your configuration file as shown below:
 
       ```yaml
          dev_config:
@@ -369,21 +369,21 @@ Depends on configuration, but usually it is not needed to generate or use API ke
          ```bash
             ./scripts/generate-certs.sh
          ``` 
-      2. Update OLS Configuration: Modify your config.yaml to include paths to your certificate and its private key:
+      2. Update RCS Configuration: Modify your config.yaml to include paths to your certificate and its private key:
          ```yaml
-            ols_config:
+            rcs_config:
                tls_config:
                   tls_certificate_path: /full/path/to/certs/cert.pem
                   tls_key_path: /full/path/to/certs/key.pem
          ```
-      3. Launch OLS with HTTPS: After applying the above configurations, OLS will run over HTTPS.
+      3. Launch RCS with HTTPS: After applying the above configurations, RCS will run over HTTPS.
    
-   3. Configuring OLS in OpenShift:
+   3. Configuring RCS in OpenShift:
 
-      For deploying in OpenShift, Service-Served Certificates can be utilized. Update your ols-config.yaml as shown below, based on the example provided in the examples directory:
+      For deploying in OpenShift, Service-Served Certificates can be utilized. Update your rcs-config.yaml as shown below, based on the example provided in the examples directory:
 
       ```yaml
-         ols_config:
+         rcs_config:
             tls_config:
                tls_certificate_path: /app-root/certs/cert.pem
                tls_key_path: /app-root/certs/key.pem
@@ -391,7 +391,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    4. Using a Private Key with a Password
       If your private key is encrypted with a password, specify a path to a file that contains the key password as follows:
       ```yaml
-         ols_config:
+         rcs_config:
             tls_config:
                tls_key_password_path: /app-root/certs/password.txt
       ```
@@ -406,7 +406,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    
    1. Cache stored in memory:
          ```yaml
-         ols_config:
+         rcs_config:
             conversation_cache:
                type: memory
                memory:
@@ -427,9 +427,9 @@ Depends on configuration, but usually it is not needed to generate or use API ke
          ```
          In this case, file `postgres_password.txt` contains password required to connect to PostgreSQL. Also CA certificate can be specified using `postgres_ca_cert.crt` to verify trusted TLS connection with the server. All these files needs to be accessible. 
 
-## 7. (Optional) Incorporating additional CA(s). You have the option to include an extra TLS certificate into the OLS trust store as follows.
+## 7. (Optional) Incorporating additional CA(s). You have the option to include an extra TLS certificate into the RCS trust store as follows.
 ```yaml
-      ols_config:
+      rcs_config:
          extra_ca:
             - "path/to/cert_1.crt"
             - "path/to/cert_2.crt"
@@ -440,7 +440,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 ## 8. (Optional) Configure the number of workers 
    By default the number of workers is set to 1, you can increase the number of workers to scale up the REST api by modifying the max_workers config option in rcsconfig.yaml.
    ```yaml
-         ols_config:
+         rcs_config:
            max_workers: 4
    ```
 
@@ -448,10 +448,10 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    Please look [here](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel) for more info.
 
 ## 10. Fine tuning
-   The service uses the, so called, system prompt to put the question into context before the question is sent to the selected LLM. The default system prompt is fine tuned for questions about OpenShift and Kubernetes. It is possible to use a different system prompt via the configuration option `system_prompt_path` in the `ols_config` section. That option must contain the path to the text file with the actual system prompt (can contain multiple lines). An example of such configuration:
+   The service uses the, so called, system prompt to put the question into context before the question is sent to the selected LLM. The default system prompt is fine tuned for questions about OpenShift and Kubernetes. It is possible to use a different system prompt via the configuration option `system_prompt_path` in the `rcs_config` section. That option must contain the path to the text file with the actual system prompt (can contain multiple lines). An example of such configuration:
 
 ```yaml
-ols_config:
+rcs_config:
   system_prompt_path: "system_prompts/system_prompt_for_product_XYZZY"
 ```
 
@@ -461,7 +461,7 @@ ols_config:
 
 ### Local Deployment
 
-OLS service can be started locally. In this case GradIO web UI is used to
+RCS service can be started locally. In this case GradIO web UI is used to
 interact with the service. Alternatively the service can be accessed through
 REST API.
 
@@ -512,11 +512,11 @@ you are logged in with sufficient permissions:
 
 1. Make the change to your API keys and/or provider configuration in the
 manifest file
-2. Create a namespace/project to hold OLS
+2. Create a namespace/project to hold RCS
 3. `oc apply -f examples/openshift-lightspeed-tls.yaml -n created-namespace`
 
 Once deployed, it is probably easiest to `oc port-forward` into the pod where
-OLS is running so that you can access it from your local machine.
+RCS is running so that you can access it from your local machine.
 
 
 ## Communication with the service
@@ -540,7 +540,7 @@ OpenAPI schema is available [docs/openapi.json](docs/openapi.json). It is possib
 make schema
 ```
 
-When the OLS service is started OpenAPI schema is available on `/openapi.json` endpoint. For example, for service running on localhost on port 8080, it can be accessed and pretty printed by using following command:
+When the RCS service is started OpenAPI schema is available on `/openapi.json` endpoint. For example, for service running on localhost on port 8080, it can be accessed and pretty printed by using following command:
 
 ```sh
 curl 'http://127.0.0.1:8080/openapi.json' | jq .
@@ -557,23 +557,23 @@ curl 'http://127.0.0.1:8080/metrics'
 
 ### Gradio UI
 
-There is a minimal Gradio UI you can use when running the OLS server locally.  To use it, it is needed to enable UI in `rcsconfig.yaml` file:
+There is a minimal Gradio UI you can use when running the RCS server locally.  To use it, it is needed to enable UI in `rcsconfig.yaml` file:
 
 ```yaml
 dev_config:
   enable_dev_ui: true
 ```
 
-Then start the OLS server per [Run the server](#run-the-server) and then browse to the built in Gradio interface at http://localhost:8080/ui
+Then start the RCS server per [Run the server](#run-the-server) and then browse to the built in Gradio interface at http://localhost:8080/ui
 
-By default this interface will ask the OLS server to retain and use your conversation history for subsequent interactions.  To disable this behavior, expand the `Additional Inputs` configuration at the bottom of the page and uncheck the `Use history` checkbox.  When not using history each message you submit to OLS will be treated independently with no context of previous interactions.
+By default this interface will ask the RCS server to retain and use your conversation history for subsequent interactions.  To disable this behavior, expand the `Additional Inputs` configuration at the bottom of the page and uncheck the `Use history` checkbox.  When not using history each message you submit to RCS will be treated independently with no context of previous interactions.
 
 ###  Swagger UI
 
-OLS API documentation is available at http://localhost:8080/docs
+RCS API documentation is available at http://localhost:8080/docs
 
 
-## Deploying OLS on OpenShift
+## Deploying RCS on OpenShift
 
 A Helm chart is available for installing the service in OpenShift.
 
@@ -587,7 +587,7 @@ helm upgrade --install ols-release helm/ --create-namespace --namespace openshif
 
 The command deploys the service in the default configuration.
 
-The default configuration contains OLS fronting with a [kube-rbac-proxy](https://github.com/brancz/kube-rbac-proxy).
+The default configuration contains RCS fronting with a [kube-rbac-proxy](https://github.com/brancz/kube-rbac-proxy).
 
 To uninstall/delete the chart with the release name `ols-release`:
 
@@ -716,7 +716,7 @@ Sequence of operations performed when user asks a question:
 
 The context window size is limited for all supported LLMs which means that token truncation algorithm needs to be performed for longer queries, queries with long conversation history etc. Current truncation logic/context window token check:
 
-1. Tokens for current prompt system instruction + user query + attachment (if any) + tokens reserved for response (default 512) should not be greater than model context window size, otherwise OLS will raise an error.
+1. Tokens for current prompt system instruction + user query + attachment (if any) + tokens reserved for response (default 512) should not be greater than model context window size, otherwise RCS will raise an error.
 1. Let’s say above tokens count as default tokens that will be used all the time. If any token is left after default usage then RAG context will be used completely or truncated depending upon how much tokens are left.
 1. Finally if we have further available tokens after using complete RAG context, then history will be used (or will be truncated)
 1. There is a flag set to True by the service, if history is truncated due to tokens limitation.
