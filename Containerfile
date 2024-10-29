@@ -1,13 +1,11 @@
 # vim: set filetype=dockerfile
-ARG LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/openshift-lightspeed/lightspeed-rag-content@sha256:a91aca8224b1405e7c91576374c7bbc766b2009b2ef852895c27069fffc5b06f
+ARG LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/openshift-lightspeed/lightspeed-rag-content@sha256:24699b4ebe31dfb09ba706e44140db48772b37590a1839e2c9f5de2005c8c385
+ARG RAG_CONTENTS_SUB_FOLDER=vector_db/ocp_product_docs
 
 FROM ${LIGHTSPEED_RAG_CONTENT_IMAGE} as lightspeed-rag-content
 
-FROM registry.redhat.io/ubi9/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 
-ARG VERSION
-# todo: this is overriden by the image ubi9/python-311, we hard coded WORKDIR below to /app-root
-# makesure the default value of rag content is set according to APP_ROOT and then update the operator.
 ARG APP_ROOT=/app-root
 
 RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
@@ -26,7 +24,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app-root
 
-COPY --from=lightspeed-rag-content /rag/vector_db/ocp_product_docs ./vector_db/ocp_product_docs
+COPY --from=lightspeed-rag-content /rag/${RAG_CONTENTS_SUB_FOLDER} ${APP_ROOT}/${RAG_CONTENTS_SUB_FOLDER}
 COPY --from=lightspeed-rag-content /rag/embeddings_model ./embeddings_model
 
 # Add explicit files and directories
@@ -45,14 +43,7 @@ EXPOSE 8080
 EXPOSE 8443
 CMD ["python3.11", "runner.py"]
 
-LABEL io.k8s.display-name="OpenShift LightSpeed Service" \
-      io.k8s.description="AI-powered OpenShift Assistant Service." \
-      io.openshift.tags="openshift-lightspeed,ols" \
-      description="Red Hat OpenShift Lightspeed Service" \
-      summary="Red Hat OpenShift Lightspeed Service" \
-      com.redhat.component=openshift-lightspeed-service \
-      name=openshift-lightspeed-service \
-      vendor="Red Hat, Inc."
+LABEL vendor="Red Hat, Inc."
 
 
 # no-root user is checked in Konflux

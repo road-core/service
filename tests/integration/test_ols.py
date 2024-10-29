@@ -12,6 +12,7 @@ from ols.app.models.config import (
     ProviderConfig,
     QueryFilter,
 )
+from ols.customize import prompts
 from ols.utils import suid
 from ols.utils.errors_parsing import DEFAULT_ERROR_MESSAGE, DEFAULT_STATUS_CODE
 from tests.mock_classes.mock_langchain_interface import mock_langchain_interface
@@ -84,7 +85,7 @@ def test_post_question_on_invalid_question(_setup):
 
         expected_json = {
             "conversation_id": conversation_id,
-            "response": constants.INVALID_QUERY_RESP,
+            "response": prompts.INVALID_QUERY_RESP,
             "referenced_documents": [],
             "truncated": False,
         }

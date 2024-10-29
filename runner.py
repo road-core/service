@@ -13,7 +13,6 @@ from cryptography import x509
 
 import ols.app.models.config as config_model
 from ols import constants
-from ols.utils.auth_dependency import K8sClientSingleton
 from ols.utils.logging import configure_logging
 
 
@@ -113,25 +112,30 @@ def start_uvicorn():
         if config.dev_config.run_on_localhost
         else "0.0.0.0"  # noqa: S104 # nosec: B104
     )
-    port = 8080 if config.dev_config.disable_tls else 8443
     log_level = config.ols_config.logging_config.uvicorn_log_level
 
-    # The tls fields can be None, which means we will pass those values as None to uvicorn.run
-    ssl_keyfile = config.ols_config.tls_config.tls_key_path
-    ssl_certfile = config.ols_config.tls_config.tls_certificate_path
-    ssl_keyfile_password = config.ols_config.tls_config.tls_key_password
-
-    uvicorn.run(
-        "ols.app.main:app",
-        host=host,
-        port=port,
-        workers=config.ols_config.max_workers,
-        log_level=log_level,
-        ssl_keyfile=ssl_keyfile,
-        ssl_certfile=ssl_certfile,
-        ssl_keyfile_password=ssl_keyfile_password,
-        access_log=log_level < logging.INFO,
-    )
+    if config.dev_config.disable_tls:
+        # TLS is disabled, run without SSL configuration
+        uvicorn.run(
+            "ols.app.main:app",
+            host=host,
+            port=8080,
+            log_level=log_level,
+            workers=1,
+            access_log=log_level < logging.INFO,
+        )
+    else:
+        uvicorn.run(
+            "ols.app.main:app",
+            host=host,
+            port=8443,
+            workers=1,
+            log_level=log_level,
+            ssl_keyfile=config.ols_config.tls_config.tls_key_path,
+            ssl_certfile=config.ols_config.tls_config.tls_certificate_path,
+            ssl_keyfile_password=config.ols_config.tls_config.tls_key_password,
+            access_log=log_level < logging.INFO,
+        )
 
 
 if __name__ == "__main__":
@@ -143,7 +147,7 @@ if __name__ == "__main__":
     # else via our code before other envs are set (mainly the gradio).
     from ols import config
 
-    cfg_file = os.environ.get("RCS_CONFIG_FILE", "rcsconfig.yaml")
+    cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
     config.reload_from_yaml_file(cfg_file)
 
     configure_logging(config.ols_config.logging_config)
@@ -158,8 +162,8 @@ if __name__ == "__main__":
 
     # Initialize the K8sClientSingleton with cluster id during module load.
     # We want the application to fail early if the cluster ID is not available.
-    cluster_id = K8sClientSingleton.get_cluster_id()
-    logger.info(f"running on cluster with ID '{cluster_id}'")
+    # cluster_id = K8sClientSingleton.get_cluster_id()
+    # logger.info(f"running on cluster with ID '{cluster_id}'")
 
     # init loading of query redactor
     config.query_redactor
