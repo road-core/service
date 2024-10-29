@@ -1,5 +1,9 @@
 # About The Project
 
+[![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/road-core/service/blob/main/LICENSE)
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+
+
 Road Core Service (RCS) is an AI powered assistant that runs on OpenShift
 and provides answers to product questions using backend LLM services. Currently
 [OpenAI](https://openai.com/), [Azure
