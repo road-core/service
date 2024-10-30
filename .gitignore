@@ -66,4 +66,4 @@ benchmark_*.svg
 dist/
 
 # requirements file
-requirements*
+# requirements*
