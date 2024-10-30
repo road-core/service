@@ -11,8 +11,8 @@ from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.config import ProviderConfig
 from ols.app.models.models import SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
+from ols.customize import prompts
 from ols.src.prompts.prompt_generator import GeneratePrompt
-from ols.src.prompts.prompts import QUERY_SYSTEM_INSTRUCTION
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
 
@@ -31,7 +31,7 @@ class DocsSummarizer(QueryHelper):
             GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: model_config.parameters.max_tokens_for_response  # noqa: E501
         }
         # default system prompt fine-tuned for the service
-        self._system_prompt = QUERY_SYSTEM_INSTRUCTION
+        self._system_prompt = prompts.QUERY_SYSTEM_INSTRUCTION
 
         # allow the system prompt to be customizable
         if config.ols_config.system_prompt is not None:
