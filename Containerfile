@@ -2,9 +2,9 @@
 ARG LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/openshift-lightspeed/lightspeed-rag-content@sha256:f059190635f632bb21b7b6db3e0a74a3ef339bd17be6ea366f1457a150fec0e5
 ARG RAG_CONTENTS_SUB_FOLDER=vector_db/ocp_product_docs
 
-FROM ${LIGHTSPEED_RAG_CONTENT_IMAGE} as lightspeed-rag-content
+FROM ${LIGHTSPEED_RAG_CONTENT_IMAGE} AS lightspeed-rag-content
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal AS production
 
 ARG APP_ROOT=/app-root
 
