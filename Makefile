@@ -16,6 +16,9 @@ PYTHON_REGISTRY = testpypi
 images: ## Build container images
 	scripts/build-container.sh
 
+images-aap: requirements.txt ## Build container images
+	scripts/build-container-aap.sh
+
 install-tools:	install-woke ## Install required utilities/tools
 	# OLS 1085: Service build failure issue caused by newest PDM version
 	# (right now we need to stick to PDM specified in pyproject.toml file)
