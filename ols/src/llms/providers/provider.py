@@ -2,6 +2,7 @@
 
 import abc
 import logging
+import ssl
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -23,6 +24,7 @@ from ols.constants import (
     PROVIDER_WATSONX,
     GenericLLMParameters,
 )
+from ols.utils import tls
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +242,7 @@ class LLMProvider(AbstractLLMProvider):
             return generic_llm_params
 
         if provider not in generic_to_llm_parameters:
-            logger.warning(f"Mappings for provider {provider} are not defined.")
+            logger.warning("Mappings for provider %s are not defined.", provider)
             return generic_llm_params
 
         # retrieve mapping
@@ -274,8 +276,9 @@ class LLMProvider(AbstractLLMProvider):
 
         if provider not in available_provider_parameters:
             logger.warning(
-                f"Available parameters for provider {provider} are not defined."
-                "Parameters validation is disabled."
+                "Available parameters for provider %s are not defined."
+                "Parameters validation is disabled.",
+                provider,
             )
             return params
 
@@ -299,8 +302,10 @@ class LLMProvider(AbstractLLMProvider):
                     continue
                 # other parameters
                 logger.warning(
-                    f"Parameter {parameter_name} with type {parameter_type} "
-                    f"can not be used by provider {provider}"
+                    "Parameter %s with type %s can not be used by provider %s",
+                    parameter_name,
+                    parameter_type,
+                    provider,
                 )
             else:
                 filtered_params[parameter_name] = parameter_value
@@ -314,7 +319,8 @@ class LLMProvider(AbstractLLMProvider):
         # config params overrides everything
         if config.dev_config.llm_params:
             logger.debug(
-                f"overriding LLM params with debug options {config.dev_config.llm_params}"
+                "overriding LLM params with debug options %s",
+                config.dev_config.llm_params,
             )
             updated_params = {**updated_params, **config.dev_config.llm_params}
 
@@ -324,6 +330,35 @@ class LLMProvider(AbstractLLMProvider):
         self, use_custom_certificate_store: bool
     ) -> httpx.Client:
         """Construct HTTPX client instance to be used to communicate with LLM."""
+        sec_profile = self.provider_config.tls_security_profile
+
+        # if security profile is not set, use httpx.Client as is
+        if sec_profile is None or sec_profile.profile_type is None:
+            if use_custom_certificate_store:
+                return httpx.Client(verify=self.provider_config.certificates_store)
+            return httpx.Client()
+
+        # security profile is set -> we need to retrieve SSL version and list of allowed ciphers
+        ciphers = tls.ciphers_as_string(sec_profile.ciphers, sec_profile.profile_type)
+        logger.info("list of ciphers: %s", ciphers)
+
+        min_tls_version = tls.min_tls_version(
+            sec_profile.min_tls_version, sec_profile.profile_type
+        )
+        logger.info("min TLS version: %s", min_tls_version)
+
+        ssl_version = tls.ssl_tls_version(min_tls_version)
+        logger.info("SSL version: %d", ssl_version)
+
+        context = ssl.create_default_context()
+
+        if ssl_version is not None:
+            context.minimum_version = ssl_version
+
+        if ciphers is not None:
+            context.set_ciphers(ciphers)
+
         if use_custom_certificate_store:
-            return httpx.Client(verify=self.provider_config.certificates_store)
-        return httpx.Client()
+            context.load_verify_locations(self.provider_config.certificates_store)
+
+        return httpx.Client(verify=context)
