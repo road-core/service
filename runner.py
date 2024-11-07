@@ -14,7 +14,6 @@ from cryptography import x509
 import ols.app.models.config as config_model
 from ols import constants
 from ols.utils import tls
-from ols.utils.auth_dependency import K8sClientSingleton
 from ols.utils.logging import configure_logging
 
 
