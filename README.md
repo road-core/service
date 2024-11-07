@@ -397,9 +397,14 @@ Depends on configuration, but usually it is not needed to generate or use API ke
       ```
 
 ## 5. (Optional) Configure the local document store
+
+   The following command downloads a copy of the whole image containing RAG embedding model and vector database:
+
    ```sh
    make get-rag
    ```
+
+   Please note that the link to the specific image to be downloaded is stored in the file `build.args` (and that file is autoupdated by bots when new a RAG is re-generated):
 
 ## 6. (Optional) Configure conversation cache
    Conversation cache can be stored in memory (it's content will be lost after shutdown) or in PostgreSQL database. It is possible to specify storage type in `rcsconfig.yaml` configuration file.
@@ -447,7 +452,48 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 ## 9. Registering a new LLM provider
    Please look [here](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel) for more info.
 
-## 10. Fine tuning
+## 10. TLS security profiles
+   TLS security profile can be set for the service itself and also for any configured provider. To specify TLS security profile for the service, the following section can be added into `rds` section in the `rdsconfig.yaml` configuration file:
+
+```
+  tlsSecurityProfile:
+    type: OldType
+    ciphers:
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    minTLSVersion: VersionTLS13
+```
+
+- `type` can be set to: OldType, IntermediateType, ModernType, or Custom
+- `minTLSVersion` can be set to: VersionTLS10, VersionTLS11, VersionTLS12, or VersionTLS13
+- `ciphers` is list of enabled ciphers. The values are not checked.
+
+Please look into `examples` folder that contains `olsconfig.yaml` with filled-in TLS security profile for the service.
+Additionally the TLS security profile can be set for any configured provider. In this case the `tlsSecurityProfile` needs to be added into the `olsconfig.yaml` file into `llm_providers/{selected_provider}` section. For example:
+
+```
+llm_providers:
+  - name: my_openai
+    type: openai
+    url: "https://api.openai.com/v1"
+    credentials_path: openai_api_key.txt
+    models:
+      - name: gpt-4-1106-preview
+      - name: gpt-4o-mini
+    tlsSecurityProfile:
+      type: Custom
+      ciphers:
+          - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+          - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      minTLSVersion: VersionTLS13
+```
+
+[!NOTE]
+The `tlsSecurityProfile` is fully optional. When it is not specified, the LLM call won't be affected by specific SSL/TLS settings.
+
+
+
+## 11. Fine tuning
    The service uses the, so called, system prompt to put the question into context before the question is sent to the selected LLM. The default system prompt is fine tuned for questions about OpenShift and Kubernetes. It is possible to use a different system prompt via the configuration option `system_prompt_path` in the `rcs_config` section. That option must contain the path to the text file with the actual system prompt (can contain multiple lines). An example of such configuration:
 
 ```yaml
