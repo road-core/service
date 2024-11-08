@@ -28,12 +28,12 @@ from ols.app.models.models import (
     UnauthorizedResponse,
 )
 from ols.customize import keywords, prompts
+from ols.src.auth.k8s import AuthDependency
 from ols.src.llms.llm_loader import LLMConfigurationError, resolve_provider_config
 from ols.src.query_helpers.attachment_appender import append_attachments_to_query
 from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.utils import errors_parsing, suid
-from ols.utils.auth_dependency import AuthDependency
 from ols.utils.token_handler import PromptTooLongError
 
 logger = logging.getLogger(__name__)
