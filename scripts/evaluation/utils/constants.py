@@ -4,12 +4,14 @@
 INSCOPE_MODELS = {
     "bam+ibm/granite-13b-chat-v2": ("bam", "ibm/granite-13b-chat-v2"),
     "watsonx+ibm/granite-13b-chat-v2": ("watsonx", "ibm/granite-13b-chat-v2"),
-    "openai+gpt-3.5-turbo": ("openai", "gpt-3.5-turbo"),
+    "watsonx+ibm/granite-3-2b-instruct": ("watsonx", "ibm/granite-3-2b-instruct"),
+    "watsonx+ibm/granite-3-8b-instruct": ("watsonx", "ibm/granite-3-2b-instruct"),
     "openai+gpt-4o-mini": ("openai", "gpt-4o-mini"),
-    "azure_openai+gpt-3.5-turbo": ("azure_openai", "gpt-3.5-turbo"),
-    "azure_openai+gpt-3.5-turbo-4k": ("azure_openai", "gpt-3.5-turbo"),
-    "azure_openai+gpt-3.5-turbo-16k": ("azure_openai", "gpt-3.5-turbo"),
+    "openai+gpt-4o": ("openai", "gpt-4o"),
+    "azure_openai+gpt-4o-mini": ("azure_openai", "gpt-4o-mini"),
     "azure_openai+gpt-4o": ("azure_openai", "gpt-4o"),
+    "ollama+llama3.1:latest": ("ollama", "llama3.1:latest"),
+    "ollama+mistral": ("ollama", "mistral"),
 }
 
 SCORE_DESCRIPTION = {
@@ -19,6 +21,7 @@ SCORE_DESCRIPTION = {
     "rougeL_precision": "RougeL Precision Score",
     "rougeL_recall": "RougeL Recall Score",
     "rougeL_f1": "RougeL F1 Score",
+    "answer_relevancy": "Answer relevancy score against query",
 }
 
 EVAL_MODES = {
@@ -36,7 +39,7 @@ You are a helpful assistant.
 """
 
 DEFAULT_QNA_FILE = "question_answer_pair.json"
-DEFAULT_CONFIG_FILE = "rcsconfig.yaml"
+DEFAULT_CONFIG_FILE = "olsconfig.yaml"
 
 DEFAULT_INPUT_DIR = "eval_data"
 DEFAULT_RESULT_DIR = "eval_result"
@@ -48,3 +51,6 @@ TIME_TO_BREATH = 10
 
 # Cut-off similarity score used for response evaluation.
 EVAL_THRESHOLD = 0.3  # low score is better
+
+# Number of related questions to be generated.
+N_QUESTIONS = 2
