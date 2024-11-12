@@ -201,12 +201,13 @@ if __name__ == "__main__":
 
     if use_k8s_auth(config.ols_config):
         logger.info("Initializing k8s auth")
-        from ols.src.auth.k8s import K8sClientSingleton
+        # from ols.src.auth.k8s import K8sClientSingleton
 
         # Initialize the K8sClientSingleton with cluster id during module load.
         # We want the application to fail early if the cluster ID is not available.
-        cluster_id = K8sClientSingleton.get_cluster_id()
-        logger.info("running on cluster with ID '%s'", cluster_id)
+        # comment in upstream for now!
+        # cluster_id = K8sClientSingleton.get_cluster_id()
+        # logger.info("running on cluster with ID '%s'", cluster_id)
 
     # init loading of query redactor
     config.query_redactor
