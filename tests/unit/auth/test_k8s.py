@@ -22,6 +22,8 @@ from tests.mock_classes.mock_k8s_api import (
     mock_token_review_response,
 )
 
+auth_dependency: Optional[AuthDependency] = None
+
 
 @pytest.fixture(scope="function")
 def _setup():
