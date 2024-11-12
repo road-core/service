@@ -13,6 +13,7 @@ from cryptography import x509
 
 import ols.app.models.config as config_model
 from ols import constants
+from ols.src.auth.k8s import K8sClientSingleton
 from ols.utils import tls
 from ols.utils.logging import configure_logging
 
@@ -200,8 +201,8 @@ if __name__ == "__main__":
 
     # Initialize the K8sClientSingleton with cluster id during module load.
     # We want the application to fail early if the cluster ID is not available.
-    # cluster_id = K8sClientSingleton.get_cluster_id()
-    # logger.info("running on cluster with ID '%s'", cluster_id)
+    cluster_id = K8sClientSingleton.get_cluster_id()
+    logger.info("running on cluster with ID '%s'", cluster_id)
 
     # init loading of query redactor
     config.query_redactor
