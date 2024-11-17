@@ -28,6 +28,14 @@ spec:
       value: .
     - name: revision
       value: "{{revision}}"
+  taskRunSpecs:
+    - pipelineTaskName: clair-scan
+      computeResources:
+        requests:
+          cpu: '1'
+          memory: 8Gi
+        limits:
+          memory: 16Gi
   pipelineSpec:
     finally:
       - name: show-sbom
