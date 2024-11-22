@@ -6,7 +6,7 @@ lint.select = ["D", "E", "F", "W", "C", "S", "I", "TCH", "SLOT", "RUF", "C90", "
 # we need to check 'mood' of all docstrings, this needs to be enabled explicitly
 lint.extend-select = ["D401"]
 
-lint.ignore = []
+lint.ignore = ["RUF021", "A004"]
 
 target-version = "py311"
 lint.pydocstyle.convention = "google"
