@@ -451,6 +451,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
            max_workers: 4
    ```
 
+
 ## 9. Registering a new LLM provider
    Please look [here](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel) for more info.
 
