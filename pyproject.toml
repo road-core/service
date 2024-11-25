@@ -1,12 +1,12 @@
 [tool.ruff]
 
 # description of all rules are available on https://docs.astral.sh/ruff/rules/
-lint.select = ["D", "E", "F", "W", "C", "S", "I", "TCH", "SLOT", "RUF", "C90", "N", "YTT", "ASYNC", "A", "C4", "T10", "PGH"]
+lint.select = ["D", "E", "F", "W", "C", "S", "I", "TCH", "SLOT", "RUF", "C90", "N", "YTT", "ASYNC", "A", "C4", "T10", "PGH", "FURB", "PERF", "AIR", "NPY", "FLY"]
 
 # we need to check 'mood' of all docstrings, this needs to be enabled explicitly
 lint.extend-select = ["D401"]
 
-lint.ignore = ["RUF021", "A004"]
+lint.ignore = []
 
 target-version = "py311"
 lint.pydocstyle.convention = "google"
@@ -46,7 +46,7 @@ dev = [
     "pytest-asyncio==0.24.0",
     "pydantic==2.9.1",
     "rouge-score==0.1.2",  # Required for model evaluation
-    "ruff==0.7.0",
+    "ruff==0.8.0",
     "bandit==1.7.9",
     "types-requests==2.32.0.20240622",
     "gradio==4.44.0",
