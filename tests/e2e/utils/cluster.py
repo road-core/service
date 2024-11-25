@@ -173,7 +173,7 @@ def get_pod_by_prefix(
         result = get_pods(namespace)
         for pod in result:
             if prefix in pod:
-                pods.append(pod)
+                pods.append(pod)  # noqa: PERF401
         if fail_not_found and not pods:
             assert False, f"No OLS api server pod found in list pods: {result}"
         return pods
