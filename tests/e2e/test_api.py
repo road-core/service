@@ -9,10 +9,10 @@ from argparse import Namespace
 import pytest
 import requests
 from httpx import Client
+from scripts.evaluation.response_evaluation import ResponseEvaluation
 
 from ols.constants import HTTP_REQUEST_HEADERS_TO_REDACT
 from ols.utils import suid
-from scripts.evaluation.response_evaluation import ResponseEvaluation
 from tests.e2e.utils import client as client_utils
 from tests.e2e.utils import cluster as cluster_utils
 from tests.e2e.utils import metrics as metrics_utils
