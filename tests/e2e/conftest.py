@@ -10,8 +10,8 @@ import uuid
 import pytest
 from pytest import TestReport
 from reportportal_client import RPLogger
-
 from scripts.upload_artifact_s3 import upload_artifact_s3
+
 from tests.e2e import test_api
 
 aws_env: dict[str, str] = {}
