@@ -7,7 +7,11 @@ ARTIFACT_DIR := $(if $(ARTIFACT_DIR),$(ARTIFACT_DIR),tests/test_results)
 TEST_TAGS := $(if $(TEST_TAGS),$(TEST_TAGS),"")
 SUITE_ID := $(if $(SUITE_ID),$(SUITE_ID),"nosuite")
 PROVIDER := $(if $(PROVIDER),$(PROVIDER),"openai")
-MODEL := $(if $(MODEL),$(MODEL),"gpt-3.5-turbo")
+MODEL := $(if $(MODEL),$(MODEL),"gpt-4o-mini")
+
+# Python registry to where the package should be uploaded
+PYTHON_REGISTRY = testpypi
+
 
 images: requirements.txt ## Build container images
 	scripts/build-container.sh
@@ -19,12 +23,12 @@ install-tools:	install-woke ## Install required utilities/tools
 	pdm --version
 	# this is quick fix for OLS-758: "Verify" CI job is broken after new Mypy 1.10.1 was released 2 days ago
 	# CI job configuration would need to be updated in follow-up task
-	# pip uninstall -y mypy 2> /dev/null || true
+	# pip uninstall -v -y mypy 2> /dev/null || true
 	# display setuptools version
 	pip show setuptools
 	export PIP_DEFAULT_TIMEOUT=100
 	# install all dependencies, including devel ones
-	pdm install --dev
+	pdm install --dev --fail-fast -v
 	# check that correct mypy version is installed
 	# mypy --version
 	pdm run mypy --version
@@ -129,11 +133,21 @@ config.puml: ## Generate PlantUML class diagram for configuration
 	pyreverse ols/app/models/config.py --output puml --output-directory=docs/
 	mv docs/classes.puml docs/config.puml
 
+llms.puml: ## Generate PlantUML class diagram for LLM plugin system
+	pyreverse ols/src/llms/ --output puml --output-directory=docs
+	mv docs/classes.puml docs/llms_classes.uml
+
+distribution-archives: ## Generate distribution archives to be uploaded into Python registry
+	pdm run python -m build
+
+upload-distribution-archives: ## Upload distribution archives into Python registry
+	pdm run python -m twine upload --repository ${PYTHON_REGISTRY} dist/*
+
 help: ## Show this help screen
 	@echo 'Usage: make <OPTIONS> ... <TARGETS>'
 	@echo ''
 	@echo 'Available targets are:'
 	@echo ''
 	@grep -E '^[ a-zA-Z0-9_.-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-33s\033[0m %s\n", $$1, $$2}'
 	@echo ''
