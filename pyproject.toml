@@ -75,7 +75,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project]
-name = "ols"
+name = "road-core"
 version = "0.2.1"
 description = "Road-core service is an AI powered assistant that runs on OpenShift and provides answers to product questions using backend LLM services."
 authors = []
