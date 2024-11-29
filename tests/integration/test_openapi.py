@@ -48,7 +48,7 @@ def test_openapi_endpoint():
     # check application description
     info = payload["info"]
     assert "description" in info, "Service description not provided"
-    assert "OpenShift LightSpeed Service API specification" in info["description"]
+    assert "Road-core service API specification" in info["description"]
 
     # elementary check that all mandatory endpoints are covered
     paths = payload["paths"]
