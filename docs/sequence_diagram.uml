@@ -11,11 +11,11 @@
 @startuml
 skin rose
 
-header Sequence diagram for OpenShift LightSpeed Service
+header Sequence diagram for Road-core service
 footer Copyright © 2024 Red Hat, Inc. Author: Pavel Tisnovsky
 
 actor "User" as user
-participant "Lightspeed\nService" as ols
+participant "Road-core\nservice" as rds
 control "Redactor" as redactor
 control "Question\nValidator" as question_validator
 control "Document\nSummarizer" as document_summarizer
@@ -25,47 +25,47 @@ collections "LLM" as llm
 
 == Question ==
 
-user -> ols: Question
+user -> rds: Question
 
 == Redaction ==
 
-ols -> redactor: Redact query
-redactor -> ols: Redacted query
+rds -> redactor: Redact query
+redactor -> rds: Redacted query
 
 == Conversation history ==
 
-ols -> cache: Retrieve conversation history
-cache -> ols: Conversation history
+rds -> cache: Retrieve conversation history
+cache -> rds: Conversation history
 
 == Attachments ==
 
-ols -> ols: Retrieve attachments from request
-ols -> ols: Attachments
-ols -> redactor: Redact attachments
-redactor -> ols: Redacted attachments
+rds -> rds: Retrieve attachments from request
+rds -> rds: Attachments
+rds -> redactor: Redact attachments
+redactor -> rds: Redacted attachments
 
 == Validation ==
 
-ols -> question_validator: Validate question
+rds -> question_validator: Validate question
 question_validator -> llm: Query
 llm -> question_validator: Valid or invalid
 
 == Answer generation ==
 
 alt "Invalid question case"
-question_validator -> ols: Invalid question
-ols -> user: Your question\nis not valid
+question_validator -> rds: Invalid question
+rds -> user: Your question\nis not valid
 end
 
 alt "Valid question case"
-question_validator -> ols: Valid question
-ols -> document_summarizer: Summarize document
+question_validator -> rds: Valid question
+rds -> document_summarizer: Summarize document
 document_summarizer -> vector_db: Read vector DB (RAG)
 vector_db -> document_summarizer: RAG DB content
 document_summarizer -> llm: Query
 llm -> document_summarizer: Answer
-document_summarizer -> ols: Summary
-ols -> user: Answer to\nyour question
+document_summarizer -> rds: Summary
+rds -> user: Answer to\nyour question
 end
 
 
