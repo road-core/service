@@ -258,7 +258,7 @@ spec:
           - name: COMMIT_SHA
             value: $(tasks.clone-repository.results.commit)
           - name: BUILD_ARGS
-            value: ["IMAGE_TAGS=pr-{{pull_request_number}} pr-{{pull_request_number}}.$(tasks.git-metadata.results.commit-timestamp)", "GIT_COMMIT=$(tasks.clone-repository.results.commit)", "RAG_CONTENTS_SUB_FOLDER=vector_db/aap_product_docs", "LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ttakamiy/aap-rag-content:latest"]
+            value: ["IMAGE_TAGS=pr-{{pull_request_number}} pr-{{pull_request_number}}.$(tasks.git-metadata.results.commit-timestamp)", "GIT_COMMIT=$(tasks.clone-repository.results.commit)", "RAG_CONTENTS_SUB_FOLDER=vector_db/aap_product_docs", "LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ansible/aap-rag-content:latest"]
           - name: BUILD_ARGS_FILE
             value: $(params.build-args-file)
         runAfter:
