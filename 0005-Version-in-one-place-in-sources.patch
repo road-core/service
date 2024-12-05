@@ -1,0 +1,80 @@
+From 8bc7d082b6cf7fe04dc29d6ad9c0ebd04bfd091f Mon Sep 17 00:00:00 2001
+From: Pavel Tisnovsky <ptisnovs@redhat.com>
+Date: Thu, 5 Dec 2024 13:36:30 +0100
+Subject: [PATCH 5/5] Version in one place in sources
+
+---
+ ols/app/main.py                                       |  4 ++--
+ ols/version.py                                        |  1 +
+ tests/integration/test_project_version_consistency.py | 11 ++++++++++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/ols/app/main.py b/ols/app/main.py
+index d1144269..50e530c0 100644
+--- a/ols/app/main.py
++++ b/ols/app/main.py
+@@ -7,13 +7,13 @@ from fastapi import FastAPI, Request, Response
+ from starlette.datastructures import Headers
+ from starlette.responses import StreamingResponse
+ 
+-from ols import config, constants
++from ols import config, constants, version
+ from ols.app import metrics, routers
+ 
+ app = FastAPI(
+     title="Swagger Road-core service - OpenAPI",
+     description="""Road-core service API specification.""",
+-    version="0.2.1",
++    version=version.__version__,
+     license_info={
+         "name": "Apache 2.0",
+         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+diff --git a/ols/version.py b/ols/version.py
+index 43560d13..c4b3fa50 100644
+--- a/ols/version.py
++++ b/ols/version.py
+@@ -1,3 +1,4 @@
+ """Service version that is read by project manager tools."""
+ 
++# this should be the only version value used in all source codes!!!
+ __version__ = "0.2.1"
+diff --git a/tests/integration/test_project_version_consistency.py b/tests/integration/test_project_version_consistency.py
+index 2469c2b4..94b3f7a5 100644
+--- a/tests/integration/test_project_version_consistency.py
++++ b/tests/integration/test_project_version_consistency.py
+@@ -5,7 +5,7 @@ import subprocess
+ 
+ import semantic_version
+ 
+-from ols import config
++from ols import config, version
+ 
+ 
+ def read_version_from_openapi():
+@@ -49,14 +49,23 @@ def check_semantic_version(value):
+ 
+ def test_project_version_consistency():
+     """Test than the project version is set consistently."""
++    # read the "true" version defined in sources
++    version_from_sources = version.__version__
++    check_semantic_version(version_from_sources)
++
++    # OpenAPI endpoint should contain version number
+     openapi_version = read_version_from_openapi()
+     check_semantic_version(openapi_version)
+ 
++    # version is dynamically put into pyproject.pdm
+     project_version = read_version_from_pyproject()
+     check_semantic_version(project_version)
+ 
++    # version is set into app object
+     app_version = read_version_from_app()
+     check_semantic_version(app_version)
+ 
++    # compare all versions for equality
++    assert version_from_sources == openapi_version
+     assert openapi_version == project_version
+     assert project_version == app_version
+-- 
+2.47.0
+
