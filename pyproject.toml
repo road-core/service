@@ -12,6 +12,10 @@ target-version = "py311"
 lint.pydocstyle.convention = "google"
 line-length = 100
 
+[tool.pdm.version]
+source = "file"
+path = "ols/version.py"
+
 [tool.coverage.report]
 # unit tests fails if the total coverage measurement is under this threshold value
 fail_under = 90
@@ -31,7 +35,7 @@ skips = []
 exclude_dirs = ["tests", "scripts"]
 
 [tool.pdm]
-distribution = false
+distribution = true
 
 [tool.pdm.dev-dependencies]
 dev = [
@@ -76,7 +80,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "road-core"
-version = "0.2.1"
+dynamic = ["version"]
 description = "Road-core service is an AI powered assistant that runs on OpenShift and provides answers to product questions using backend LLM services."
 authors = []
 dependencies = [
@@ -124,6 +128,7 @@ dependencies = [
     "filelock==3.16.1",
     "ffmpy==0.4.0",
     "virtualenv==20.28.0",
+    "msgpack==1.1.0",
 ]
 requires-python = "==3.11.*"
 readme = "README.md"
