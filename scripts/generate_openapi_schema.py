@@ -15,7 +15,7 @@ sys.path.append(
 from ols import config
 
 # it is needed to read proper configuration in order to start the app to generate schema
-cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
+cfg_file = os.environ.get("RCS_CONFIG_FILE", "scripts/rcsconfig.yaml")
 config.reload_from_yaml_file(cfg_file)
 
 from ols.app.main import app  # noqa: E402
@@ -26,6 +26,10 @@ if __name__ == "__main__":
         sys.exit(1)
 
     filename = sys.argv[1]
+
+    print("Service metadata:")
+    print(app.title)
+    print(app.description)
 
     # retrieve OpenAPI schema via initialized app
     open_api = get_openapi(
