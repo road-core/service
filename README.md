@@ -108,7 +108,7 @@ configure model, and connect to it.
 # Prerequisites
 
 * Python 3.11
-    - please note that currently Python 3.12 is not officially supported, because RDS service depends on some packages that can not be used in this Python version
+    - please note that currently Python 3.12 is not officially supported, because RCS service depends on some packages that can not be used in this Python version
 * Git, pip and [PDM](https://github.com/pdm-project/pdm?tab=readme-ov-file#installation)
 * An LLM API key or API secret (in case of Azure OpenAI)
 * (Optional) extra certificates to access LLM API
