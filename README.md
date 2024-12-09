@@ -462,7 +462,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
    Please look [here](https://github.com/openshift/lightspeed-service/blob/main/CONTRIBUTING.md#adding-a-new-providermodel) for more info.
 
 ## 10. TLS security profiles
-   TLS security profile can be set for the service itself and also for any configured provider. To specify TLS security profile for the service, the following section can be added into `rds` section in the `rdsconfig.yaml` configuration file:
+   TLS security profile can be set for the service itself and also for any configured provider. To specify TLS security profile for the service, the following section can be added into `rcs` section in the `rcsconfig.yaml` configuration file:
 
 ```
   tlsSecurityProfile:
