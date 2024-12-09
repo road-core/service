@@ -15,7 +15,7 @@ header Sequence diagram for Road-core service
 footer Copyright © 2024 Red Hat, Inc. Author: Pavel Tisnovsky
 
 actor "User" as user
-participant "Road-core\nservice" as rds
+participant "Road-core\nservice" as rcs
 control "Redactor" as redactor
 control "Question\nValidator" as question_validator
 control "Document\nSummarizer" as document_summarizer
@@ -25,47 +25,47 @@ collections "LLM" as llm
 
 == Question ==
 
-user -> rds: Question
+user -> rcs: Question
 
 == Redaction ==
 
-rds -> redactor: Redact query
-redactor -> rds: Redacted query
+rcs -> redactor: Redact query
+redactor -> rcs: Redacted query
 
 == Conversation history ==
 
-rds -> cache: Retrieve conversation history
-cache -> rds: Conversation history
+rcs -> cache: Retrieve conversation history
+cache -> rcs: Conversation history
 
 == Attachments ==
 
-rds -> rds: Retrieve attachments from request
-rds -> rds: Attachments
-rds -> redactor: Redact attachments
-redactor -> rds: Redacted attachments
+rcs -> rcs: Retrieve attachments from request
+rcs -> rcs: Attachments
+rcs -> redactor: Redact attachments
+redactor -> rcs: Redacted attachments
 
 == Validation ==
 
-rds -> question_validator: Validate question
+rcs -> question_validator: Validate question
 question_validator -> llm: Query
 llm -> question_validator: Valid or invalid
 
 == Answer generation ==
 
 alt "Invalid question case"
-question_validator -> rds: Invalid question
-rds -> user: Your question\nis not valid
+question_validator -> rcs: Invalid question
+rcs -> user: Your question\nis not valid
 end
 
 alt "Valid question case"
-question_validator -> rds: Valid question
-rds -> document_summarizer: Summarize document
+question_validator -> rcs: Valid question
+rcs -> document_summarizer: Summarize document
 document_summarizer -> vector_db: Read vector DB (RAG)
 vector_db -> document_summarizer: RAG DB content
 document_summarizer -> llm: Query
 llm -> document_summarizer: Answer
-document_summarizer -> rds: Summary
-rds -> user: Answer to\nyour question
+document_summarizer -> rcs: Summary
+rcs -> user: Answer to\nyour question
 end
 
 
