@@ -12,7 +12,10 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 )
 
-from ols import config  # pylint: disable=C0413
+# pylint: disable-next=C0413
+from ols import config
+
+# pylint: disable-next=C0413
 from ols.constants import (
     CONFIGURATION_FILE_NAME_ENV_VARIABLE,
     DEFAULT_CONFIGURATION_FILE,
@@ -47,5 +50,5 @@ if __name__ == "__main__":
     )
 
     # dump the schema into file
-    with open(filename, "w") as fout:
+    with open(filename, "w", encoding="utf-8") as fout:
         json.dump(open_api, fout, indent=4)
