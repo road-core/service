@@ -17,4 +17,4 @@ jobs:
       - name: Python linter installation
         run: pip install --user pylint
       - name: Python linter
-        run: pylint ols/
+        run: pylint ols/ scripts/
