@@ -10,6 +10,8 @@ from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
+from ols.customize import prompts
+from ols.customize.ols.reranker import rerank
 from ols.src.prompts.prompt_generator import GeneratePrompt
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
@@ -80,8 +82,10 @@ class DocsSummarizer(QueryHelper):
 
         if vector_index is not None:
             retriever = vector_index.as_retriever(similarity_top_k=RAG_CONTENT_LIMIT)
+            retrieved_nodes = retriever.retrieve(query)
+            retrieved_nodes = rerank(retrieved_nodes)
             rag_chunks, available_tokens = token_handler.truncate_rag_context(
-                retriever.retrieve(query), self.model, available_tokens
+                retrieved_nodes, self.model, available_tokens
             )
         else:
             logger.warning("Proceeding without RAG content. Check start up messages.")
