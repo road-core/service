@@ -10,7 +10,6 @@ from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
-from ols.customize import prompts
 from ols.customize.ols.reranker import rerank
 from ols.src.prompts.prompt_generator import GeneratePrompt
 from ols.src.query_helpers.query_helper import QueryHelper
