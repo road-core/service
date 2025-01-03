@@ -22,24 +22,21 @@ from tests.mock_classes.mock_langchain_interface import mock_langchain_interface
 from tests.mock_classes.mock_llm_chain import mock_llm_chain
 from tests.mock_classes.mock_llm_loader import mock_llm_loader
 
-client: TestClient
-
 
 @pytest.fixture(scope="function")
 def _setup():
     """Setups the test client."""
     config.reload_from_yaml_file("tests/config/config_for_integration_tests.yaml")
-    global client
 
     # app.main need to be imported after the configuration is read
     from ols.app.main import app  # pylint: disable=C0415
 
-    client = TestClient(app)
+    pytest.client = TestClient(app)
 
 
 def test_post_question_on_unexpected_payload(_setup):
     """Check the REST API /v1/query with POST HTTP method when unexpected payload is posted."""
-    response = client.post("/v1/query", json="this is really not proper payload")
+    response = pytest.client.post("/v1/query", json="this is really not proper payload")
     assert response.status_code == requests.codes.unprocessable
 
     # try to deserialize payload
@@ -64,7 +61,7 @@ def test_post_question_on_unexpected_payload(_setup):
 def test_post_question_without_payload(_setup):
     """Check the REST API /v1/query with POST HTTP method when no payload is posted."""
     # perform POST request without any payload
-    response = client.post("/v1/query")
+    response = pytest.client.post("/v1/query")
     assert response.status_code == requests.codes.unprocessable
 
     # check the response payload
@@ -80,7 +77,7 @@ def test_post_question_on_invalid_question(_setup):
     # let's pretend the question is invalid without even asking LLM
     with patch("ols.app.endpoints.ols.validate_question", return_value=False):
         conversation_id = suid.get_suid()
-        response = client.post(
+        response = pytest.client.post(
             "/v1/query",
             json={"conversation_id": conversation_id, "query": "test query"},
         )
@@ -110,7 +107,7 @@ def test_post_question_on_generic_response_type_summarize_error(_setup):
         ),
     ):
         conversation_id = suid.get_suid()
-        response = client.post(
+        response = pytest.client.post(
             "/v1/query",
             json={"conversation_id": conversation_id, "query": "test query"},
         )
@@ -137,7 +134,7 @@ def test_post_question_that_is_not_validated(_setup):
         side_effect=Exception("can not validate"),
     ):
         conversation_id = suid.get_suid()
-        response = client.post(
+        response = pytest.client.post(
             "/v1/query",
             json={"conversation_id": conversation_id, "query": "test query"},
         )
@@ -156,7 +153,7 @@ def test_post_question_that_is_not_validated(_setup):
 def test_post_question_with_provider_but_not_model(_setup):
     """Check how missing model is detected in request."""
     conversation_id = suid.get_suid()
-    response = client.post(
+    response = pytest.client.post(
         "/v1/query",
         json={
             "conversation_id": conversation_id,
@@ -176,7 +173,7 @@ def test_post_question_with_provider_but_not_model(_setup):
 def test_post_question_with_model_but_not_provider(_setup):
     """Check how missing provider is detected in request."""
     conversation_id = suid.get_suid()
-    response = client.post(
+    response = pytest.client.post(
         "/v1/query",
         json={
             "conversation_id": conversation_id,
@@ -197,7 +194,7 @@ def test_unknown_provider_in_post(_setup):
     """Check the REST API /v1/query with POST method when unknown provider is requested."""
     # empty config - no providers
     config.llm_config.providers = {}
-    response = client.post(
+    response = pytest.client.post(
         "/v1/query",
         json={
             "query": "hello?",
@@ -229,7 +226,7 @@ def test_unsupported_model_in_post(_setup):
     provider_config.models = {}  # no models configured
     config.llm_config.providers = {test_provider: provider_config}
 
-    response = client.post(
+    response = pytest.client.post(
         "/v1/query",
         json={
             "query": "hello?",
@@ -259,7 +256,7 @@ def test_post_question_improper_conversation_id(_setup) -> None:
     ):
 
         conversation_id = "not-correct-uuid"
-        response = client.post(
+        response = pytest.client.post(
             "/v1/query",
             json={
                 "conversation_id": conversation_id,
@@ -295,7 +292,7 @@ def test_post_question_on_noyaml_response_type(_setup) -> None:
             ),
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -327,7 +324,7 @@ def test_post_question_with_keyword(mock_llm_validation, _setup) -> None:
         ),
     ):
         conversation_id = suid.get_suid()
-        response = client.post(
+        response = pytest.client.post(
             "/v1/query",
             json={"conversation_id": conversation_id, "query": query},
         )
@@ -367,7 +364,7 @@ def test_post_query_with_query_filters_response_type(_setup) -> None:
             ),
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -408,7 +405,7 @@ def test_post_query_for_conversation_history(_setup) -> None:
             ) as token_counter,
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -424,7 +421,7 @@ def test_post_query_for_conversation_history(_setup) -> None:
             )
             invoke.reset_mock()
 
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -475,7 +472,7 @@ def test_post_question_without_attachments(_setup) -> None:
             ),
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -518,7 +515,7 @@ def test_post_question_with_empty_list_of_attachments(_setup) -> None:
             ),
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -562,7 +559,7 @@ def test_post_question_with_one_plaintext_attachment(_setup) -> None:
             ),
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -624,7 +621,7 @@ kind: Pod
 metadata:
      name: private-reg
 """
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -695,7 +692,7 @@ kind: Deployment
 metadata:
      name: foobar-deployment
 """
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -775,7 +772,7 @@ def test_post_question_with_one_yaml_without_kind_attachment(_setup) -> None:
 metadata:
      name: private-reg
 """
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -840,7 +837,7 @@ kind: Deployment
 metadata:
      foo: bar
 """
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -906,7 +903,7 @@ kind: Pod
 *metadata:
      name: private-reg
 """
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -971,7 +968,7 @@ logs:
         ):
             conversation_id = suid.get_suid()
 
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
@@ -993,7 +990,7 @@ def test_post_too_long_query(_setup):
     """Check the REST API /v1/query with POST HTTP method for query that is too long."""
     query = "test query" * 1000
     conversation_id = suid.get_suid()
-    response = client.post(
+    response = pytest.client.post(
         "/v1/query",
         json={"conversation_id": conversation_id, "query": query},
     )
@@ -1029,7 +1026,7 @@ def _post_with_system_prompt_override(_setup, caplog, query, system_prompt):
             ),
         ):
             conversation_id = suid.get_suid()
-            response = client.post(
+            response = pytest.client.post(
                 "/v1/query",
                 json={
                     "conversation_id": conversation_id,
