@@ -1,0 +1,24 @@
+name: Check dependencies
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  check_dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check Python version
+        run: python --version
+      - name: Install pip-tools
+        run: pip install --user pip-tools
+      - name: Check lip-compile version
+        run: pip-compile --version
+      - name: Generate requirements.txt file
+        run: pip-compile -v --generate-hashes pyproject.toml
+      - name: List requirements.txt file
+        run: cat requirements.txt
