@@ -35,6 +35,7 @@ from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +103,7 @@ def conversation_request(
     # Log incoming request (after redaction)
     logger.info("%s Incoming request: %s", conversation_id, llm_request.query)
 
-    previous_input = retrieve_previous_input(user_id, llm_request)
+    previous_input = retrieve_previous_input(user_id, llm_request.conversation_id)
     timestamps["retrieve previous input"] = time.time()
 
     # Retrieve attachments from the request
@@ -172,6 +173,43 @@ def conversation_request(
     )
 
 
+
+@router.get("/conversations/{conversation_id}", responses=query_responses)
+def get_conversation(
+    conversation_id: str,
+    user_id: str | None = None,
+    auth: Any = Depends(auth_dependency)
+) -> list[BaseMessage]:
+    """Handle conversation requests for the OLS endpoint.
+
+    Args:
+        auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
+        conversation_id: The conversation ID to retrieve.
+        user_id: The user ID to retrieve the conversation for.
+
+    Returns:
+        List of conversation messages.
+    """
+    # Initialize variables
+    previous_input = []
+    chat_history: list[BaseMessage] = []
+
+    effective_user_id = user_id or retrieve_user_id(auth)
+    logger.info("User ID %s", effective_user_id)
+
+    # Log incoming request (after redaction)
+    logger.info("Getting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
+
+    previous_input = retrieve_previous_input(effective_user_id, conversation_id)
+
+    for entry in previous_input:
+        chat_history.append(entry.query)
+        chat_history.append(entry.response)
+
+    return chat_history
+
+
+
 def log_processing_durations(timestamps: dict[str, float]) -> None:
     """Log processing durations."""
 
@@ -224,19 +262,19 @@ def retrieve_conversation_id(llm_request: LLMRequest) -> str:
     return conversation_id
 
 
-def retrieve_previous_input(user_id: str, llm_request: LLMRequest) -> list[CacheEntry]:
+def retrieve_previous_input(user_id: str, conversation_id: str) -> list[CacheEntry]:
     """Retrieve previous user input, if exists."""
     try:
         previous_input = []
-        if llm_request.conversation_id:
+        if conversation_id:
             cache_content = config.conversation_cache.get(
-                user_id, llm_request.conversation_id
+                user_id, conversation_id
             )
             if cache_content is not None:
                 previous_input = cache_content
             logger.info(
                 "%s Previous conversation input: %s",
-                llm_request.conversation_id,
+                conversation_id,
                 previous_input,
             )
         return previous_input
@@ -359,8 +397,8 @@ def store_conversation_history(
         if config.conversation_cache is not None:
             logger.info("%s Storing conversation history", conversation_id)
             cache_entry = CacheEntry(
-                query=llm_request.query,
-                response=response,
+                query=HumanMessage(llm_request.query),
+                response=AIMessage(response),
                 attachments=attachments,
             )
             config.conversation_cache.insert_or_append(

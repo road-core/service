@@ -11,6 +11,7 @@ from langchain_core.prompts import (
 
 from ols.constants import ModelFamily
 from ols.customize import prompts
+from langchain_core.messages import BaseMessage
 
 
 def restructure_rag_context_pre(text: str, model: str) -> str:
@@ -27,16 +28,16 @@ def restructure_rag_context_post(text: str, model: str) -> str:
     return "\n" + text.lstrip("\n") + "\n"
 
 
-def restructure_history(text: str, model: str) -> str:
+def restructure_history(message: BaseMessage , model: str) -> str:
     """Restructure history."""
     if ModelFamily.GRANITE not in model:
         # No processing required here for gpt.
-        return text
+        return message
 
     # Granite specific formatting for history
-    if text.startswith("human: "):
-        return "\n<|user|>\n" + text.removeprefix("human: ")
-    return "\n<|assistant|>\n" + text.removeprefix("ai: ")
+    if isinstance(message, HumanMessage):
+        return "\n<|user|>\n" + message.content
+    return "\n<|assistant|>\n" + message.content
 
 
 class GeneratePrompt:
@@ -46,7 +47,7 @@ class GeneratePrompt:
         self,
         query: str,
         rag_context: list[str] = [],
-        history: list[str] = [],
+        history: list[BaseMessage] = [],
         system_instruction: str = prompts.QUERY_SYSTEM_INSTRUCTION,
     ):
         """Initialize prompt generator."""
@@ -68,13 +69,13 @@ class GeneratePrompt:
             )
 
         if len(self._history) > 0:
-            chat_history = []
-            for h in self._history:
-                if h.startswith("human: "):
-                    chat_history.append(HumanMessage(content=h.removeprefix("human: ")))
-                else:
-                    chat_history.append(AIMessage(content=h.removeprefix("ai: ")))
-            llm_input_values["chat_history"] = chat_history
+            # chat_history = []
+            # for h in self._history:
+            #     if h.type == "human":
+            #         chat_history.append(HumanMessage(content=h.removeprefix("human: ")))
+            #     else:
+            #         chat_history.append(AIMessage(content=h.removeprefix("ai: ")))
+            llm_input_values["chat_history"] = self._history
 
             sys_intruction = (
                 sys_intruction + "\n" + prompts.USE_HISTORY_INSTRUCTION.strip()
@@ -112,6 +113,7 @@ class GeneratePrompt:
             prompt_message = prompt_message + "\n{context}"
         if "chat_history" in llm_input_values:
             prompt_message = prompt_message + "\n{chat_history}"
+            
 
         prompt_message = prompt_message + "\n<|user|>\n{query}\n<|assistant|>\n"
         return PromptTemplate.from_template(prompt_message), llm_input_values
@@ -120,6 +122,6 @@ class GeneratePrompt:
         self, model: str
     ) -> tuple[ChatPromptTemplate | PromptTemplate, dict]:
         """Generate prompt."""
-        if ModelFamily.GRANITE in model:
-            return self._generate_prompt_granite()
+        # if ModelFamily.GRANITE in model:
+        #     return self._generate_prompt_granite()
         return self._generate_prompt_gpt()

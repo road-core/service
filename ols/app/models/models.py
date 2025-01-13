@@ -10,6 +10,9 @@ from ols.customize import prompts
 from ols.utils import suid
 
 
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+
+
 class Attachment(BaseModel):
     """Model representing an attachment that can be send from UI as part of query.
 
@@ -539,8 +542,8 @@ class CacheEntry(BaseModel):
         response: The response string.
     """
 
-    query: str
-    response: Optional[str] = ""
+    query: HumanMessage
+    response: AIMessage
     attachments: list[Attachment] = []
 
     @field_validator("response")
@@ -571,12 +574,12 @@ class CacheEntry(BaseModel):
         )
 
     @staticmethod
-    def cache_entries_to_history(cache_entries: list["CacheEntry"]) -> list[str]:
+    def cache_entries_to_history(cache_entries: list["CacheEntry"]) -> list[BaseMessage]:
         """Convert cache entries to a history."""
-        history = []
+        history: list[BaseMessage] = []
         for entry in cache_entries:
-            history.append(f"human: {entry.query.strip()}")
+            history.append(entry.query)
             # the real response or empty string when response is not recorded
-            history.append(f"ai: {str(entry.response).strip()}")
+            history.append(entry.response)
 
         return history

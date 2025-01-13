@@ -19,6 +19,8 @@ from ols.src.prompts.prompt_generator import (
     restructure_rag_context_pre,
 )
 
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+
 logger = logging.getLogger(__name__)
 
 
@@ -178,7 +180,7 @@ class TokenHandler:
         return rag_chunks, max_tokens
 
     def limit_conversation_history(
-        self, history: list[str], model: str, limit: int = 0
+        self, history: list[BaseMessage], model: str, limit: int = 0
     ) -> tuple[list[str], bool]:
         """Limit conversation history to specified number of tokens."""
         total_length = 0
@@ -186,9 +188,9 @@ class TokenHandler:
 
         for original_message in reversed(history):
             # Restructure messages as per model
-            message = restructure_history(original_message, model)
-
-            message_length = TokenHandler._get_token_count(self.text_to_tokens(message))
+            message = original_message #restructure_history(original_message, model)
+            print("Message is: ", message)
+            message_length = TokenHandler._get_token_count(self.text_to_tokens(message.content))
             total_length += message_length
             # if total length of already checked messages is higher than limit
             # then skip all remaining messages (we need to skip from top)
@@ -199,4 +201,4 @@ class TokenHandler:
                 return formatted_history[::-1], True
             formatted_history.append(message)
 
-        return formatted_history[::-1], False
+        return formatted_history[::-1], False # reverse back to original order

@@ -3,7 +3,7 @@
 import logging
 from typing import Any, Optional
 
-from langchain.chains import LLMChain
+from langchain.chains.llm import LLMChain
 from llama_index.core import VectorStoreIndex
 
 from ols import config
@@ -14,6 +14,7 @@ from ols.customize import reranker
 from ols.src.prompts.prompt_generator import GeneratePrompt
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
+from langchain_core.messages import AIMessage, BaseMessage
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class DocsSummarizer(QueryHelper):
         conversation_id: str,
         query: str,
         vector_index: Optional[VectorStoreIndex] = None,
-        history: Optional[list[str]] = None,
+        history: Optional[list[BaseMessage]] = None,
     ) -> SummarizerResponse:
         """Summarize the given query based on the provided conversation context.
 
@@ -50,7 +51,7 @@ class DocsSummarizer(QueryHelper):
         """
         # if history is not provided, initialize to empty history
         if history is None:
-            history = []
+            history:list[BaseMessage] = []
 
         verbose = config.ols_config.logging_config.app_log_level == logging.DEBUG
 
@@ -71,7 +72,7 @@ class DocsSummarizer(QueryHelper):
         # Use sample text for context/history to get complete prompt instruction.
         # This is used to calculate available tokens.
         temp_prompt, temp_prompt_input = GeneratePrompt(
-            query, ["sample"], ["ai: sample"], self._system_prompt
+            query, ["sample"], [AIMessage("sample")], self._system_prompt
         ).generate_prompt(self.model)
         available_tokens = token_handler.calculate_and_check_available_tokens(
             temp_prompt.format(**temp_prompt_input),
@@ -110,6 +111,7 @@ class DocsSummarizer(QueryHelper):
             model_config.parameters.max_tokens_for_response,
         )
 
+        print(final_prompt.format(**llm_input_values))
         chat_engine = LLMChain(
             llm=bare_llm,
             prompt=final_prompt,
@@ -125,7 +127,6 @@ class DocsSummarizer(QueryHelper):
                 input=llm_input_values,
                 config={"callbacks": [token_counter]},
             )
-
         # retrieve text response returned from LLM, strip whitespace characters from beginning/end
         response = summary["text"].strip()
         # TODO: Better handling of stop token.
