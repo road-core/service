@@ -14,7 +14,11 @@ jobs:
           python-version: '3.11'
       - name: Python version
         run: python --version
-      - name: Python linter installation
-        run: pip install --user pylint
+      - name: PDM installation
+        run: pip install --user pdm
+      - name: Install dependencies
+        run: pdm install
+      - name: Install devel dependencies
+        run: pdm install --dev
       - name: Python linter
-        run: pylint ols/ scripts/
+        run: pdm run pylint ols/ scripts/ tests/ runner.py
