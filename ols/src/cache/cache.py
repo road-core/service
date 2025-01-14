@@ -64,3 +64,27 @@ class Cache(ABC):
             conversation_id: Conversation ID unique for given user.
             cache_entry: The value to store.
         """
+
+
+    @abstractmethod
+    def delete(self, user_id: str, conversation_id: str) -> bool:
+        """Delete all entries for a given conversation.
+        
+        Args:
+            user_id: User identification.
+            conversation_id: Conversation ID unique for given user.
+            
+        Returns:
+            bool: True if entries were deleted, False if key wasn't found.
+        """
+
+    @abstractmethod
+    def list(self, user_id: str) -> list[str]:
+        """List all conversations for a given user_id.
+        
+        Args:
+            user_id: User identification.
+            
+        Returns:
+            A list of conversation ids from the cache
+        """
