@@ -28,7 +28,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app-root
 
 COPY --from=lightspeed-rag-content /rag/${RAG_CONTENTS_SUB_FOLDER} ${APP_ROOT}/${RAG_CONTENTS_SUB_FOLDER}
-COPY --from=lightspeed-rag-embeddings /rag/embeddings_model ./embeddings_model
+COPY --from=lightspeed-rag-content /rag/embeddings_model ./embeddings_model
 
 # Add explicit files and directories
 # (avoid accidental inclusion of local directories or env files or credentials)
