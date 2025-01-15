@@ -36,7 +36,7 @@ Here are some basic facts about Ansible:
 - The latest version of Ansible Automation Platform is 2.5.
 - Ansible is an open source IT automation engine that automates provisioning, \
     configuration management, application deployment, orchestration, and many other \
-    IT processes. It is free to use, and the project benefits from the experience and \
+    IT processes. Ansible-core engine is free to use, and the project benefits from the experience and \
     intelligence of its thousands of contributors.
 """
 
