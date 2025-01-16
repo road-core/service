@@ -11,9 +11,8 @@ from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import RagChunk, SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
-from ols.customize import reranker
+from ols.customize import prompts, reranker
 from ols.src.prompts.prompt_generator import GeneratePrompt
-from ols.src.prompts.prompts import QUERY_SYSTEM_INSTRUCTION
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
 
@@ -48,7 +47,7 @@ class DocsSummarizer(QueryHelper):
         if config.ols_config.system_prompt is not None:
             self.system_prompt = config.ols_config.system_prompt
         else:
-            self.system_prompt = QUERY_SYSTEM_INSTRUCTION
+            self.system_prompt = prompts.QUERY_SYSTEM_INSTRUCTION
         logger.debug("System prompt: %s", self.system_prompt)
 
     def _prepare_prompt(

@@ -148,8 +148,8 @@ def test_summarize_reranker(caplog):
     summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
     question = "What's the ultimate question with answer 42?"
     rag_index = MockLlamaIndex()
-    # no history is passed into summarize() method
-    summary = summarizer.summarize(conversation_id, question, rag_index)
+    # no history is passed into create_response() method
+    summary = summarizer.create_response(question, rag_index)
     check_summary_result(summary, question)
 
     # Check captured log text to see if reranker was called.

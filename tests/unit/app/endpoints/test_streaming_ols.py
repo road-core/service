@@ -15,6 +15,7 @@ from ols.app.endpoints.streaming_ols import (
     stream_start_event,
 )
 from ols.app.models.models import RagChunk
+from ols.customize import prompts
 from ols.utils import suid
 
 conversation_id = suid.get_suid()
@@ -42,7 +43,7 @@ async def test_invalid_response_generator():
 
     response = await drain_generator(generator)
 
-    assert response == constants.INVALID_QUERY_RESP
+    assert response == prompts.INVALID_QUERY_RESP
 
 
 def test_build_yield_item():

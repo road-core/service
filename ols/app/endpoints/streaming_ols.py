@@ -32,6 +32,7 @@ from ols.app.models.models import (
     UnauthorizedResponse,
 )
 from ols.constants import MEDIA_TYPE_TEXT
+from ols.customize import prompts
 from ols.src.auth.auth import get_auth_dependency
 from ols.utils import errors_parsing
 from ols.utils.token_handler import PromptTooLongError
@@ -119,7 +120,7 @@ async def invalid_response_generator() -> AsyncGenerator[str, None]:
     Yields:
         str: The response indicating invalid query.
     """
-    yield constants.INVALID_QUERY_RESP
+    yield prompts.INVALID_QUERY_RESP
 
 
 def stream_start_event(conversation_id: str) -> str:
