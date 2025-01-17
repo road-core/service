@@ -11,7 +11,6 @@ from typing import Any, Generator, Optional, Union
 
 import pytz
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
 
 from ols import config, constants
 from ols.app import metrics
@@ -36,7 +35,7 @@ from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 logger = logging.getLogger(__name__)
 
@@ -140,109 +139,6 @@ def conversation_request(
     )
 
 
-
-@router.get("/conversations/{conversation_id}")
-def get_conversation(
-    conversation_id: str,
-    user_id: str | None = None,
-    auth: Any = Depends(auth_dependency)
-) -> list[BaseMessage]:
-    """Get conversation history for a given conversation ID.
-
-    Args:
-        auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
-        conversation_id: The conversation ID to retrieve.
-        user_id: (Optional)The user ID to retrieve the conversation for.
-
-    Returns:
-        List of conversation messages.
-    
-    Raises:
-        HTTPException: 404 if conversation not found
-    """
-    # Initialize variables
-    previous_input = []
-    chat_history: list[BaseMessage] = []
-
-    effective_user_id = user_id or retrieve_user_id(auth)
-    logger.info("User ID %s", effective_user_id)
-
-    # Log incoming request (after redaction)
-    logger.info("Getting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
-
-    previous_input = retrieve_previous_input(effective_user_id, conversation_id)
-    if previous_input.__len__() == 0:
-        logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
-        raise HTTPException(
-            status_code=404,
-            detail=f"Conversation {conversation_id} not found"
-        ) 
-    for entry in previous_input:
-        chat_history.append(entry.query)
-        chat_history.append(entry.response)
-
-    return chat_history
-
-
-@router.delete("/conversations/{conversation_id}")
-def get_conversation(
-    conversation_id: str,
-    user_id: str | None = None,
-    auth: Any = Depends(auth_dependency)
-) -> JSONResponse:
-    """Delete conversation history for a given conversation ID.
-
-    Args:
-        auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
-        conversation_id: The conversation ID to delete.
-        user_id: (Optional)The user ID to delete the conversation for.
-    
-    Raises:
-        HTTPException: 404 if conversation not found
-
-    """
-
-    effective_user_id = user_id or retrieve_user_id(auth)
-    logger.info("User ID %s", effective_user_id)
-
-    # Log incoming request (after redaction)
-    logger.info("Deleting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
-
-    if config.conversation_cache.delete(effective_user_id, conversation_id):
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"message": f"Conversation {conversation_id} successfully deleted"}
-        )
-    else:
-        logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
-        raise HTTPException(
-            status_code=404,
-            detail=f"Conversation {conversation_id} not found"
-        )
-
-
-@router.get("/conversations")
-def get_conversation(
-    user_id: str | None = None,
-    auth: Any = Depends(auth_dependency)
-) -> list[str]:
-    """List all conversations for a given user.
-
-    Args:
-        auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
-        user_id: (Optional)The user ID to get all conversations for.
-
-    """
-
-    effective_user_id = user_id or retrieve_user_id(auth)
-    logger.info("User ID %s", effective_user_id)
-
-    # Log incoming request (after redaction)
-    logger.info("Listing all conversations for user: %s ", user_id)
-
-    return config.conversation_cache.list(effective_user_id)
-
-
 def process_request(
     auth: Any, llm_request: LLMRequest
 ) -> tuple[str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float]]:
@@ -276,7 +172,7 @@ def process_request(
     # Log incoming request (after redaction)
     logger.info("%s Incoming request: %s", conversation_id, llm_request.query)
 
-    previous_input = retrieve_previous_input(user_id, llm_request)
+    previous_input = retrieve_previous_input(user_id, llm_request.conversation_id)
     timestamps["retrieve previous input"] = time.time()
 
     # Retrieve attachments from the request

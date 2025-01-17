@@ -213,7 +213,9 @@ class PostgresCache(Cache):
         
         with self.conn.cursor() as cursor:
             try:
-                return PostgresCache._list(cursor, user_id)
+                cursor.execute(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,))
+                rows = cursor.fetchall()
+                return [row[0] for row in rows]
             except psycopg2.DatabaseError as e:
                 logger.error("PostgresCache.list: %s", e)
                 raise CacheError("PostgresCache.list", e) from e
@@ -293,12 +295,3 @@ class PostgresCache(Cache):
         )
         return cursor.fetchone() is not None
     
-
-    @staticmethod
-    def _list(
-        cursor: psycopg2.extensions.cursor, user_id: str
-    ) -> list[str]:
-        """List all conversation IDs for given user_id."""
-        cursor.execute(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,))
-        rows = cursor.fetchall()
-        return [row[0] for row in rows]
