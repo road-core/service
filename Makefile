@@ -13,7 +13,7 @@ MODEL := $(if $(MODEL),$(MODEL),"gpt-4o-mini")
 PYTHON_REGISTRY = testpypi
 
 
-images: requirements.txt ## Build container images
+images: ## Build container images
 	scripts/build-container.sh
 
 install-tools:	install-woke ## Install required utilities/tools
@@ -115,7 +115,7 @@ verify:	install-woke install-deps-test ## Verify the code using various linters
 	pdm run black . --check
 	pdm run ruff check . --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
 	./woke . --exit-1-on-failure
-	pylint ols scripts tests
+	pylint ols scripts tests runner.py
 
 schema:	## Generate OpenAPI schema file
 	python scripts/generate_openapi_schema.py docs/openapi.json

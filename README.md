@@ -53,6 +53,7 @@ configure model, and connect to it.
     * [9. Registering a new LLM provider](#9-registering-a-new-llm-provider)
     * [10. TLS security profiles](#10-tls-security-profiles)
     * [11. Fine tuning](#11-fine-tuning)
+    * [12. Configuration dump](#12-configuration-dump)
 * [Usage](#usage)
     * [Deployments](#deployments)
         * [Local Deployment](#local-deployment)
@@ -66,6 +67,8 @@ configure model, and connect to it.
         * [Metrics](#metrics)
         * [Gradio UI](#gradio-ui)
         * [Swagger UI](#swagger-ui-1)
+        * [CPU profiling](#cpu-profiling)
+        * [Memory profiling](#memory-profiling)
     * [Deploying RCS on OpenShift](#deploying-rcs-on-openshift)
 * [Project structure](#project-structure)
     * [Overall architecture](#overall-architecture)
@@ -514,6 +517,12 @@ rcs_config:
 Additionally an optional string parameter `system_prompt` can be specified in `/v1/query` endpoint to override the configured system prompt. This override mechanism can be used only when the `dev_config.enable_system_prompt_override` configuration options is set to `true` in the service configuration file. Please note that the default value for this option is `false`, so the system prompt cannot be changed. This means, when the `dev_config.enable_system_prompt_override` is set to `false` and `/v1/query` is invoked with the `system_prompt` parameter, the value specified in `system_prompt` parameter is ignored.
 
 
+## 12. Configuration dump
+
+It is possible to dump the actual configuration into a JSON file for further processing. The generated configuration file will contain all the configuration attributes, including keys etc., so keep the output file in a secret.
+
+In order to dump the configuration, pass `--dump-config` command line option.
+
 
 # Usage
 
@@ -600,9 +609,14 @@ To send a request to the server you can use the following curl command:
 curl -X 'POST' 'http://127.0.0.1:8080/v1/query' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"query": "write a deployment yaml for the mongodb image"}'
 ```
 
+> You can use the `/v1/streaming_query` (with the same parameters) to get the streaming response (SSE/HTTP chunking). By default, it streams text, but you can also yield events as JSONs via additional `"media_type": "application/json"` parameter in the payload data.
+
 ### Swagger UI
 
-Web page with Swagger UI has the standard `/docs` endpoint. If the service is running on localhost on port 8080, Swagger UI can be accessed on address `http://localhost:8080/docs`.
+Web page with Swagger UI has the standard `/docs` endpoint. If the service is running on localhost on port 8080, Swagger UI can be accessed on the address `http://localhost:8080/docs`.
+
+It is also possible to access Redoc page with three-panel, responsive layout. This page uses `/redoc` endpoint. Again, if the service is running on localhost on port 8080, Redoc UI can be accessed on the address `http://localhost:8080/redoc`.
+
 
 ### OpenAPI
 

@@ -2,7 +2,13 @@
 
 from langchain_core.outputs.llm_result import LLMResult
 
-from ols.app.metrics import GenericTokenCounter
+from ols import config
+
+# needs to be setup there before is_user_authorized is imported
+config.ols_config.authentication_config.module = "k8s"
+
+
+from ols.app.metrics import GenericTokenCounter  # noqa:E402
 
 
 class MockLLM:
@@ -24,6 +30,12 @@ def test_on_llm_start():
     assert token_counter.llm_calls == 0
     assert token_counter.input_tokens_counted == 0
 
+    # check the textual representation as well
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    )
+    assert str(token_counter) == expected
+
     # token count for empty input
     token_counter.on_llm_start({}, [])
 
@@ -31,10 +43,22 @@ def test_on_llm_start():
     assert token_counter.llm_calls == 1
     assert token_counter.input_tokens_counted == 0
 
+    # check the textual representation as well
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 1"
+    )
+    assert str(token_counter) == expected
+
     # now the prompt will be tokenized into 5 tokens
     token_counter.on_llm_start({}, ["this is just a test"])
     assert token_counter.llm_calls == 2
     assert token_counter.input_tokens_counted == 5
+
+    # check the textual representation as well
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 5 LLM calls: 2"
+    )
+    assert str(token_counter) == expected
 
 
 class MockResult:
@@ -71,6 +95,12 @@ def test_on_llm_end():
     assert token_counter.input_tokens == 0
     assert token_counter.output_tokens == 0
 
+    # check the textual representation as well
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    )
+    assert str(token_counter) == expected
+
     # empty response
     response = MockLLMResult([])
     token_counter.on_llm_end(response)
@@ -78,6 +108,12 @@ def test_on_llm_end():
     # for empty response, counters should not change
     assert token_counter.input_tokens == 0
     assert token_counter.output_tokens == 0
+
+    # check the textual representation as well
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    )
+    assert str(token_counter) == expected
 
     # non-empty response
     x = MockResult(10, 20)
@@ -87,3 +123,7 @@ def test_on_llm_end():
     # for non-empty response, counters should change
     assert token_counter.input_tokens == 10
     assert token_counter.output_tokens == 20
+
+    # check the textual representation as well
+    expected = "GenericTokenCounter: input_tokens: 10 output_tokens: 20 counted: 0 LLM calls: 0"
+    assert str(token_counter) == expected

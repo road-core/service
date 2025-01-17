@@ -23,7 +23,7 @@ def load_index():
     """Load the index."""
     # accessing the config's rag_index property will trigger the loading
     # of the index
-    config.rag_index
+    config.rag_index  # pylint: disable=W0104, E0606
 
 
 if __name__ == "__main__":
@@ -43,6 +43,11 @@ if __name__ == "__main__":
         CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
     )
     config.reload_from_yaml_file(cfg_file)
+
+    if "--dump-config" in sys.argv:
+        with open("olsconfig.json", "w", encoding="utf-8") as fout:
+            fout.write(config.config.json())
+        sys.exit()
 
     logger = logging.getLogger("ols")
     configure_logging(config.ols_config.logging_config)
@@ -65,7 +70,7 @@ if __name__ == "__main__":
         # logger.info("running on cluster with ID '%s'", cluster_id)
 
     # init loading of query redactor
-    config.query_redactor
+    config.query_redactor  # pylint: disable=W0104
 
     if config.dev_config.pyroscope_url:
         start_with_pyroscope_enabled(config, logger)
