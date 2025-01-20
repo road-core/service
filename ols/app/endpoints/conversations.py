@@ -8,12 +8,12 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
 
 from ols import config
 from ols.app.endpoints.ols import (
     retrieve_user_id,
-    retrieve_previous_input
+    retrieve_previous_input,
+    retrieve_skip_user_id_check
 )
 from ols.app.models.models import (
     ErrorResponse,
@@ -53,10 +53,9 @@ chat_history_response: dict[int | str, dict[str, Any]] = {
 }
 
 
-@router.get("/conversations/{conversation_id}", reponse=chat_history_response)
+@router.get("/conversations/{conversation_id}", responses=chat_history_response)
 def get_conversation(
     conversation_id: str,
-    user_id: str | None = None,
     auth: Any = Depends(auth_dependency)
 ) -> ChatHistoryResponse:
     """Get conversation history for a given conversation ID.
@@ -73,13 +72,14 @@ def get_conversation(
     previous_input = []
     chat_history: list[BaseMessage] = []
 
-    effective_user_id = user_id or retrieve_user_id(auth)
-    logger.info("User ID %s", effective_user_id)
+    user_id = retrieve_user_id(auth)
+    logger.info("User ID %s", user_id)
+    skip_user_id_check = retrieve_skip_user_id_check(auth)
 
     # Log incoming request (after redaction)
     logger.info("Getting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
     try:
-        previous_input = retrieve_previous_input(effective_user_id, conversation_id)
+        previous_input = retrieve_previous_input(user_id, conversation_id, skip_user_id_check)
     except Exception as e:
         logger.error("Error retrieving previous chat history: %s", e)
         raise HTTPException(
@@ -124,10 +124,9 @@ delete_conversation_response: dict[int | str, dict[str, Any]] = {
     },
 }
 
-@router.delete("/conversations/{conversation_id}", response=delete_conversation_response)
+@router.delete("/conversations/{conversation_id}", responses=delete_conversation_response)
 def get_conversation(
     conversation_id: str,
-    user_id: str | None = None,
     auth: Any = Depends(auth_dependency)
 ) -> ConversationDeletionResponse:
     """Delete conversation history for a given conversation ID.
@@ -139,13 +138,14 @@ def get_conversation(
 
     """
 
-    effective_user_id = user_id or retrieve_user_id(auth)
-    logger.info("User ID %s", effective_user_id)
+    user_id = retrieve_user_id(auth)
+    logger.info("User ID %s", user_id)
+    skip_user_id_check = retrieve_skip_user_id_check(auth)
 
     # Log incoming request (after redaction)
     logger.info("Deleting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
 
-    if config.conversation_cache.delete(effective_user_id, conversation_id):
+    if config.conversation_cache.delete(user_id, conversation_id, skip_user_id_check):
         return ConversationDeletionResponse(response=f"Conversation {conversation_id} successfully deleted")
     else:
         logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
@@ -178,9 +178,8 @@ list_conversations_response: dict[int | str, dict[str, Any]] = {
     },
 }
 
-@router.get("/conversations", response=list_conversations_response)
+@router.get("/conversations", responses=list_conversations_response)
 def get_conversation(
-    user_id: str | None = None,
     auth: Any = Depends(auth_dependency)
 ) -> ListConversationsResponse:
     """List all conversations for a given user.
@@ -191,11 +190,12 @@ def get_conversation(
 
     """
 
-    effective_user_id = user_id or retrieve_user_id(auth)
-    logger.info("User ID %s", effective_user_id)
+    user_id = retrieve_user_id(auth)
+    logger.info("User ID %s", user_id)
+    skip_user_id_check = retrieve_skip_user_id_check(auth)
 
     # Log incoming request (after redaction)
     logger.info("Listing all conversations for user: %s ", user_id)
 
-    return ListConversationsResponse(conversations=config.conversation_cache.list(effective_user_id))
+    return ListConversationsResponse(conversations=config.conversation_cache.list(user_id, skip_user_id_check))
 

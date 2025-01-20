@@ -28,7 +28,7 @@ from ols.app.models.models import (
     UnauthorizedResponse,
 )
 from ols.customize import keywords, prompts
-from ols.src.auth.auth import get_auth_dependency
+from ols.src.auth.auth import get_auth_dependency, noop
 from ols.src.llms.llm_loader import LLMConfigurationError, resolve_provider_config
 from ols.src.query_helpers.attachment_appender import append_attachments_to_query
 from ols.src.query_helpers.docs_summarizer import DocsSummarizer
@@ -41,7 +41,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["query"])
 auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
-
 
 query_responses: dict[int | str, dict[str, Any]] = {
     200: {
@@ -88,6 +87,7 @@ def conversation_request(
         attachments,
         valid,
         timestamps,
+        skip_user_id_check
     ) = process_request(auth, llm_request)
 
     summarizer_response: SummarizerResponse | Generator
@@ -108,7 +108,7 @@ def conversation_request(
     timestamps["generate response"] = time.time()
 
     store_conversation_history(
-        user_id, conversation_id, llm_request, summarizer_response.response, attachments
+        user_id, conversation_id, llm_request, summarizer_response.response, attachments, skip_user_id_check
     )
 
     if config.ols_config.user_data_collection.transcripts_disabled:
@@ -155,7 +155,7 @@ def conversation_request(
 
 def process_request(
     auth: Any, llm_request: LLMRequest
-) -> tuple[str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float]]:
+) -> tuple[str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float], str]:
     """Process incoming request.
 
     Args:
@@ -165,7 +165,7 @@ def process_request(
     Returns:
         Tuple containing the processed information.
         User ID, conversation ID, query without attachments, previous input,
-        attachments, validation result and timestamps.
+        attachments, validation result, timestamps and skip_user_id_check
     """
     timestamps = {"start": time.time()}
 
@@ -175,6 +175,8 @@ def process_request(
 
     conversation_id = retrieve_conversation_id(llm_request)
     timestamps["retrieve conversation"] = time.time()
+
+    skip_user_id_check = retrieve_skip_user_id_check(auth)
 
     # Important note: Redact the query before attempting to do any
     # logging of the query to avoid leaking PII into logs.
@@ -186,7 +188,7 @@ def process_request(
     # Log incoming request (after redaction)
     logger.info("%s Incoming request: %s", conversation_id, llm_request.query)
 
-    previous_input = retrieve_previous_input(user_id, llm_request.conversation_id)
+    previous_input = retrieve_previous_input(user_id, llm_request.conversation_id, skip_user_id_check)
     timestamps["retrieve previous input"] = time.time()
 
     # Retrieve attachments from the request
@@ -220,6 +222,7 @@ def process_request(
         attachments,
         valid,
         timestamps,
+        skip_user_id_check
     )
 
 
@@ -262,6 +265,10 @@ def retrieve_user_id(auth: Any) -> str:
     # auth contains tuple with user ID (in UUID format) and user name
     return auth[0]
 
+def retrieve_skip_user_id_check(auth: Any) -> bool:
+    """Retrieve skip user_id check from the token processed by auth. mechanism."""
+    return auth[2]
+
 
 def retrieve_conversation_id(llm_request: LLMRequest) -> str:
     """Retrieve conversation ID based on existing ID or on newly generated one."""
@@ -275,13 +282,13 @@ def retrieve_conversation_id(llm_request: LLMRequest) -> str:
     return conversation_id
 
 
-def retrieve_previous_input(user_id: str, conversation_id: str) -> list[CacheEntry]:
+def retrieve_previous_input(user_id: str, conversation_id: str, skip_user_id_check: bool) -> list[CacheEntry]:
     """Retrieve previous user input, if exists."""
     try:
         previous_input = []
         if conversation_id:
             cache_content = config.conversation_cache.get(
-                user_id, conversation_id
+                user_id, conversation_id, skip_user_id_check
             )
             if cache_content is not None:
                 previous_input = cache_content
@@ -414,6 +421,7 @@ def store_conversation_history(
     llm_request: LLMRequest,
     response: Optional[str],
     attachments: list[Attachment],
+    skip_user_id_check: bool,
 ) -> None:
     """Store conversation history into selected cache.
 
@@ -434,6 +442,7 @@ def store_conversation_history(
                 user_id,
                 conversation_id,
                 cache_entry,
+                skip_user_id_check,
             )
     except Exception as e:
         logger.error(

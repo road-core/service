@@ -35,17 +35,18 @@ class InMemoryCache(Cache):
         self.deque: deque[str] = deque()
         self.cache: dict[str, list[dict[str, Any]]] = {}
 
-    def get(self, user_id: str, conversation_id: str) -> list[CacheEntry]:
+    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
           user_id: User identification.
           conversation_id: Conversation ID unique for given user.
+          skip_user_id_check: Skip user_id suid check.
 
         Returns:
           The value associated with the key, or `None` if the key is not present.
         """
-        key = super().construct_key(user_id, conversation_id)
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
 
         if key not in self.cache:
             return None
@@ -60,6 +61,7 @@ class InMemoryCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        skip_user_id_check: bool,
     ) -> None:
         """Set the value if a key is not present or else simply appends.
 
@@ -67,8 +69,9 @@ class InMemoryCache(Cache):
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             cache_entry: The `CacheEntry` object to store.
+            skip_user_id_check: Skip user_id suid check.
         """
-        key = super().construct_key(user_id, conversation_id)
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
         value = cache_entry.to_dict()
 
         with self._lock:
@@ -85,17 +88,18 @@ class InMemoryCache(Cache):
             self.deque.appendleft(key)
 
 
-    def delete(self, user_id: str, conversation_id: str) -> bool:
+    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> bool:
         """Delete all entries for a given conversation.
         
         Args:
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
+            skip_user_id_check: Skip user_id suid check.
             
         Returns:
             bool: True if entries were deleted, False if key wasn't found.
         """
-        key = super().construct_key(user_id, conversation_id)
+        key = super().construct_key(user_id, conversation_id,skip_user_id_check)
         
         with self._lock:
             if key not in self.cache:
@@ -107,16 +111,18 @@ class InMemoryCache(Cache):
             return True
         
 
-    def list(self, user_id: str) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool) -> list[str]:
         """List all conversations for a given user_id.
         
         Args:
             user_id: User identification.
+            skip_user_id_check: Skip user_id suid check.
             
         Returns:
             A list of conversation ids from the cache
         """
         conversation_ids = []
+        super()._check_user_id(user_id, skip_user_id_check)
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
         
         with self._lock:
