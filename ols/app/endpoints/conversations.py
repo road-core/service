@@ -19,6 +19,9 @@ from ols.app.models.models import (
     ErrorResponse,
     ForbiddenResponse,
     UnauthorizedResponse,
+    ChatHistoryResponse,
+    ConversationDeletionResponse,
+    ListConversationsResponse,
 )
 from ols.src.auth.auth import get_auth_dependency
 
@@ -30,13 +33,32 @@ router = APIRouter(tags=["conversations"])
 auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
 
 
+chat_history_response: dict[int | str, dict[str, Any]] = {
+    200: {
+        "description": "Request is valid and chat history is returned",
+        "model": ChatHistoryResponse,
+    },
+    401: {
+        "description": "Missing or invalid credentials provided by client",
+        "model": UnauthorizedResponse,
+    },
+    403: {
+        "description": "Client does not have permission to access resource",
+        "model": ForbiddenResponse,
+    },
+    500: {
+        "description": "Conversation history is not accessible or other internal error",
+        "model": ErrorResponse,
+    },
+}
 
-@router.get("/conversations/{conversation_id}")
+
+@router.get("/conversations/{conversation_id}", reponse=chat_history_response)
 def get_conversation(
     conversation_id: str,
     user_id: str | None = None,
     auth: Any = Depends(auth_dependency)
-) -> list[BaseMessage]:
+) -> ChatHistoryResponse:
     """Get conversation history for a given conversation ID.
 
     Args:
@@ -46,9 +68,6 @@ def get_conversation(
 
     Returns:
         List of conversation messages.
-    
-    Raises:
-        HTTPException: 404 if conversation not found
     """
     # Initialize variables
     previous_input = []
@@ -59,36 +78,64 @@ def get_conversation(
 
     # Log incoming request (after redaction)
     logger.info("Getting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
-
-    previous_input = retrieve_previous_input(effective_user_id, conversation_id)
+    try:
+        previous_input = retrieve_previous_input(effective_user_id, conversation_id)
+    except Exception as e:
+        logger.error("Error retrieving previous chat history: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "response": "Error retrieving previous chat history",
+                "cause": str(e),
+            },
+        )
     if previous_input.__len__() == 0:
         logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
         raise HTTPException(
-            status_code=404,
-            detail=f"Conversation {conversation_id} not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "response": "Error retrieving previous chat history",
+                "cause": f"Conversation {conversation_id} not found"
+            },
         ) 
     for entry in previous_input:
         chat_history.append(entry.query)
         chat_history.append(entry.response)
 
-    return chat_history
+    return ChatHistoryResponse(chat_history=chat_history)
 
 
-@router.delete("/conversations/{conversation_id}")
+delete_conversation_response: dict[int | str, dict[str, Any]] = {
+    200: {
+        "description": "Request is valid and conversation is deleted",
+        "model": ConversationDeletionResponse,
+    },
+    401: {
+        "description": "Missing or invalid credentials provided by client",
+        "model": UnauthorizedResponse,
+    },
+    403: {
+        "description": "Client does not have permission to access resource",
+        "model": ForbiddenResponse,
+    },
+    500: {
+        "description": "Conversation history is not accessible or other internal error",
+        "model": ErrorResponse,
+    },
+}
+
+@router.delete("/conversations/{conversation_id}", response=delete_conversation_response)
 def get_conversation(
     conversation_id: str,
     user_id: str | None = None,
     auth: Any = Depends(auth_dependency)
-) -> JSONResponse:
+) -> ConversationDeletionResponse:
     """Delete conversation history for a given conversation ID.
 
     Args:
         auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
         conversation_id: The conversation ID to delete.
         user_id: (Optional)The user ID to delete the conversation for.
-    
-    Raises:
-        HTTPException: 404 if conversation not found
 
     """
 
@@ -99,23 +146,43 @@ def get_conversation(
     logger.info("Deleting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
 
     if config.conversation_cache.delete(effective_user_id, conversation_id):
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"message": f"Conversation {conversation_id} successfully deleted"}
-        )
+        return ConversationDeletionResponse(response=f"Conversation {conversation_id} successfully deleted")
     else:
         logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
         raise HTTPException(
-            status_code=404,
-            detail=f"Conversation {conversation_id} not found"
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "response": "Error deleting conversation",
+                "cause": f"Conversation {conversation_id} not found"
+            },
+        ) 
 
 
-@router.get("/conversations")
+
+list_conversations_response: dict[int | str, dict[str, Any]] = {
+    200: {
+        "description": "Request is valid and a list of conversations is returned",
+        "model": ListConversationsResponse,
+    },
+    401: {
+        "description": "Missing or invalid credentials provided by client",
+        "model": UnauthorizedResponse,
+    },
+    403: {
+        "description": "Client does not have permission to access resource",
+        "model": ForbiddenResponse,
+    },
+    500: {
+        "description": "Conversation history is not accessible or other internal error",
+        "model": ErrorResponse,
+    },
+}
+
+@router.get("/conversations", response=list_conversations_response)
 def get_conversation(
     user_id: str | None = None,
     auth: Any = Depends(auth_dependency)
-) -> list[str]:
+) -> ListConversationsResponse:
     """List all conversations for a given user.
 
     Args:
@@ -130,5 +197,5 @@ def get_conversation(
     # Log incoming request (after redaction)
     logger.info("Listing all conversations for user: %s ", user_id)
 
-    return config.conversation_cache.list(effective_user_id)
+    return ListConversationsResponse(conversations=config.conversation_cache.list(effective_user_id))
 

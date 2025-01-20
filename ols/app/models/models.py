@@ -211,6 +211,84 @@ class LLMResponse(BaseModel):
         }
     }
 
+class ChatHistoryResponse(BaseModel):
+    """Model representing a response to a list conversation request.
+
+    Attributes:
+        chat_history: List of conversation messages.
+    """
+
+    chat_history: list[BaseMessage]
+
+    # provides examples for /docs endpoint
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "chat_history": [
+                            {
+                                "content": "what is openshift",
+                                "type": "human",
+                            },
+                            {
+                                "content": " OpenShift is a container orchestration platform built by Red Hat...",
+                                "type": "ai",
+                            }
+                        ]
+                }
+            ]
+        }
+    }
+
+class ListConversationsResponse(BaseModel):
+    """Model representing a response to a request to retrieve a conversation history.
+
+    Attributes:
+        conversations: List of conversation IDs.
+    """
+
+    conversations: list[str]
+
+    # provides examples for /docs endpoint
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "conversations": [
+                           "15a78660-a18e-447b-9fea-9deb27b63b5f",
+                           "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
+                           "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                        ]
+                }
+            ]
+        }
+    }
+
+class ConversationDeletionResponse(BaseModel):
+    """Model representing a response to a conversation deletion request.
+
+    Attributes:
+        response: The response of the conversation deletion request.
+
+    Example:
+        ```python
+        conversation_deletion_response = ConversationDeletionResponse(response="conversation deleted")
+        ```
+    """
+
+    response: str
+
+    # provides examples for /docs endpoint
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "response": "conversation deleted",
+                }
+            ]
+        }
+    }
+
 
 class UnauthorizedResponse(BaseModel):
     """Model representing response for missing or invalid credentials."""
