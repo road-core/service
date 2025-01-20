@@ -92,6 +92,8 @@ def test_post_question_on_invalid_question(_setup, endpoint):
                 "response": prompts.INVALID_QUERY_RESP,
                 "referenced_documents": [],
                 "truncated": False,
+                "input_tokens": 0,
+                "output_tokens": 0,
             }
             actual_response = response.json()
         else:
