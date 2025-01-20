@@ -377,7 +377,10 @@ Depends on configuration, but usually it is not needed to generate or use API ke
               module: "noop"
       ```
 
-      In this case it is possible to pass `user-id` optional when calling REST API query endpoints. If the `user-id` won't be passed, the default one will be used: `00000000-0000-0000-0000-000000000000`
+      In this case it is possible to pass `user-id` optional parameter when calling REST API query endpoints. If the `user-id` won't be passed, the default one will be used: `00000000-0000-0000-0000-000000000000`
+
+      [!NOTE]
+      The value of `user-id` parameter is not checked. This means it is possible to pass non-UUID value, which might not be appropriate for some use cases.
 
 ## 4. Configure RCS TLS communication
 
