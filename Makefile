@@ -32,8 +32,6 @@ install-tools:	install-woke ## Install required utilities/tools
 	# check that correct mypy version is installed
 	# mypy --version
 	pdm run mypy --version
-	# check that correct Black version is installed
-	pdm run black --version
 	# check that correct Ruff version is installed
 	pdm run ruff --version
 	# check that correct Pydocstyle version is installed
@@ -108,11 +106,9 @@ security-check: ## Check the project for security issues
 	bandit -c pyproject.toml -r .
 
 format: ## Format the code into unified format
-	pdm run black .
 	pdm run ruff check . --fix --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
 
 verify:	install-woke install-deps-test ## Verify the code using various linters
-	pdm run black . --check
 	pdm run ruff check . --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
 	./woke . --exit-1-on-failure
 	pylint ols scripts tests runner.py
