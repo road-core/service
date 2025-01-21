@@ -1,5 +1,6 @@
 """Data models representing payloads for REST API calls."""
 
+import json
 from collections import OrderedDict
 from typing import Optional, Self
 
@@ -580,10 +581,12 @@ class AuthorizationResponse(BaseModel):
     Attributes:
         user_id: The ID of the logged in user.
         username: The name of the logged in user.
+        skip_user_id_check: Skip user_id suid check.
     """
 
     user_id: str
     username: str
+    skip_user_id_check: bool
 
     # provides examples for /docs endpoint
     model_config = {
@@ -592,6 +595,7 @@ class AuthorizationResponse(BaseModel):
                 {
                     "user_id": "123e4567-e89b-12d3-a456-426614174000",
                     "username": "user1",
+                    "skip_user_id_check": False,
                 }
             ]
         }
@@ -658,15 +662,15 @@ class CacheEntry(BaseModel):
     """
 
     query: HumanMessage
-    response: AIMessage
+    response: Optional[AIMessage]= AIMessage("") 
     attachments: list[Attachment] = []
 
     @field_validator("response")
     @classmethod
-    def set_none_response_to_empty_string(cls, v: Optional[str]) -> str:
+    def set_none_response_to_empty_string(cls, v: Optional[AIMessage]) -> AIMessage:
         """Convert None response to an empty string."""
         if v is None:
-            return ""
+            return AIMessage("")
         return v
 
     def to_dict(self) -> dict:
@@ -693,8 +697,38 @@ class CacheEntry(BaseModel):
         """Convert cache entries to a history."""
         history: list[BaseMessage] = []
         for entry in cache_entries:
+            entry.query.content = entry.query.content.strip()
+            entry.response.content = entry.response.content.strip()
             history.append(entry.query)
             # the real response or empty string when response is not recorded
             history.append(entry.response)
 
         return history
+
+
+
+class MessageEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (HumanMessage, AIMessage)):
+            return {
+                "type": obj.type,
+                "content": obj.content,
+                "response_metadata": obj.response_metadata,
+                "additional_kwargs": obj.additional_kwargs
+            }
+        return super().default(obj)
+
+class MessageDecoder(json.JSONDecoder):
+    def __init__(self, *args, **kwargs):
+        super().__init__(object_hook=self.object_hook, *args, **kwargs)
+
+    def object_hook(self, dct):
+        if "type" in dct:
+            if dct["type"] == "human":
+                message = HumanMessage(content=dct["content"])
+            elif dct["type"] == "ai":
+                message = AIMessage(content=dct["content"])
+            message.additional_kwargs = dct["additional_kwargs"]
+            message.response_metadata = dct["response_metadata"]
+            return message
+        return dct

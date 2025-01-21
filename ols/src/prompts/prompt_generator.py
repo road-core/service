@@ -28,16 +28,16 @@ def restructure_rag_context_post(text: str, model: str) -> str:
     return "\n" + text.lstrip("\n") + "\n"
 
 
-def restructure_history(message: BaseMessage , model: str) -> str:
-    """Restructure history."""
-    if ModelFamily.GRANITE not in model:
-        # No processing required here for gpt.
-        return message
+# def restructure_history(message: BaseMessage , model: str) -> BaseMessage:
+#     """Restructure history."""
+#     if ModelFamily.GRANITE not in model:
+#         # No processing required here for gpt.
+#         return message
 
-    # Granite specific formatting for history
-    if isinstance(message, HumanMessage):
-        return "\n<|user|>\n" + message.content
-    return "\n<|assistant|>\n" + message.content
+#     # Granite specific formatting for history
+#     if isinstance(message, HumanMessage):
+#         return "\n<|user|>\n" + message.content
+#     return "\n<|assistant|>\n" + message.content
 
 
 class GeneratePrompt:

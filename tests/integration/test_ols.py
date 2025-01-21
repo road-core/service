@@ -20,6 +20,7 @@ from ols.utils.logging_configurator import configure_logging
 from tests.mock_classes.mock_langchain_interface import mock_langchain_interface
 from tests.mock_classes.mock_llm_chain import mock_llm_chain
 from tests.mock_classes.mock_llm_loader import mock_llm_loader
+from langchain_core.messages import AIMessage, HumanMessage
 
 
 @pytest.fixture(scope="function")
@@ -469,7 +470,7 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
         )
         assert response.status_code == requests.codes.ok
         chat_history_expected = [
-            CacheEntry(query="Query1", response="Query1", attachments=[])
+            CacheEntry(query=HumanMessage("Query1"), response=AIMessage("Query1"), attachments=[])
         ]
         assert actual_returned_history == chat_history_expected
 

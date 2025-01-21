@@ -5,6 +5,7 @@ import pytest
 from ols.app.models.config import RedisConfig
 from ols.app.models.models import CacheEntry
 from ols.src.cache.redis_cache import RedisCache
+from langchain_core.messages import AIMessage, HumanMessage
 
 USER_ID = "00000000-0000-0000-0000-000000000001"
 CONVERSATION_ID = "00000000-0000-0000-0000-000000000002"
@@ -39,7 +40,7 @@ def test_conversation_in_redis():
     assert retrieved is None
 
     # insert some conversation
-    cache_entry = CacheEntry(query="First human message", response="First AI response")
+    cache_entry = CacheEntry(query=HumanMessage("First human message"), response=AIMessage("First AI response"))
     pytest.redis_cache.insert_or_append(USER_ID, CONVERSATION_ID, cache_entry)
 
     # check what is stored in conversation cache

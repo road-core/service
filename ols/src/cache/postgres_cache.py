@@ -7,9 +7,10 @@ from typing import Any
 import psycopg2
 
 from ols.app.models.config import PostgresConfig
-from ols.app.models.models import CacheEntry
+from ols.app.models.models import CacheEntry, MessageDecoder, MessageEncoder
 from ols.src.cache.cache import Cache
 from ols.src.cache.cache_error import CacheError
+
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +118,7 @@ class PostgresCache(Cache):
         cur.close()
         self.conn.commit()
 
-    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool,) -> list[CacheEntry]:
+    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool = False) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
@@ -143,7 +144,7 @@ class PostgresCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
-        skip_user_id_check: bool,
+        skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
 
@@ -152,7 +153,7 @@ class PostgresCache(Cache):
             conversation_id: Conversation ID unique for given user.
             cache_entry: The `CacheEntry` object to store.
             skip_user_id_check: Skip user_id suid check.
-            
+
         """
         value = cache_entry.to_dict()
         # the whole operation is run in one transaction
@@ -165,14 +166,14 @@ class PostgresCache(Cache):
                         cursor,
                         user_id,
                         conversation_id,
-                        json.dumps(old_value).encode("utf-8"),
+                        json.dumps(old_value, cls=MessageEncoder).encode("utf-8"),
                     )
                 else:
                     PostgresCache._insert(
                         cursor,
                         user_id,
                         conversation_id,
-                        json.dumps([value]).encode("utf-8"),
+                        json.dumps([value], cls=MessageEncoder).encode("utf-8"),
                     )
                     PostgresCache._cleanup(cursor, self.capacity)
                 # commit is implicit at this point
@@ -181,7 +182,7 @@ class PostgresCache(Cache):
                 raise CacheError("PostgresCache.insert_or_append", e) from e
 
 
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> bool:
+    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> bool:
         """Delete conversation history for a given user_id and conversation_id.
         
         Args:
@@ -201,7 +202,7 @@ class PostgresCache(Cache):
                 raise CacheError("PostgresCache.delete", e) from e
 
 
-    def list(self, user_id: str, skip_user_id_check: bool,) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool=False) -> list[str]:
         """List all conversations for a given user_id.
         
         Args:
@@ -224,7 +225,7 @@ class PostgresCache(Cache):
 
     @staticmethod
     def _select(
-        cursor: psycopg2.extensions.cursor, user_id: str, conversation_id: str, skip_user_id_check: bool
+        cursor: psycopg2.extensions.cursor, user_id: str, conversation_id: str, skip_user_id_check: bool=False
     ) -> Any:
         """Select conversation history for given user_id and conversation_id."""
         cursor.execute(
@@ -242,7 +243,7 @@ class PostgresCache(Cache):
             raise ValueError("Invalid value read from cache:", value)
 
         # try to deserialize the value
-        return json.loads(value[0])
+        return json.loads(value[0],cls=MessageDecoder)
 
     @staticmethod
     def _update(

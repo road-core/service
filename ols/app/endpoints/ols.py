@@ -285,7 +285,7 @@ def retrieve_conversation_id(llm_request: LLMRequest) -> str:
     return conversation_id
 
 
-def retrieve_previous_input(user_id: str, conversation_id: str, skip_user_id_check: bool) -> list[CacheEntry]:
+def retrieve_previous_input(user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> list[CacheEntry]:
     """Retrieve previous user input, if exists."""
     try:
         previous_input = []
@@ -424,7 +424,7 @@ def store_conversation_history(
     llm_request: LLMRequest,
     response: Optional[str],
     attachments: list[Attachment],
-    skip_user_id_check: bool,
+    skip_user_id_check: bool=False,
 ) -> None:
     """Store conversation history into selected cache.
 
@@ -434,6 +434,8 @@ def store_conversation_history(
     ```
     """
     try:
+        if response is None:
+            response = ""
         if config.conversation_cache is not None:
             logger.info("%s Storing conversation history", conversation_id)
             cache_entry = CacheEntry(

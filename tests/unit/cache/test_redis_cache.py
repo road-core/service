@@ -6,14 +6,15 @@ import pytest
 
 from ols import constants
 from ols.app.models.config import RedisConfig
-from ols.app.models.models import CacheEntry
+from ols.app.models.models import CacheEntry, MessageEncoder, MessageDecoder
 from ols.src.cache.redis_cache import RedisCache
 from ols.utils import suid
 from tests.mock_classes.mock_redis_client import MockRedisClient
+from langchain_core.messages import AIMessage, HumanMessage
 
 conversation_id = suid.get_suid()
-cache_entry_1 = CacheEntry(query="user message1", response="ai message1")
-cache_entry_2 = CacheEntry(query="user message2", response="ai message2")
+cache_entry_1 = CacheEntry(query=HumanMessage("user message1"), response=AIMessage("ai message1"))
+cache_entry_2 = CacheEntry(query=HumanMessage("user message2"), response=AIMessage("ai message2"))
 
 
 @pytest.fixture

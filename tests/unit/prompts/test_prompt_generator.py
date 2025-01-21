@@ -16,10 +16,12 @@ from ols.constants import (
 )
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
-    restructure_history,
+    #restructure_history,
     restructure_rag_context_post,
     restructure_rag_context_pre,
 )
+
+from langchain_core.messages import AIMessage, HumanMessage
 
 model = [GRANITE_13B_CHAT_V2, GPT35_TURBO]
 
@@ -28,7 +30,7 @@ Answer user queries in the context of openshift.
 """
 query = "What is Kubernetes?"
 rag_context = ["context 1", "context 2"]
-conversation_history = ["human: First human message", "ai: First AI message"]
+conversation_history = [HumanMessage("First human message"), AIMessage("First AI message")]
 
 
 def _restructure_prompt_input(rag_context, conversation_history, model):
@@ -37,10 +39,10 @@ def _restructure_prompt_input(rag_context, conversation_history, model):
         restructure_rag_context_post(restructure_rag_context_pre(text, model), model)
         for text in rag_context
     ]
-    history_formatted = [
-        restructure_history(history, model) for history in conversation_history
-    ]
-    return rag_formatted, history_formatted
+    # history_formatted = [
+    #     restructure_history(history, model) for history in conversation_history
+    # ]
+    return rag_formatted, conversation_history
 
 
 @pytest.mark.parametrize("model", model)

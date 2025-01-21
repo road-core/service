@@ -35,7 +35,7 @@ class InMemoryCache(Cache):
         self.deque: deque[str] = deque()
         self.cache: dict[str, list[dict[str, Any]]] = {}
 
-    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> list[CacheEntry]:
+    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
@@ -61,7 +61,7 @@ class InMemoryCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
-        skip_user_id_check: bool,
+        skip_user_id_check: bool = False,
     ) -> None:
         """Set the value if a key is not present or else simply appends.
 
@@ -88,7 +88,7 @@ class InMemoryCache(Cache):
             self.deque.appendleft(key)
 
 
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> bool:
+    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> bool:
         """Delete all entries for a given conversation.
         
         Args:
@@ -111,7 +111,7 @@ class InMemoryCache(Cache):
             return True
         
 
-    def list(self, user_id: str, skip_user_id_check: bool) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool=False) -> list[str]:
         """List all conversations for a given user_id.
         
         Args:
