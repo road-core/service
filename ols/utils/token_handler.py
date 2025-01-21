@@ -103,7 +103,7 @@ class TokenHandler:
             context_window_size - max_tokens_for_response - prompt_token_count
         )
 
-        if available_tokens <= 0:
+        if available_tokens < 0:
             limit = context_window_size - max_tokens_for_response
             raise PromptTooLongError(
                 f"Prompt length {prompt_token_count} exceeds LLM "
@@ -154,13 +154,14 @@ class TokenHandler:
             node_text = restructure_rag_context_pre(node_text, model)
             tokens = self.text_to_tokens(node_text)
             tokens_count = TokenHandler._get_token_count(tokens)
-            logger.debug("RAG content tokens count: %d.", tokens_count)
+            logger.debug("RAG max_tokens: %d.", max_tokens)
+            logger.debug("RAG Node tokens_count: %d.", tokens_count)
 
             available_tokens = min(tokens_count, max_tokens)
-            logger.debug("Available tokens: %d.", tokens_count)
+            logger.debug("RAG Node available_tokens: %d.", available_tokens)
 
             if available_tokens < MINIMUM_CONTEXT_TOKEN_LIMIT:
-                logger.debug("%d tokens are less than threshold.", available_tokens)
+                logger.debug("RAG Node available %d tokens are less than threshold.", available_tokens)
                 break
 
             node_text = self.tokens_to_text(tokens[:available_tokens])
