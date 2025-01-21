@@ -1,11 +1,14 @@
 """Similarity check by LLM."""
 
+import logging
 from time import sleep
 
 from langchain_core.prompts.prompt import PromptTemplate
 
 from .constants import MAX_RETRY_ATTEMPTS, TIME_TO_BREATH
 from .prompts import ANSWER_SIMILARITY_PROMPT
+
+logger = logging.getLogger(__name__)
 
 
 class AnswerSimilarityScore:
