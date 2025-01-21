@@ -12,7 +12,11 @@ from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import RagChunk, SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
 from ols.customize import prompts, reranker
-from ols.src.prompts.prompt_generator import GeneratePrompt
+from ols.src.prompts.prompt_generator import (
+    GeneratePrompt,
+    restructure_history,
+    restructure_rag_context,
+)
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
 
@@ -80,7 +84,12 @@ class DocsSummarizer(QueryHelper):
         # Use sample text for context/history to get complete prompt
         # instruction. This is used to calculate available tokens.
         temp_prompt, temp_prompt_input = GeneratePrompt(
-            query, ["sample"], ["ai: sample"], self.system_prompt
+            # Sample prompt's context/history must be re-structured for the given model,
+            # to ensure the further right available token calculation.
+            query,
+            [restructure_rag_context("sample", self.model)],
+            [restructure_history("ai: sample", self.model)],
+            self._system_prompt,
         ).generate_prompt(self.model)
 
         available_tokens = token_handler.calculate_and_check_available_tokens(
