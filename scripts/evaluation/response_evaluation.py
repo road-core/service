@@ -6,15 +6,6 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from time import sleep
 
-<<<<<<< HEAD
-=======
-import json
-import os
-from collections import defaultdict
-from datetime import UTC, datetime
-from time import sleep
-
->>>>>>> dd45418c (code changes for aap_38439 from ols)
 from pandas import DataFrame, concat, read_csv, read_parquet
 from tqdm import tqdm
 
