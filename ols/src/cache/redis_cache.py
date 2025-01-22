@@ -115,11 +115,13 @@ class RedisCache(Cache):
             old_value = self.get(user_id, conversation_id, skip_user_id_check)
             if old_value:
                 old_value.append(cache_entry)
-                self.redis_client.set(
-                    key, json.dumps(old_value, default=lambda o: o.to_dict(), cls=MessageEncoder)
-                )
+                # self.redis_client.set(
+                #     key, json.dumps(old_value, default=lambda o: o.to_dict(), cls=MessageEncoder)
+                # )
+                self.redis_client.set(key, json.dumps([entry.to_dict() for entry in old_value], cls=MessageEncoder))
             else:
                 self.redis_client.set(key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder))
+                
 
 
     def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> bool:

@@ -15,6 +15,7 @@ from tests.mock_classes.mock_langchain_interface import mock_langchain_interface
 from tests.mock_classes.mock_llama_index import MockLlamaIndex
 from tests.mock_classes.mock_llm_chain import mock_llm_chain
 from tests.mock_classes.mock_llm_loader import mock_llm_loader
+from langchain_core.messages import HumanMessage
 
 conversation_id = suid.get_suid()
 
@@ -114,7 +115,7 @@ def test_summarize_truncation():
     rag_index = MockLlamaIndex()
 
     # too long history
-    history = ["human: What is Kubernetes?"] * 10000
+    history = [HumanMessage("What is Kubernetes?")] * 10000
     summary = summarizer.create_response(question, rag_index, history)
 
     # truncation should be done

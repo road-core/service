@@ -19,7 +19,7 @@ from ols.src.prompts.prompt_generator import (
     restructure_rag_context_pre,
 )
 
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+from langchain_core.messages import BaseMessage
 
 logger = logging.getLogger(__name__)
 
@@ -188,9 +188,8 @@ class TokenHandler:
 
         for original_message in reversed(history):
             # Restructure messages as per model
-            message = original_message #restructure_history(original_message, model)
-            print("Message is: ", message)
-            message_length = TokenHandler._get_token_count(self.text_to_tokens(message.content))
+            message = restructure_history(original_message, model)
+            message_length = TokenHandler._get_token_count(self.text_to_tokens(f"{message.type}: {message.content}"))
             total_length += message_length
             # if total length of already checked messages is higher than limit
             # then skip all remaining messages (we need to skip from top)

@@ -16,7 +16,7 @@ from ols.constants import (
 )
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
-    #restructure_history,
+    restructure_history,
     restructure_rag_context_post,
     restructure_rag_context_pre,
 )
@@ -39,10 +39,10 @@ def _restructure_prompt_input(rag_context, conversation_history, model):
         restructure_rag_context_post(restructure_rag_context_pre(text, model), model)
         for text in rag_context
     ]
-    # history_formatted = [
-    #     restructure_history(history, model) for history in conversation_history
-    # ]
-    return rag_formatted, conversation_history
+    history_formatted = [
+        restructure_history(history, model) for history in conversation_history
+    ]
+    return rag_formatted, history_formatted
 
 
 @pytest.mark.parametrize("model", model)

@@ -8,7 +8,7 @@ from langchain_core.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
-
+from copy import copy
 from ols.constants import ModelFamily
 from ols.customize import prompts
 from langchain_core.messages import BaseMessage
@@ -28,16 +28,19 @@ def restructure_rag_context_post(text: str, model: str) -> str:
     return "\n" + text.lstrip("\n") + "\n"
 
 
-# def restructure_history(message: BaseMessage , model: str) -> BaseMessage:
-#     """Restructure history."""
-#     if ModelFamily.GRANITE not in model:
-#         # No processing required here for gpt.
-#         return message
+def restructure_history(message: BaseMessage , model: str) -> BaseMessage:
+    """Restructure history."""
+    if ModelFamily.GRANITE not in model:
+        # No processing required here for gpt.
+        return message
 
-#     # Granite specific formatting for history
-#     if isinstance(message, HumanMessage):
-#         return "\n<|user|>\n" + message.content
-#     return "\n<|assistant|>\n" + message.content
+    newMessage = copy(message)
+    # Granite specific formatting for history
+    if isinstance(message, HumanMessage):
+        newMessage.content = "\n<|user|>\n" + message.content
+    else:
+        newMessage.content = "\n<|assistant|>\n" + message.content
+    return newMessage
 
 
 class GeneratePrompt:
@@ -107,7 +110,10 @@ class GeneratePrompt:
             prompt_message = (
                 prompt_message + "\n" + prompts.USE_HISTORY_INSTRUCTION.strip()
             )
-            llm_input_values["chat_history"] = "".join(self._history)
+            llm_input_values["chat_history"] = ""
+            for message in self._history:
+                llm_input_values["chat_history"] += message.content
+            # llm_input_values["chat_history"] = "".join(self._history)
 
         if "context" in llm_input_values:
             prompt_message = prompt_message + "\n{context}"
@@ -122,6 +128,6 @@ class GeneratePrompt:
         self, model: str
     ) -> tuple[ChatPromptTemplate | PromptTemplate, dict]:
         """Generate prompt."""
-        # if ModelFamily.GRANITE in model:
-        #     return self._generate_prompt_granite()
+        if ModelFamily.GRANITE in model:
+            return self._generate_prompt_granite()
         return self._generate_prompt_gpt()

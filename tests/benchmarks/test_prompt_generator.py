@@ -16,6 +16,7 @@ from ols.constants import (
     PROVIDER_WATSONX,
 )
 from ols.src.prompts.prompt_generator import GeneratePrompt
+from langchain_core.messages import AIMessage, HumanMessage
 
 # providers and models used by parametrized benchmarks
 provider_and_model = (
@@ -38,8 +39,8 @@ def empty_history():
 def conversation_history():
     """Non-empty conversation history."""
     return [
-        "First human message",
-        "First AI response",
+        HumanMessage("First human message"),
+        AIMessage("First AI response"),
     ] * 50
 
 
@@ -47,8 +48,8 @@ def conversation_history():
 def long_history():
     """Long conversation history."""
     return [
-        "First human message",
-        "First AI response",
+        HumanMessage("First human message"),
+        AIMessage("First AI response"),
     ] * 10000
 
 
