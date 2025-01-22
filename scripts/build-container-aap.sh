@@ -3,7 +3,8 @@
 # Build an ansible-chatbot-service image locally
 
 AAP_VERSION=v2.5
-LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ttakamiy/aap-rag-content:latest
+LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ansible/aap-rag-content:latest
+LIGHTSPEED_RAG_EMBEDDINGS_IMAGE=quay.io/ansible/aap-rag-embeddings-image:latest
 RAG_CONTENTS_SUB_FOLDER=vector_db/aap_product_docs
 
 CACHE_OPTS=""
@@ -16,6 +17,7 @@ podman build \
   ${CACHE_OPTS} \
   --build-arg=VERSION="${AAP_VERSION}" \
   --build-arg=LIGHTSPEED_RAG_CONTENT_IMAGE="${LIGHTSPEED_RAG_CONTENT_IMAGE}" \
+  --build-arg=LIGHTSPEED_RAG_EMBEDDINGS_IMAGE="${LIGHTSPEED_RAG_EMBEDDINGS_IMAGE}" \
   --build-arg=RAG_CONTENTS_SUB_FOLDER="${RAG_CONTENTS_SUB_FOLDER}" \
   -t "${AAP_API_IMAGE:-quay.io/ansible/ansible-chatbot-service:latest}" \
   -f Containerfile
