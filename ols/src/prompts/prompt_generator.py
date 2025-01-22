@@ -1,6 +1,7 @@
 """Prompt generator based on model / context."""
+
 from copy import copy
-from langchain_core.messages import  HumanMessage, BaseMessage
+from langchain_core.messages import HumanMessage, BaseMessage
 from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
@@ -11,7 +12,6 @@ from langchain_core.prompts import (
 
 from ols.constants import ModelFamily
 from ols.customize import prompts
-
 
 
 def restructure_rag_context_pre(text: str, model: str) -> str:
@@ -67,16 +67,12 @@ class GeneratePrompt:
 
         if len(self._rag_context) > 0:
             llm_input_values["context"] = "".join(self._rag_context)
-            sys_intruction = (
-                sys_intruction + "\n" + prompts.USE_CONTEXT_INSTRUCTION.strip()
-            )
+            sys_intruction = sys_intruction + "\n" + prompts.USE_CONTEXT_INSTRUCTION.strip()
 
         if len(self._history) > 0:
             llm_input_values["chat_history"] = self._history
 
-            sys_intruction = (
-                sys_intruction + "\n" + prompts.USE_HISTORY_INSTRUCTION.strip()
-            )
+            sys_intruction = sys_intruction + "\n" + prompts.USE_HISTORY_INSTRUCTION.strip()
 
         if "context" in llm_input_values:
             sys_intruction = sys_intruction + "\n{context}"
@@ -96,14 +92,10 @@ class GeneratePrompt:
 
         if len(self._rag_context) > 0:
             llm_input_values["context"] = "".join(self._rag_context)
-            prompt_message = (
-                prompt_message + "\n" + prompts.USE_CONTEXT_INSTRUCTION.strip()
-            )
+            prompt_message = prompt_message + "\n" + prompts.USE_CONTEXT_INSTRUCTION.strip()
 
         if len(self._history) > 0:
-            prompt_message = (
-                prompt_message + "\n" + prompts.USE_HISTORY_INSTRUCTION.strip()
-            )
+            prompt_message = prompt_message + "\n" + prompts.USE_HISTORY_INSTRUCTION.strip()
             llm_input_values["chat_history"] = ""
             for message in self._history:
                 llm_input_values["chat_history"] += message.content
@@ -116,9 +108,7 @@ class GeneratePrompt:
         prompt_message = prompt_message + "\n<|user|>\n{query}\n<|assistant|>\n"
         return PromptTemplate.from_template(prompt_message), llm_input_values
 
-    def generate_prompt(
-        self, model: str
-    ) -> tuple[ChatPromptTemplate | PromptTemplate, dict]:
+    def generate_prompt(self, model: str) -> tuple[ChatPromptTemplate | PromptTemplate, dict]:
         """Generate prompt."""
         if ModelFamily.GRANITE in model:
             return self._generate_prompt_granite()

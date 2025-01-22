@@ -149,9 +149,7 @@ DEFAULT_USER_NAME = "OLS"
 
 
 # HTTP headers to redact from FastAPI HTTP logs
-HTTP_REQUEST_HEADERS_TO_REDACT = frozenset(
-    {"authorization", "proxy-authorization", "cookie"}
-)
+HTTP_REQUEST_HEADERS_TO_REDACT = frozenset({"authorization", "proxy-authorization", "cookie"})
 HTTP_RESPONSE_HEADERS_TO_REDACT = frozenset(
     {"www-authenticate", "proxy-authenticate", "set-cookie"}
 )

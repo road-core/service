@@ -3,9 +3,7 @@
 from ols.utils.token_handler import TokenHandler
 
 
-def benchmark_token_hander(
-    benchmark, prompt, context_window_size=500, max_tokens_for_response=20
-):
+def benchmark_token_hander(benchmark, prompt, context_window_size=500, max_tokens_for_response=20):
     """Benchmark the method to calculate available tokens."""
     token_handler = TokenHandler()
 

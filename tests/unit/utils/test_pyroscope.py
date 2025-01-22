@@ -64,9 +64,7 @@ def test_pyroscope_server_unreachable(mock_config, mock_logger):
 
         start_with_pyroscope_enabled(mock_config, mock_logger)
 
-        mock_logger.info.assert_any_call(
-            "Failed to reach Pyroscope server. Status code: %d", 500
-        )
+        mock_logger.info.assert_any_call("Failed to reach Pyroscope server. Status code: %d", 500)
 
 
 def test_pyroscope_connection_error(mock_config, mock_logger):

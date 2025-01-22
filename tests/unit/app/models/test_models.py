@@ -80,9 +80,7 @@ class TestLLM:
         conversation_id = "id"
         response = "response"
         referenced_documents = [
-            ReferencedDocument(
-                docs_url="https://foo.bar.com/index.html", title="Foo Bar"
-            )
+            ReferencedDocument(docs_url="https://foo.bar.com/index.html", title="Foo Bar")
         ]
 
         llm_response = LLMResponse(
@@ -255,9 +253,7 @@ class TestFeedback:
         assert feedback_request.sentiment == 1
 
         # check some invalid values
-        with pytest.raises(
-            ValidationError, match="Improper value 2, needs to be -1 or 1"
-        ):
+        with pytest.raises(ValidationError, match="Improper value 2, needs to be -1 or 1"):
             FeedbackRequest(
                 conversation_id=conversation_id,
                 user_question=user_question,
@@ -265,9 +261,7 @@ class TestFeedback:
                 sentiment=2,
             )
 
-        with pytest.raises(
-            ValidationError, match="Improper value 0, needs to be -1 or 1"
-        ):
+        with pytest.raises(ValidationError, match="Improper value 0, needs to be -1 or 1"):
             FeedbackRequest(
                 conversation_id=conversation_id,
                 user_question=user_question,
@@ -275,9 +269,7 @@ class TestFeedback:
                 sentiment=0,
             )
 
-        with pytest.raises(
-            ValidationError, match="Improper value 2, needs to be -1 or 1"
-        ):
+        with pytest.raises(ValidationError, match="Improper value 2, needs to be -1 or 1"):
             FeedbackRequest(
                 conversation_id=conversation_id,
                 user_question=user_question,
@@ -353,18 +345,14 @@ class TestCacheEntry:
         assert cache_entry.query == HumanMessage("query")
         assert cache_entry.response == AIMessage("")
 
-        cache_entry = CacheEntry(
-            query=HumanMessage("query"), response=AIMessage("response")
-        )
+        cache_entry = CacheEntry(query=HumanMessage("query"), response=AIMessage("response"))
         assert cache_entry.query == HumanMessage("query")
         assert cache_entry.response == AIMessage("response")
 
     @staticmethod
     def test_to_dict():
         """Test the to_dict method of the CacheEntry model."""
-        cache_entry = CacheEntry(
-            query=HumanMessage("query"), response=AIMessage("response")
-        )
+        cache_entry = CacheEntry(query=HumanMessage("query"), response=AIMessage("response"))
         assert cache_entry.to_dict() == {
             "human_query": HumanMessage("query"),
             "ai_response": AIMessage("response"),

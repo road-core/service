@@ -18,9 +18,7 @@ def check_missing_field_response(response, field_name):
     json_response = response.json()
 
     # check payload details
-    assert (
-        "detail" in json_response
-    ), "Improper response format: 'detail' node is missing"
+    assert "detail" in json_response, "Improper response format: 'detail' node is missing"
     assert json_response["detail"][0]["msg"] == "Field required"
     assert json_response["detail"][0]["loc"][0] == "body"
     assert json_response["detail"][0]["loc"][1] == field_name

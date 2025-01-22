@@ -148,9 +148,7 @@ def test_chat_ui_handler_bad_http_code():
 
 def test_chat_ui_handler_error_handling():
     """Test error handling in UI handler."""
-    with patch(
-        "ols.src.ui.gradio_ui.requests.post", side_effect=requests.exceptions.HTTPError
-    ):
+    with patch("ols.src.ui.gradio_ui.requests.post", side_effect=requests.exceptions.HTTPError):
         ui = GradioUI()
         ret = ui.chat_ui("prompt", [], False)
         assert "An error occurred" in ret

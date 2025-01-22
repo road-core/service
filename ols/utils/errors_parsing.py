@@ -23,10 +23,7 @@ def parse_openai_error(e: BadRequestError) -> tuple[int, str, str]:
 
 def parse_bam_error(e: ApiResponseException) -> tuple[int, str, str]:
     """Parse BAM error."""
-    if (
-        e.response.extensions.state is not None
-        and "message" in e.response.extensions.state
-    ):
+    if e.response.extensions.state is not None and "message" in e.response.extensions.state:
         response_text = e.response.extensions.state["message"]
     else:
         response_text = e.message

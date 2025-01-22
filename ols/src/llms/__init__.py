@@ -15,9 +15,7 @@ def import_providers() -> None:
     modules = [f for f in providers_dir.iterdir() if not f.stem.startswith("__")]
 
     for module_name in modules:
-        spec = importlib.util.spec_from_file_location(
-            "module_name", module_name.as_posix()
-        )
+        spec = importlib.util.spec_from_file_location("module_name", module_name.as_posix())
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 

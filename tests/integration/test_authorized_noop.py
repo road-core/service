@@ -21,9 +21,7 @@ def test_authorized():
     assert response.username == constants.DEFAULT_USER_NAME
 
     config.dev_config.disable_auth = False
-    authorized.auth_dependency = get_auth_dependency(
-        config.ols_config, virtual_path="/ols-access"
-    )
+    authorized.auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
 
     # auth is enabled
     request = Request(scope={"type": "http", "headers": [], "query_string": ""})

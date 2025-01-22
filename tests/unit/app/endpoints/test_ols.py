@@ -62,9 +62,7 @@ def test_retrieve_conversation_id_existing_id():
 def test_retrieve_previous_input_no_previous_history():
     """Check how function to retrieve previous input handle empty history."""
     llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=None)
-    llm_input = ols.retrieve_previous_input(
-        constants.DEFAULT_USER_UID, llm_request.conversation_id
-    )
+    llm_input = ols.retrieve_previous_input(constants.DEFAULT_USER_UID, llm_request.conversation_id)
     assert llm_input == []
 
 
@@ -72,9 +70,7 @@ def test_retrieve_previous_input_no_previous_history():
 def test_retrieve_previous_input_empty_user_id():
     """Check how function to retrieve previous input handle empty user ID."""
     conversation_id = suid.get_suid()
-    llm_request = LLMRequest(
-        query="Tell me about Kubernetes", conversation_id=conversation_id
-    )
+    llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=conversation_id)
     # cache must check if user ID is correct
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.retrieve_previous_input("", llm_request.conversation_id)
@@ -86,9 +82,7 @@ def test_retrieve_previous_input_empty_user_id():
 def test_retrieve_previous_input_improper_user_id():
     """Check how function to retrieve previous input handle improper user ID."""
     conversation_id = suid.get_suid()
-    llm_request = LLMRequest(
-        query="Tell me about Kubernetes", conversation_id=conversation_id
-    )
+    llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=conversation_id)
     # cache must check if user ID is correct
     with pytest.raises(HTTPException, match="Invalid user ID improper_user_id"):
         ols.retrieve_previous_input("improper_user_id", llm_request.conversation_id)
@@ -100,9 +94,7 @@ def test_retrieve_previous_input_for_previous_history(get):
     """Check how function to retrieve previous input handle existing history."""
     conversation_id = suid.get_suid()
     get.return_value = "input"
-    llm_request = LLMRequest(
-        query="Tell me about Kubernetes", conversation_id=conversation_id
-    )
+    llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=conversation_id)
     previous_input = ols.retrieve_previous_input(
         constants.DEFAULT_USER_UID, llm_request.conversation_id
     )
@@ -113,9 +105,7 @@ def test_retrieve_previous_input_for_previous_history(get):
 def test_retrieve_attachments_on_no_input():
     """Check the function to retrieve attachments from payload when attachments are not send."""
     conversation_id = suid.get_suid()
-    llm_request = LLMRequest(
-        query="Tell me about Kubernetes", conversation_id=conversation_id
-    )
+    llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=conversation_id)
     attachments = ols.retrieve_attachments(llm_request)
     # empty list should be returned
     assert attachments is not None
@@ -214,9 +204,7 @@ def test_store_conversation_history(insert_or_append):
     query = "Tell me about Kubernetes"
     llm_request = LLMRequest(query=query)
 
-    ols.store_conversation_history(
-        constants.DEFAULT_USER_UID, conversation_id, llm_request, "", []
-    )
+    ols.store_conversation_history(constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [])
 
     expected_history = CacheEntry(query=HumanMessage(query))
     insert_or_append.assert_called_with(
@@ -240,9 +228,7 @@ def test_store_conversation_history_some_response(insert_or_append):
 
     ols.store_conversation_history(user_id, conversation_id, llm_request, response, [])
 
-    expected_history = CacheEntry(
-        query=HumanMessage(query), response=AIMessage(response)
-    )
+    expected_history = CacheEntry(query=HumanMessage(query), response=AIMessage(response))
     insert_or_append.assert_called_with(
         user_id, conversation_id, expected_history, skip_user_id_check
     )
@@ -388,9 +374,7 @@ def test_validate_question_on_validation_error(validate_question_mock):
 
 @patch("ols.app.endpoints.ols._validate_question_keyword")
 @patch("ols.src.query_helpers.question_validator.QuestionValidator.validate_question")
-def test_validate_question_disabled(
-    validate_question_llm_mock, validate_question_kw_mock
-):
+def test_validate_question_disabled(validate_question_llm_mock, validate_question_kw_mock):
     """Check the behaviour of validate_question function when it is disabled."""
     # This is the default behavior; no query validation.
     conversation_id = suid.get_suid()
@@ -638,9 +622,7 @@ def test_conversation_request(
     """Test conversation request API endpoint."""
     # valid question
     mock_validate_question.return_value = True
-    mock_response = (
-        "Kubernetes is an open-source container-orchestration system..."  # summary
-    )
+    mock_response = "Kubernetes is an open-source container-orchestration system..."  # summary
     mock_summarize.return_value = SummarizerResponse(
         response=mock_response,
         rag_chunks=[],
@@ -649,22 +631,15 @@ def test_conversation_request(
     )
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     response = ols.conversation_request(llm_request, auth)
-    assert (
-        response.response
-        == "Kubernetes is an open-source container-orchestration system..."
-    )
-    assert suid.check_suid(
-        response.conversation_id
-    ), "Improper conversation ID returned"
+    assert response.response == "Kubernetes is an open-source container-orchestration system..."
+    assert suid.check_suid(response.conversation_id), "Improper conversation ID returned"
 
     # invalid question
     mock_validate_question.return_value = False
     llm_request = LLMRequest(query="Generate a yaml")
     response = ols.conversation_request(llm_request, auth)
     assert response.response == prompts.INVALID_QUERY_RESP
-    assert suid.check_suid(
-        response.conversation_id
-    ), "Improper conversation ID returned"
+    assert suid.check_suid(response.conversation_id), "Improper conversation ID returned"
 
     # validation failure
     mock_validate_question.side_effect = HTTPException
@@ -723,9 +698,7 @@ def test_conversation_request_on_wrong_configuration(
     """Test conversation request API endpoint."""
     # mock invalid configuration
     message = "wrong model is configured"
-    mock_validate_question.side_effect = Mock(
-        side_effect=LLMConfigurationError(message)
-    )
+    mock_validate_question.side_effect = Mock(side_effect=LLMConfigurationError(message))
     llm_request = LLMRequest(query="Tell me about Kubernetes")
 
     # call must fail because we mocked invalid configuration state
@@ -800,9 +773,7 @@ def test_conversation_request_invalid_subject(mock_validate, auth):
 def test_generate_response_valid_subject(mock_summarize):
     """Test how generate_response function checks validation results."""
     # mock the DocsSummarizer
-    mock_response = (
-        "Kubernetes is an open-source container-orchestration system..."  # summary
-    )
+    mock_response = "Kubernetes is an open-source container-orchestration system..."  # summary
     mock_summarize.return_value = SummarizerResponse(
         mock_response,
         [],
@@ -816,9 +787,7 @@ def test_generate_response_valid_subject(mock_summarize):
     previous_input = []
 
     # try to get response
-    summarizer_response = ols.generate_response(
-        conversation_id, llm_request, previous_input
-    )
+    summarizer_response = ols.generate_response(conversation_id, llm_request, previous_input)
 
     # check the response
     assert "Kubernetes" in summarizer_response.response

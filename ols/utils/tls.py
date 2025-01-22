@@ -132,9 +132,7 @@ def ciphers_for_tls_profile(tls_profile: TLSProfiles) -> Optional[str]:
     return ciphers_from_list(ciphers)
 
 
-def ciphers_as_string(
-    ciphers: Optional[list[str]], tls_profile: TLSProfiles
-) -> Optional[str]:
+def ciphers_as_string(ciphers: Optional[list[str]], tls_profile: TLSProfiles) -> Optional[str]:
     """Retrieve ciphers as one string for custom list of TLS profile-based list."""
     ciphers_as_str = ciphers_from_list(ciphers)
     if ciphers_as_str is None:

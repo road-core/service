@@ -90,9 +90,7 @@ def file_check(path: FilePath, desc: str) -> None:
 def get_log_level(value: str) -> int:
     """Get log level from string."""
     if not isinstance(value, str):
-        raise InvalidConfigurationError(
-            f"'{value}' log level must be string, got {type(value)}"
-        )
+        raise InvalidConfigurationError(f"'{value}' log level must be string, got {type(value)}")
     log_level = logging.getLevelName(value.upper())
     if not isinstance(log_level, int):
         raise InvalidConfigurationError(

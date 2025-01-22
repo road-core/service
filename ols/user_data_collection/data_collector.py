@@ -32,12 +32,8 @@ from ols.constants import (  # pylint: disable=C0413
     DEFAULT_CONFIGURATION_FILE,
 )
 
-cfg_file = os.environ.get(
-    CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
-)
-config.reload_from_yaml_file(
-    cfg_file, ignore_llm_secrets=True, ignore_missing_certs=True
-)
+cfg_file = os.environ.get(CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE)
+config.reload_from_yaml_file(cfg_file, ignore_llm_secrets=True, ignore_missing_certs=True)
 udc_config = config.user_data_collector_config  # shortcut
 
 
@@ -133,8 +129,7 @@ def get_cloud_openshift_pull_secret() -> str:
         logger.error("failed to get token from cluster pull-secret, missing keys")
     except TypeError:
         logger.error(
-            "failed to get token from cluster pull-secret, unexpected "
-            "object type: %s",
+            "failed to get token from cluster pull-secret, unexpected object type: %s",
             str(type(dockerconfig)),
         )
     except kubernetes.client.exceptions.ApiException as e:
@@ -161,9 +156,7 @@ def collect_ols_data_from(location: str) -> list[pathlib.Path]:
     return files
 
 
-def package_files_into_tarball(
-    file_paths: list[pathlib.Path], path_to_strip: str
-) -> io.BytesIO:
+def package_files_into_tarball(file_paths: list[pathlib.Path], path_to_strip: str) -> io.BytesIO:
     """Package specified directory into a tarball.
 
     Args:
@@ -181,9 +174,7 @@ def package_files_into_tarball(
         for file_path in file_paths:
             # skip symlinks as those are a potential security risk
             if not file_path.is_symlink():
-                tar.add(
-                    file_path, arcname=file_path.as_posix().replace(path_to_strip, "")
-                )
+                tar.add(file_path, arcname=file_path.as_posix().replace(path_to_strip, ""))
 
         # add magic file for identification of our archive on the CCX side
         empty_file = tarfile.TarInfo("openshift_lightspeed.json")
@@ -206,9 +197,7 @@ def exponential_backoff_decorator(max_retries: int, base_delay: int) -> Callable
                     func(*args, **kwargs)
                     return
                 except Exception as e:
-                    logger.error(
-                        "attempt %d failed with error: %s", retries + 1, str(e)
-                    )
+                    logger.error("attempt %d failed with error: %s", retries + 1, str(e))
                     retries += 1
                     delay = base_delay * 2**retries
                     logger.info("retrying in %d seconds...", delay)
@@ -220,9 +209,7 @@ def exponential_backoff_decorator(max_retries: int, base_delay: int) -> Callable
     return decorator
 
 
-@exponential_backoff_decorator(
-    max_retries=INGRESS_MAX_RETRIES, base_delay=INGRESS_BASE_DELAY
-)
+@exponential_backoff_decorator(max_retries=INGRESS_MAX_RETRIES, base_delay=INGRESS_BASE_DELAY)
 def upload_data_to_ingress(tarball: io.BytesIO) -> requests.Response:
     """Upload the tarball to a Ingress.
 
@@ -348,9 +335,7 @@ def gather_ols_user_data(data_path: str) -> None:
                 delete_data(data_chunk)
                 logger.info("uploaded data removed")
             except (ClusterPullSecretNotFoundError, ClusterIDNotFoundError) as e:
-                logger.error(
-                    "%s - upload and data removal canceled", e.__class__.__name__
-                )
+                logger.error("%s - upload and data removal canceled", e.__class__.__name__)
 
             # close the tarball to release mem
             tarball.close()
@@ -395,9 +380,7 @@ def disabled_by_file() -> bool:
     user data dir is enough to disable the data collection.
     """
     if udc_config.data_storage is None:
-        logger.warning(
-            "Data storage path is None, cannot check for disable_collector file."
-        )
+        logger.warning("Data storage path is None, cannot check for disable_collector file.")
         return False
     return (udc_config.data_storage / "disable_collector").exists()
 

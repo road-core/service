@@ -123,9 +123,7 @@ def test_params_handling(provider_config):
         "temperature": 0.3,
     }
 
-    watsonx = Watsonx(
-        model="uber-model", params=params, provider_config=provider_config
-    )
+    watsonx = Watsonx(model="uber-model", params=params, provider_config=provider_config)
     llm = watsonx.load()
     assert isinstance(llm, WatsonxLLM)
     assert watsonx.default_params
@@ -198,9 +196,7 @@ def test_params_handling_none_values(provider_config):
         "max_new_tokens": None,
     }
 
-    watsonx = Watsonx(
-        model="uber-model", params=params, provider_config=provider_config
-    )
+    watsonx = Watsonx(model="uber-model", params=params, provider_config=provider_config)
     llm = watsonx.load()
     assert isinstance(llm, WatsonxLLM)
     assert watsonx.default_params
@@ -235,9 +231,7 @@ def test_params_replace_default_values_with_none(provider_config):
     # provider initialization where default parameter is overriden
     params = {"decoding_method": None}
 
-    watsonx = Watsonx(
-        model="uber-model", params=params, provider_config=provider_config
-    )
+    watsonx = Watsonx(model="uber-model", params=params, provider_config=provider_config)
     watsonx.load()
 
     # check default value overrided by None

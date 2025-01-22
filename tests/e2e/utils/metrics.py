@@ -17,9 +17,7 @@ def read_metrics(client):
     return response.text
 
 
-def get_rest_api_counter_value(
-    client, path, status_code=requests.codes.ok, default=None
-):
+def get_rest_api_counter_value(client, path, status_code=requests.codes.ok, default=None):
     """Retrieve counter value from metrics."""
     response = read_metrics(client)
     counter_name = "ols_rest_api_calls_total"
@@ -43,9 +41,7 @@ def get_response_duration_seconds_value(client, path, default=None):
     return get_counter_value(prefix, response, default, to_int=False)
 
 
-def get_model_provider_counter_value(
-    client, counter_name, model, provider, default=None
-):
+def get_model_provider_counter_value(client, counter_name, model, provider, default=None):
     """Retrieve counter value from metrics."""
     response = read_metrics(client)
 
@@ -60,9 +56,7 @@ def get_model_provider_counter_value(
 def get_all_metric_counters(response, metric_name) -> list[float]:
     """Get all counters associated with one metric with any labels."""
     # make sure there won't be any whitespace characters at beginning or end
-    lines = [
-        line.strip() for line in response.split("\n") if line.startswith(metric_name)
-    ]
+    lines = [line.strip() for line in response.split("\n") if line.startswith(metric_name)]
 
     # find the number in string and convert accordingly
     return [float(line[1 + line.rindex(" ") :]) for line in lines]
@@ -134,28 +128,26 @@ def get_counter_value(counter_name, response, default=None, to_int=True):
 
 def check_counter_increases(endpoint, old_counter, new_counter, delta=1):
     """Check if the counter value increases as expected."""
-    assert (
-        new_counter >= old_counter + delta
-    ), f"REST API counter for {endpoint} has not been updated properly"
+    assert new_counter >= old_counter + delta, (
+        f"REST API counter for {endpoint} has not been updated properly"
+    )
 
 
 def check_duration_sum_increases(endpoint, old_counter, new_counter):
     """Check if the counter value with total duration increases as expected."""
-    assert (
-        new_counter > old_counter
-    ), f"Duration sum for {endpoint} has not been updated properly"
+    assert new_counter > old_counter, f"Duration sum for {endpoint} has not been updated properly"
 
 
 def check_token_counter_increases(counter, old_counter, new_counter, expect_change):
     """Check if the counter value increases as expected."""
     if expect_change:
-        assert (
-            new_counter > old_counter
-        ), f"Counter for {counter} tokens has not been updated properly"
+        assert new_counter > old_counter, (
+            f"Counter for {counter} tokens has not been updated properly"
+        )
     else:
-        assert (
-            new_counter == old_counter
-        ), f"Counter for {counter} tokens has changed, which is unexpected"
+        assert new_counter == old_counter, (
+            f"Counter for {counter} tokens has changed, which is unexpected"
+        )
 
 
 class RestAPICallCounterChecker:

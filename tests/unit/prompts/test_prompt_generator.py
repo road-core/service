@@ -42,9 +42,7 @@ def _restructure_prompt_input(rag_context, conversation_history, model):
         restructure_rag_context_post(restructure_rag_context_pre(text, model), model)
         for text in rag_context
     ]
-    history_formatted = [
-        restructure_history(history, model) for history in conversation_history
-    ]
+    history_formatted = [restructure_history(history, model) for history in conversation_history]
     return rag_formatted, history_formatted
 
 
@@ -320,7 +318,5 @@ def test_generate_prompt_without_rag_without_history(model):
             "Answer user queries in the context of openshift.\n"
         )
         assert prompt.format(**llm_input_values) == (
-            "System: Answer user queries in the context of openshift.\n"
-            "\n"
-            f"Human: {query}"
+            f"System: Answer user queries in the context of openshift.\n\nHuman: {query}"
         )

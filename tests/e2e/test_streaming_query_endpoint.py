@@ -20,7 +20,7 @@ STREAMING_QUERY_ENDPOINT = "/v1/streaming_query"
 
 def parse_streaming_response_to_events(response: str) -> list[dict]:
     """Parse streaming response to events."""
-    return json.loads(f'[{response.replace("}{", "},{")}]')
+    return json.loads(f"[{response.replace('}{', '},{')}]")
 
 
 def construct_response_from_streamed_events(events: dict) -> str:
@@ -34,9 +34,7 @@ def construct_response_from_streamed_events(events: dict) -> str:
 
 def test_invalid_question():
     """Check the endpoint POST method for invalid question."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         cid = suid.get_suid()
 
         response = pytest.client.post(
@@ -61,9 +59,7 @@ def test_invalid_question():
 
 def test_invalid_question_without_conversation_id():
     """Check the endpoint POST method for generating new conversation_id."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         response = pytest.client.post(
             STREAMING_QUERY_ENDPOINT,
             json={
@@ -181,9 +177,7 @@ def test_too_long_question() -> None:
 @pytest.mark.rag
 def test_valid_question() -> None:
     """Check the endpoint with POST HTTP method for valid question and no yaml."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         cid = suid.get_suid()
         response = pytest.client.post(
             STREAMING_QUERY_ENDPOINT,
@@ -205,9 +199,7 @@ def test_valid_question() -> None:
 @pytest.mark.rag
 def test_ocp_docs_version_same_as_cluster_version() -> None:
     """Check that the version of OCP docs matches the cluster we're on."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         cid = suid.get_suid()
         response = pytest.client.post(
             STREAMING_QUERY_ENDPOINT,
@@ -225,22 +217,15 @@ def test_ocp_docs_version_same_as_cluster_version() -> None:
         events = parse_streaming_response_to_events(response.text)
         assert events[-1]["event"] == "end"
         assert events[-1]["data"]["referenced_documents"]
-        assert (
-            f"{major}.{minor}"
-            in events[-1]["data"]["referenced_documents"][0]["doc_title"]
-        )
+        assert f"{major}.{minor}" in events[-1]["data"]["referenced_documents"][0]["doc_title"]
 
 
 def test_valid_question_tokens_counter() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(
-        pytest.metrics_client
-    )
+    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
 
     with (
-        metrics_utils.RestAPICallCounterChecker(
-            pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-        ),
+        metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT),
         metrics_utils.TokenCounterChecker(pytest.metrics_client, model, provider),
     ):
         response = pytest.client.post(
@@ -254,14 +239,10 @@ def test_valid_question_tokens_counter() -> None:
 
 def test_invalid_question_tokens_counter() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(
-        pytest.metrics_client
-    )
+    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
 
     with (
-        metrics_utils.RestAPICallCounterChecker(
-            pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-        ),
+        metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT),
         metrics_utils.TokenCounterChecker(pytest.metrics_client, model, provider),
     ):
         response = pytest.client.post(
@@ -275,9 +256,7 @@ def test_invalid_question_tokens_counter() -> None:
 
 def test_token_counters_for_query_call_without_payload() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(
-        pytest.metrics_client
-    )
+    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
 
     with (
         metrics_utils.RestAPICallCounterChecker(
@@ -303,9 +282,7 @@ def test_token_counters_for_query_call_without_payload() -> None:
 
 def test_token_counters_for_query_call_with_improper_payload() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(
-        pytest.metrics_client
-    )
+    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
 
     with (
         metrics_utils.RestAPICallCounterChecker(
@@ -334,9 +311,7 @@ def test_token_counters_for_query_call_with_improper_payload() -> None:
 @retry(max_attempts=3, wait_between_runs=10)
 def test_rag_question() -> None:
     """Ensure responses include rag references."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         response = pytest.client.post(
             STREAMING_QUERY_ENDPOINT,
             json={
@@ -366,9 +341,7 @@ def test_rag_question() -> None:
 @pytest.mark.cluster
 def test_query_filter() -> None:
     """Ensure responses does not include filtered words and redacted words are not logged."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         query = "what is foo in bar?"
         response = pytest.client.post(
             STREAMING_QUERY_ENDPOINT,
@@ -411,9 +384,7 @@ def test_query_filter() -> None:
 @retry(max_attempts=3, wait_between_runs=10)
 def test_conversation_history() -> None:
     """Ensure conversations include previous query history."""
-    with metrics_utils.RestAPICallCounterChecker(
-        pytest.metrics_client, STREAMING_QUERY_ENDPOINT
-    ):
+    with metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, STREAMING_QUERY_ENDPOINT):
         response = pytest.client.post(
             STREAMING_QUERY_ENDPOINT,
             json={
@@ -424,9 +395,7 @@ def test_conversation_history() -> None:
         )
         scenario_fail_msg = "First call to LLM without conversation history has failed"
         assert response.status_code == requests.codes.ok, scenario_fail_msg
-        response_utils.check_content_type(
-            response, constants.MEDIA_TYPE_JSON, scenario_fail_msg
-        )
+        response_utils.check_content_type(response, constants.MEDIA_TYPE_JSON, scenario_fail_msg)
 
         events = parse_streaming_response_to_events(response.text)
         response_text = construct_response_from_streamed_events(events).lower()
@@ -448,9 +417,7 @@ def test_conversation_history() -> None:
 
         scenario_fail_msg = "Second call to LLM with conversation history has failed"
         assert response.status_code == requests.codes.ok
-        response_utils.check_content_type(
-            response, constants.MEDIA_TYPE_JSON, scenario_fail_msg
-        )
+        response_utils.check_content_type(response, constants.MEDIA_TYPE_JSON, scenario_fail_msg)
 
         events = parse_streaming_response_to_events(response.text)
         response_text = construct_response_from_streamed_events(events).lower()
@@ -541,14 +508,9 @@ def test_query_with_unknown_provider() -> None:
         json_response = response.json()
 
         # explicit response and cause check
-        assert (
-            "detail" in json_response
-        ), "Improper response format: 'detail' node is missing"
+        assert "detail" in json_response, "Improper response format: 'detail' node is missing"
         assert "Unable to process this request" in json_response["detail"]["response"]
-        assert (
-            "Provider 'foo' is not a valid provider."
-            in json_response["detail"]["cause"]
-        )
+        assert "Provider 'foo' is not a valid provider." in json_response["detail"]["cause"]
 
 
 def test_query_with_unknown_model() -> None:
@@ -578,8 +540,6 @@ def test_query_with_unknown_model() -> None:
         json_response = response.json()
 
         # explicit response and cause check
-        assert (
-            "detail" in json_response
-        ), "Improper response format: 'detail' node is missing"
+        assert "detail" in json_response, "Improper response format: 'detail' node is missing"
         assert "Unable to process this request" in json_response["detail"]["response"]
         assert "Model 'bar' is not a valid model " in json_response["detail"]["cause"]

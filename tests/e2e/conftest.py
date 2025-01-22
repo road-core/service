@@ -156,14 +156,14 @@ def write_json_to_temp_file(json_data):
 def create_datarouter_config_file(session):
     """Create datarouter config file."""
     project = session.config.getini("rp_project")
-    assert (
-        project is not None
-    ), "create_datarouter_config_file: 'rp_project' attribute not found in session.config"
+    assert project is not None, (
+        "create_datarouter_config_file: 'rp_project' attribute not found in session.config"
+    )
 
     endpoint = session.config.getini("rp_endpoint")
-    assert (
-        endpoint is not None
-    ), "create_datarouter_config_file: 'rp_endpoint' attribute not found in session.config"
+    assert endpoint is not None, (
+        "create_datarouter_config_file: 'rp_endpoint' attribute not found in session.config"
+    )
 
     endpoint = endpoint.replace("https://", "")
     launch = session.config.option.rp_name
@@ -239,6 +239,5 @@ def pytest_sessionfinish(session):
         upload_artifact_s3(aws_env=aws_env)
     except KeyError:
         print(
-            "Could not find aws credentials to upload to S3. "
-            "Skipping reporting to Report portal."
+            "Could not find aws credentials to upload to S3. Skipping reporting to Report portal."
         )

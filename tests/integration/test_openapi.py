@@ -17,9 +17,7 @@ from ols.constants import CONFIGURATION_FILE_NAME_ENV_VARIABLE
 @pytest.fixture(scope="function", autouse=True)
 @patch.dict(
     os.environ,
-    {
-        CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests.yaml"
-    },
+    {CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests.yaml"},
 )
 def _setup():
     """Setups the test client."""
@@ -42,9 +40,7 @@ def test_openapi_endpoint():
 
     # check the metadata nodes
     for attribute in ("openapi", "info", "components", "paths"):
-        assert (
-            attribute in payload
-        ), f"Required metadata attribute {attribute} not found"
+        assert attribute in payload, f"Required metadata attribute {attribute} not found"
 
     # check application description
     info = payload["info"]
@@ -72,6 +68,6 @@ def test_openapi_content():
     del current_schema["info"]["license"]
 
     # compare schemas (as dicts)
-    assert (
-        current_schema == pre_generated_schema
-    ), "Pre-generated schema is not up to date. Fix it with `make schema`."
+    assert current_schema == pre_generated_schema, (
+        "Pre-generated schema is not up to date. Fix it with `make schema`."
+    )

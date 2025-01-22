@@ -35,10 +35,7 @@ from ols.utils.checks import InvalidConfigurationError
 def test_model_parameters():
     """Test the ModelParameters model."""
     default_params = ModelParameters()
-    assert (
-        default_params.max_tokens_for_response
-        == constants.DEFAULT_MAX_TOKENS_FOR_RESPONSE
-    )
+    assert default_params.max_tokens_for_response == constants.DEFAULT_MAX_TOKENS_FOR_RESPONSE
 
     parameters = ModelParameters(max_tokens_for_response=10, unknown_param="hello")
 
@@ -327,14 +324,8 @@ def test_provider_config_with_tls_security_profile():
     assert provider_config.tls_security_profile is not None
     assert provider_config.tls_security_profile.profile_type == "Custom"
     assert provider_config.tls_security_profile.min_tls_version == "VersionTLS13"
-    assert (
-        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-        in provider_config.tls_security_profile.ciphers
-    )
-    assert (
-        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
-        in provider_config.tls_security_profile.ciphers
-    )
+    assert "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256" in provider_config.tls_security_profile.ciphers
+    assert "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384" in provider_config.tls_security_profile.ciphers
 
 
 def test_that_url_is_required_provider_parameter():
@@ -533,12 +524,8 @@ def test_provider_config_azure_openai_specific():
     # Azure OpenAI-specific configuration must be present
     assert provider_config.azure_config is not None
     assert str(provider_config.azure_config.url) == "http://localhost/"
-    assert (
-        provider_config.azure_config.tenant_id == "00000000-0000-0000-0000-000000000001"
-    )
-    assert (
-        provider_config.azure_config.client_id == "00000000-0000-0000-0000-000000000002"
-    )
+    assert provider_config.azure_config.tenant_id == "00000000-0000-0000-0000-000000000001"
+    assert provider_config.azure_config.client_id == "00000000-0000-0000-0000-000000000002"
     assert provider_config.azure_config.deployment_name == "deployment-name"
     assert provider_config.azure_config.client_secret == "client secret"  # noqa: S105
     assert provider_config.azure_config.api_key is None
@@ -1274,9 +1261,7 @@ def test_llm_providers():
         == "http://test.url/"
     )
     assert (
-        llm_providers.providers["test_provider_name"]
-        .models["test_model_name"]
-        .credentials
+        llm_providers.providers["test_provider_name"].models["test_model_name"].credentials
         == "secret_key"
     )
 
@@ -1395,10 +1380,7 @@ def test_llm_providers_watsonx_required_projectid():
     assert len(llm_providers.providers) == 1
     assert llm_providers.providers["watsonx"].name == "watsonx"
     assert llm_providers.providers["watsonx"].type == "watsonx"
-    assert (
-        llm_providers.providers["watsonx"].project_id
-        == "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-    )
+    assert llm_providers.providers["watsonx"].project_id == "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 
     llm_providers = LLMProviders(
         [
@@ -1406,9 +1388,7 @@ def test_llm_providers_watsonx_required_projectid():
                 "name": "test_provider",
                 "type": "watsonx",
                 "project_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
-                "models": [
-                    {"name": "test_model_name", "url": "http://test_model_url/"}
-                ],
+                "models": [{"name": "test_model_name", "url": "http://test_model_url/"}],
             },
         ]
     )
@@ -1761,9 +1741,7 @@ def test_postgres_config_correct_values():
 
 def test_postgres_config_wrong_port():
     """Test the PostgresConfig model."""
-    with pytest.raises(
-        ValidationError, match="The port needs to be between 0 and 65536"
-    ):
+    with pytest.raises(ValidationError, match="The port needs to be between 0 and 65536"):
         PostgresConfig(
             host="other_host",
             port=9999999,
@@ -2126,16 +2104,12 @@ def test_conversation_cache_config_validation():
 
     # not specified cache type case
     conversation_cache_config.type = None
-    with pytest.raises(
-        InvalidConfigurationError, match="missing conversation cache type"
-    ):
+    with pytest.raises(InvalidConfigurationError, match="missing conversation cache type"):
         conversation_cache_config.validate_yaml()
 
     # unknown cache type case
     conversation_cache_config.type = "unknown"
-    with pytest.raises(
-        InvalidConfigurationError, match="unknown conversation cache type: unknown"
-    ):
+    with pytest.raises(InvalidConfigurationError, match="unknown conversation cache type: unknown"):
         conversation_cache_config.validate_yaml()
 
 
@@ -2178,9 +2152,7 @@ def test_ols_config(tmpdir):
     assert ols_config.conversation_cache.type == "memory"
     assert ols_config.conversation_cache.memory.max_entries == 100
     assert ols_config.logging_config.app_log_level == logging.INFO
-    assert (
-        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
-    )
+    assert ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
     assert ols_config.user_data_collection == UserDataCollection()
     assert ols_config.reference_content is None
     assert ols_config.authentication_config == AuthenticationConfig(
@@ -2216,9 +2188,7 @@ def test_ols_config_with_auth_config(tmpdir):
     assert ols_config.conversation_cache.type == "memory"
     assert ols_config.conversation_cache.memory.max_entries == 100
     assert ols_config.logging_config.app_log_level == logging.INFO
-    assert (
-        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
-    )
+    assert ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
     assert ols_config.user_data_collection == UserDataCollection()
     assert ols_config.reference_content is None
     assert ols_config.authentication_config == AuthenticationConfig(module="foo")
@@ -2259,9 +2229,7 @@ def test_ols_config_with_tls_security_profile(tmpdir):
     assert ols_config.conversation_cache.type == "memory"
     assert ols_config.conversation_cache.memory.max_entries == 100
     assert ols_config.logging_config.app_log_level == logging.INFO
-    assert (
-        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
-    )
+    assert ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
     assert ols_config.user_data_collection == UserDataCollection()
     assert ols_config.reference_content is None
     assert ols_config.authentication_config == AuthenticationConfig(
@@ -2274,14 +2242,8 @@ def test_ols_config_with_tls_security_profile(tmpdir):
     assert ols_config.tls_security_profile is not None
     assert ols_config.tls_security_profile.profile_type == "Custom"
     assert ols_config.tls_security_profile.min_tls_version == "VersionTLS13"
-    assert (
-        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-        in ols_config.tls_security_profile.ciphers
-    )
-    assert (
-        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
-        in ols_config.tls_security_profile.ciphers
-    )
+    assert "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256" in ols_config.tls_security_profile.ciphers
+    assert "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384" in ols_config.tls_security_profile.ciphers
 
 
 def get_ols_configs():
@@ -2358,9 +2320,7 @@ def test_ols_config_equality(subtests):
     # authentication_config attribute (AuthenticationConfig)
     with subtests.test(msg="Different attribute: authentication_config"):
         ols_config_1, ols_config_2 = get_ols_configs()
-        ols_config_1.authentication_config = AuthenticationConfig(
-            skip_tls_verification=True
-        )
+        ols_config_1.authentication_config = AuthenticationConfig(skip_tls_verification=True)
         assert ols_config_1 != ols_config_2
 
     # tls_config attribute (TLSConfig)
@@ -2454,35 +2414,20 @@ def test_config():
         }
     )
     assert len(config.llm_providers.providers) == 3
-    assert (
-        config.llm_providers.providers["test_provider_name"].name
-        == "test_provider_name"
-    )
-    assert (
-        config.llm_providers.providers["test_provider_name"].url == "test_provider_url"
-    )
-    assert (
-        config.llm_providers.providers["test_provider_name"].credentials == "secret_key"
-    )
+    assert config.llm_providers.providers["test_provider_name"].name == "test_provider_name"
+    assert config.llm_providers.providers["test_provider_name"].url == "test_provider_url"
+    assert config.llm_providers.providers["test_provider_name"].credentials == "secret_key"
     assert len(config.llm_providers.providers["test_provider_name"].models) == 1
     assert (
-        config.llm_providers.providers["test_provider_name"]
-        .models["test_model_name"]
-        .name
+        config.llm_providers.providers["test_provider_name"].models["test_model_name"].name
         == "test_model_name"
     )
     assert (
-        str(
-            config.llm_providers.providers["test_provider_name"]
-            .models["test_model_name"]
-            .url
-        )
+        str(config.llm_providers.providers["test_provider_name"].models["test_model_name"].url)
         == "http://test_model_url/"
     )
     assert (
-        config.llm_providers.providers["test_provider_name"]
-        .models["test_model_name"]
-        .credentials
+        config.llm_providers.providers["test_provider_name"].models["test_model_name"].credentials
         == "secret_key"
     )
     assert (
@@ -2493,19 +2438,14 @@ def test_config():
         config.llm_providers.providers["rhelai_provider_name"].certificates_store
         == "/foo/bar/baz/ols.pem"
     )
-    assert (
-        config.llm_providers.providers["test_provider_name"].certificates_store is None
-    )
+    assert config.llm_providers.providers["test_provider_name"].certificates_store is None
 
     assert config.ols_config.default_provider == "test_default_provider"
     assert config.ols_config.default_model == "test_default_model"
     assert config.ols_config.conversation_cache.type == "memory"
     assert config.ols_config.conversation_cache.memory.max_entries == 100
     assert config.ols_config.logging_config.app_log_level == logging.ERROR
-    assert (
-        config.ols_config.query_validation_method
-        == constants.QueryValidationMethod.DISABLED
-    )
+    assert config.ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
     assert config.user_data_collector_config == UserDataCollectorConfig()
     assert config.ols_config.certificate_directory == "/foo/bar/baz"
     assert config.ols_config.system_prompt_path is None
@@ -2627,10 +2567,7 @@ def test_config_default_certificate_directory():
             "dev_config": {"disable_tls": "true"},
         }
     )
-    assert (
-        config.ols_config.certificate_directory
-        == constants.DEFAULT_CERTIFICATE_DIRECTORY
-    )
+    assert config.ols_config.certificate_directory == constants.DEFAULT_CERTIFICATE_DIRECTORY
 
 
 def test_config_improper_missing_model():
@@ -3022,16 +2959,10 @@ def test_config_with_multiple_query_filter():
         }
     )
     assert config.ols_config.query_filters[0].name == "filter1"
-    assert (
-        config.ols_config.query_filters[0].pattern
-        == r"(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
-    )
+    assert config.ols_config.query_filters[0].pattern == r"(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
     assert config.ols_config.query_filters[0].replace_with == "redacted"
     assert config.ols_config.query_filters[1].name == "filter2"
-    assert (
-        config.ols_config.query_filters[1].pattern
-        == r"(?:https?://)?(?:www\.)?[\w\.-]+\.\w+"
-    )
+    assert config.ols_config.query_filters[1].pattern == r"(?:https?://)?(?:www\.)?[\w\.-]+\.\w+"
     assert config.ols_config.query_filters[1].replace_with == ""
 
 
@@ -3123,9 +3054,7 @@ def test_query_filter_validation():
 
     def get_query_filter():
         """Construct new fully-configured filter from scratch."""
-        return QueryFilter(
-            {"name": "NAME", "pattern": "PATTERN", "replace_with": "REPLACE_WITH"}
-        )
+        return QueryFilter({"name": "NAME", "pattern": "PATTERN", "replace_with": "REPLACE_WITH"})
 
     query_filter = get_query_filter()
     query_filter.name = None
@@ -3232,9 +3161,7 @@ def test_authentication_config_wrong_module():
         k8s_cluster_api="http://cluster.org/foo",
         k8s_ca_cert_path="tests/config/empty_cert.crt",
     )
-    with pytest.raises(
-        InvalidConfigurationError, match="Authentication module is not setup"
-    ):
+    with pytest.raises(InvalidConfigurationError, match="Authentication module is not setup"):
         cfg.validate_yaml()
 
     # empty module
@@ -3244,9 +3171,7 @@ def test_authentication_config_wrong_module():
         k8s_cluster_api="http://cluster.org/foo",
         k8s_ca_cert_path="tests/config/empty_cert.crt",
     )
-    with pytest.raises(
-        InvalidConfigurationError, match="invalid authentication module"
-    ):
+    with pytest.raises(InvalidConfigurationError, match="invalid authentication module"):
         cfg.validate_yaml()
 
     # custom module
@@ -3256,9 +3181,7 @@ def test_authentication_config_wrong_module():
         k8s_cluster_api="http://cluster.org/foo",
         k8s_ca_cert_path="tests/config/empty_cert.crt",
     )
-    with pytest.raises(
-        InvalidConfigurationError, match="invalid authentication module"
-    ):
+    with pytest.raises(InvalidConfigurationError, match="invalid authentication module"):
         cfg.validate_yaml()
 
 
@@ -3343,9 +3266,7 @@ def test_authentication_config_validation_k8s_ca_cert_path():
 def test_user_data_config__feedback(tmpdir):
     """Tests the UserDataCollection model, feedback part."""
     # valid configuration
-    user_data = UserDataCollection(
-        feedback_disabled=False, feedback_storage=tmpdir.strpath
-    )
+    user_data = UserDataCollection(feedback_disabled=False, feedback_storage=tmpdir.strpath)
     assert user_data.feedback_disabled is False
     assert user_data.feedback_storage == tmpdir.strpath
 
@@ -3365,9 +3286,7 @@ def test_user_data_config__feedback(tmpdir):
 def test_user_data_config__transcripts(tmpdir):
     """Tests the UserDataCollection model, transripts part."""
     # valid configuration
-    user_data = UserDataCollection(
-        transcripts_disabled=False, transcripts_storage=tmpdir.strpath
-    )
+    user_data = UserDataCollection(transcripts_disabled=False, transcripts_storage=tmpdir.strpath)
     assert user_data.transcripts_disabled is False
     assert user_data.transcripts_storage == tmpdir.strpath
 
@@ -3502,7 +3421,8 @@ def test_user_data_collection_config__logging_level():
 def test_user_data_collection_config__token_expectation():
     """Test the UserDataCollection model with token expectation."""
     udc_config = UserDataCollectorConfig(
-        ingress_env="stage", cp_offline_token="123"  # noqa: S106
+        ingress_env="stage",
+        cp_offline_token="123",  # noqa: S106
     )
     assert udc_config.ingress_env == "stage"
     assert udc_config.cp_offline_token == "123"  # noqa: S105
@@ -3537,9 +3457,7 @@ def test_ols_config_with_system_prompt(tmpdir):
     assert ols_config.conversation_cache.type == "memory"
     assert ols_config.conversation_cache.memory.max_entries == 100
     assert ols_config.logging_config.app_log_level == logging.INFO
-    assert (
-        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
-    )
+    assert ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
     assert ols_config.user_data_collection == UserDataCollection()
     assert ols_config.reference_content is None
     assert ols_config.authentication_config == AuthenticationConfig(

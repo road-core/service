@@ -29,9 +29,7 @@ def store_fake_feedback(path, filename, data):
 
 def load_fake_feedback(filename):
     """Load feedback data."""
-    feedback_file = (
-        f"{config.ols_config.user_data_collection.feedback_storage}/{filename}.json"
-    )
+    feedback_file = f"{config.ols_config.user_data_collection.feedback_storage}/{filename}.json"
     return json.loads(open(feedback_file).read())
 
 

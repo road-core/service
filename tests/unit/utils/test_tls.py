@@ -51,10 +51,7 @@ tls_profile_to_min_version = (
 @pytest.mark.parametrize("tls_profile_to_min_version", tls_profile_to_min_version)
 def test_min_tls_version_tls_profile(tls_profile_to_min_version):
     """Check the function min_tls_version."""
-    assert (
-        tls.min_tls_version(None, tls_profile_to_min_version[0])
-        == tls_profile_to_min_version[1]
-    )
+    assert tls.min_tls_version(None, tls_profile_to_min_version[0]) == tls_profile_to_min_version[1]
 
 
 @pytest.mark.parametrize("tls_version", tls_versions)
@@ -70,9 +67,7 @@ def test_ciphers_from_list():
         "TLS_AES_256_GCM_SHA384",
         "TLS_CHACHA20_POLY1305_SHA256",
     ]
-    expected = (
-        "TLS_AES_128_GCM_SHA256, TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256"
-    )
+    expected = "TLS_AES_128_GCM_SHA256, TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256"
     assert tls.ciphers_from_list(ciphers) == expected
 
 

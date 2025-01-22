@@ -15,12 +15,9 @@ def start_with_pyroscope_enabled(
 ) -> None:
     """Start the application using pyroscope."""
     try:
-
         response = requests.get(config.dev_config.pyroscope_url, timeout=60)
         if response.status_code == requests.codes.ok:
-            logger.info(
-                "Pyroscope server is reachable at %s", config.dev_config.pyroscope_url
-            )
+            logger.info("Pyroscope server is reachable at %s", config.dev_config.pyroscope_url)
             # pylint: disable=C0415
             import pyroscope
 

@@ -35,9 +35,7 @@ def summarizer_no_reference_content():
     """Prepare document summarizer instance without reference content."""
     from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 
-    return DocsSummarizer(
-        llm_loader=mock_llm_loader(mock_langchain_interface("test response")())
-    )
+    return DocsSummarizer(llm_loader=mock_llm_loader(mock_langchain_interface("test response")()))
 
 
 @pytest.fixture

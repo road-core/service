@@ -58,17 +58,13 @@ numbers:
 
 def test_format_attachment_empty_text_plain_format(benchmark):
     """Benchmark the function to format one attachment that is empty."""
-    attachment = Attachment(
-        attachment_type="log", content_type="text/plain", content=""
-    )
+    attachment = Attachment(attachment_type="log", content_type="text/plain", content="")
     benchmark(format_attachment, attachment)
 
 
 def test_format_attachment_empty_yaml_format(benchmark):
     """Benchmark the function to format one attachment that is empty."""
-    attachment = Attachment(
-        attachment_type="log", content_type="application/yaml", content=""
-    )
+    attachment = Attachment(attachment_type="log", content_type="application/yaml", content="")
     benchmark(format_attachment, attachment)
 
 
@@ -83,9 +79,7 @@ def test_format_attachment_plain_text_format(benchmark):
 def test_format_long_attachment_plain_text_format(benchmark):
     """Benchmark the function to format one attachment in plain text format."""
     content = "foo\nbar\nbaz" * 10000
-    attachment = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
+    attachment = Attachment(attachment_type="log", content_type="text/plain", content=content)
     benchmark(format_attachment, attachment)
 
 
@@ -110,23 +104,15 @@ def test_format_long_attachment_yaml(long_yaml_content, benchmark):
 def test_append_attachments_to_query_one_attachment(benchmark, short_query):
     """Benchmark the function to append attachments to query."""
     content = "foo\nbar\nbaz"
-    attachment = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
+    attachment = Attachment(attachment_type="log", content_type="text/plain", content=content)
     benchmark(append_attachments_to_query, short_query, [attachment])
 
 
-def test_append_attachments_to_query_3_attachments(
-    benchmark, short_query, yaml_content
-):
+def test_append_attachments_to_query_3_attachments(benchmark, short_query, yaml_content):
     """Benchmark the function to append attachments to query."""
     content = "foo\nbar\nbaz"
-    attachment1 = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
-    attachment2 = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
+    attachment1 = Attachment(attachment_type="log", content_type="text/plain", content=content)
+    attachment2 = Attachment(attachment_type="log", content_type="text/plain", content=content)
     attachment3 = Attachment(
         attachment_type="log",
         content_type="application/yaml",
@@ -142,12 +128,8 @@ def test_append_attachments_to_query_3_attachments(
 def test_append_attachments_to_query_100_attachments(benchmark, short_query):
     """Benchmark the function to append attachments to query."""
     content = "foo\nbar\nbaz"
-    attachment1 = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
-    attachment2 = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
+    attachment1 = Attachment(attachment_type="log", content_type="text/plain", content=content)
+    attachment2 = Attachment(attachment_type="log", content_type="text/plain", content=content)
     attachments = [attachment1, attachment2] * 50
     benchmark(append_attachments_to_query, short_query, attachments)
 
@@ -155,7 +137,5 @@ def test_append_attachments_to_query_100_attachments(benchmark, short_query):
 def test_append_attachments_to_query_long_query(benchmark, long_query):
     """Benchmark the function to append attachments to query."""
     content = "foo\nbar\nbaz"
-    attachment = Attachment(
-        attachment_type="log", content_type="text/plain", content=content
-    )
+    attachment = Attachment(attachment_type="log", content_type="text/plain", content=content)
     benchmark(append_attachments_to_query, long_query, [attachment])

@@ -35,23 +35,17 @@ def add_ca_to_certificates_store(
     else:
         with open(cert_location, "ab") as certifi_store:
             certifi_store.write(new_certificate_data)
-            logger.debug(
-                "Written certificate with length %d bytes", len(new_certificate_data)
-            )
+            logger.debug("Written certificate with length %d bytes", len(new_certificate_data))
 
 
-def generate_certificates_file(
-    logger: logging.Logger, ols_config: config_model.OLSConfig
-) -> None:
+def generate_certificates_file(logger: logging.Logger, ols_config: config_model.OLSConfig) -> None:
     """Generate certificates by merging certificates from certify with defined certificates."""
     certificate_directory = ols_config.certificate_directory
 
     logger.info("Generating certificates file into directory %s", certificate_directory)
 
     # file where all certificates will be stored
-    destination_file = os.path.join(
-        certificate_directory, constants.CERTIFICATE_STORAGE_FILENAME
-    )
+    destination_file = os.path.join(certificate_directory, constants.CERTIFICATE_STORAGE_FILENAME)
 
     certifi_cert_location = certifi.where()
     logger.debug(

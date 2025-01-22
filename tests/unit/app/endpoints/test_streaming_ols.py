@@ -57,10 +57,7 @@ def test_build_yield_item():
 
 def test_prompt_too_long_error():
     """Test prompt_too_long_error."""
-    assert (
-        prompt_too_long_error("error", constants.MEDIA_TYPE_TEXT)
-        == "Prompt is too long: error"
-    )
+    assert prompt_too_long_error("error", constants.MEDIA_TYPE_TEXT) == "Prompt is too long: error"
 
     assert (
         prompt_too_long_error("error", constants.MEDIA_TYPE_JSON)
@@ -103,15 +100,11 @@ def test_stream_end_event():
         == "\n\n---\n\ntitle_1: doc_url_1"
     )
 
-    assert stream_end_event(
-        ref_docs, truncated, constants.MEDIA_TYPE_JSON, None
-    ) == json.dumps(
+    assert stream_end_event(ref_docs, truncated, constants.MEDIA_TYPE_JSON, None) == json.dumps(
         {
             "event": "end",
             "data": {
-                "referenced_documents": [
-                    {"doc_title": "title_1", "doc_url": "doc_url_1"}
-                ],
+                "referenced_documents": [{"doc_title": "title_1", "doc_url": "doc_url_1"}],
                 "truncated": truncated,
                 "input_tokens": 0,
                 "output_tokens": 0,
@@ -126,9 +119,7 @@ def test_stream_end_event():
         {
             "event": "end",
             "data": {
-                "referenced_documents": [
-                    {"doc_title": "title_1", "doc_url": "doc_url_1"}
-                ],
+                "referenced_documents": [{"doc_title": "title_1", "doc_url": "doc_url_1"}],
                 "truncated": truncated,
                 "input_tokens": 123,
                 "output_tokens": 456,

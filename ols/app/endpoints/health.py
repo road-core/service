@@ -44,9 +44,7 @@ def llm_is_ready() -> bool:
     # Reset `llm_is_ready_persistent_state`
     llm_is_ready_persistent_state = False
     try:
-        bare_llm = load_llm(
-            config.ols_config.default_provider, config.ols_config.default_model
-        )
+        bare_llm = load_llm(config.ols_config.default_provider, config.ols_config.default_model)
         response = bare_llm.invoke(input="Hello there!")
         # BAM and Watsonx replies as str and not as `AIMessage`
         if isinstance(response, (str, AIMessage)):

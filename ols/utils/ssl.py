@@ -21,9 +21,7 @@ def get_ssl_version(sec_profile: Optional[TLSSecurityProfile]) -> str:
         return constants.DEFAULT_SSL_VERSION
 
     # security profile is set -> we need to retrieve SSL version and list of allowed ciphers
-    min_tls_version = tls.min_tls_version(
-        sec_profile.min_tls_version, sec_profile.profile_type
-    )
+    min_tls_version = tls.min_tls_version(sec_profile.min_tls_version, sec_profile.profile_type)
     logger.info("min TLS version: %s", min_tls_version)
 
     ssl_version = tls.ssl_tls_version(min_tls_version)

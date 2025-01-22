@@ -225,9 +225,7 @@ class LLMProvider(AbstractLLMProvider):
         params = self._remap_to_llm_params(params)
         self.params = self._validate_parameters(params)
 
-    def _remap_to_llm_params(
-        self, generic_llm_params: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _remap_to_llm_params(self, generic_llm_params: dict[str, Any]) -> dict[str, Any]:
         """Remap generic parameters into LLM specific ones."""
         if self.provider_config is None:
             logger.warning("Provider is not set. Parameters mapping won't proceed.")
@@ -236,9 +234,7 @@ class LLMProvider(AbstractLLMProvider):
         provider = self.provider_config.type
 
         if provider is None:
-            logger.warning(
-                "Provider type is not set. Parameters mapping won't proceed."
-            )
+            logger.warning("Provider type is not set. Parameters mapping won't proceed.")
             return generic_llm_params
 
         if provider not in generic_to_llm_parameters:
@@ -269,9 +265,7 @@ class LLMProvider(AbstractLLMProvider):
         provider = self.provider_config.type
 
         if provider is None:
-            logger.warning(
-                "Provider type is not set. Parameters validation is disabled."
-            )
+            logger.warning("Provider type is not set. Parameters validation is disabled.")
             return params
 
         if provider not in available_provider_parameters:
@@ -294,10 +288,7 @@ class LLMProvider(AbstractLLMProvider):
             parameter = ProviderParameter(parameter_name, parameter_type)
             if parameter not in available_parameters:
                 # check for allowed parameter with None value
-                if (
-                    parameter_value is None
-                    and parameter_name in available_parameter_names
-                ):
+                if parameter_value is None and parameter_name in available_parameter_names:
                     filtered_params[parameter_name] = None
                     continue
                 # other parameters
@@ -326,9 +317,7 @@ class LLMProvider(AbstractLLMProvider):
 
         return updated_params
 
-    def _construct_httpx_client(
-        self, use_custom_certificate_store: bool
-    ) -> httpx.Client:
+    def _construct_httpx_client(self, use_custom_certificate_store: bool) -> httpx.Client:
         """Construct HTTPX client instance to be used to communicate with LLM."""
         sec_profile = self.provider_config.tls_security_profile
 
@@ -342,9 +331,7 @@ class LLMProvider(AbstractLLMProvider):
         ciphers = tls.ciphers_as_string(sec_profile.ciphers, sec_profile.profile_type)
         logger.info("list of ciphers: %s", ciphers)
 
-        min_tls_version = tls.min_tls_version(
-            sec_profile.min_tls_version, sec_profile.profile_type
-        )
+        min_tls_version = tls.min_tls_version(sec_profile.min_tls_version, sec_profile.profile_type)
         logger.info("min TLS version: %s", min_tls_version)
 
         ssl_version = tls.ssl_tls_version(min_tls_version)

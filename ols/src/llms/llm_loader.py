@@ -52,9 +52,7 @@ def resolve_provider_config(
     return provider_config
 
 
-def load_llm(
-    provider: str, model: str, generic_llm_params: Optional[dict] = None
-) -> LLM:
+def load_llm(provider: str, model: str, generic_llm_params: Optional[dict] = None) -> LLM:
     """Load LLM according to input provider and model.
 
     Args:
@@ -87,9 +85,7 @@ def load_llm(
 
     provider_config = resolve_provider_config(provider, model, providers_config)
     if provider_config.type not in llm_providers_reg.llm_providers:
-        raise UnsupportedProviderError(
-            f"Unsupported LLM provider type '{provider_config.type}'."
-        )
+        raise UnsupportedProviderError(f"Unsupported LLM provider type '{provider_config.type}'.")
 
     logger.debug("loading LLM model '%s' from provider '%s'", model, provider)
 

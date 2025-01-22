@@ -16,9 +16,7 @@ from ols.constants import CONFIGURATION_FILE_NAME_ENV_VARIABLE
 @pytest.fixture(scope="function", autouse=True)
 @patch.dict(
     os.environ,
-    {
-        CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests.yaml"
-    },
+    {CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests.yaml"},
 )
 def _setup():
     """Setups the test client."""

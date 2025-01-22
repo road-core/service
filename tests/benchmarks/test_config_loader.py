@@ -30,9 +30,7 @@ def test_load_invalid_config_file(benchmark):
 
 def test_load_non_existent_config(benchmark):
     """Benchmark for configuration file loading when config file does not exists."""
-    benchmark(
-        try_to_load_config_file, "tests/config/NOT_EXISTS.yaml", FileNotFoundError
-    )
+    benchmark(try_to_load_config_file, "tests/config/NOT_EXISTS.yaml", FileNotFoundError)
 
 
 def read_empty_config_stream():

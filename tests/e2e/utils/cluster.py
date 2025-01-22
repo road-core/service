@@ -25,16 +25,12 @@ def run_oc(
         if ignore_existing_resource and "AlreadyExists" in e.stderr:
             print(f"Resource already exists: {e}\nproceeding...")
         else:
-            print(
-                f"Error running oc command {args}: {e}, stdout: {e.output}, stderr: {e.stderr}"
-            )
+            print(f"Error running oc command {args}: {e}, stdout: {e.output}, stderr: {e.stderr}")
             raise
     return subprocess.CompletedProcess("", 0)
 
 
-def run_oc_and_store_stdout(
-    args: list[str], stdout_file: str
-) -> subprocess.CompletedProcess:
+def run_oc_and_store_stdout(args: list[str], stdout_file: str) -> subprocess.CompletedProcess:
     """Run a command in the OpenShift cluster and store the stdout in a file."""
     try:
         result = run_oc(args)
@@ -219,8 +215,7 @@ def list_path(pod_name: str, path: str) -> list[str]:
     except subprocess.CalledProcessError as e:
         print(f"Error listing path {path}: {e}, stderr: {e.stderr}, stdout: {e.stdout}")
         if e.returncode == 2 and (
-            "No such file or directory" in e.stdout
-            or "No such file or directory" in e.stderr
+            "No such file or directory" in e.stdout or "No such file or directory" in e.stderr
         ):
             return None
         raise Exception("Error listing pod path") from e
@@ -242,9 +237,7 @@ def get_single_existing_transcript(pod_name: str, transcripts_path: str) -> dict
     conv_id_list = list_path(pod_name, transcripts_path + "/" + user_id)
     assert len(conv_id_list) == 1
     conv_id = conv_id_list[0]
-    transcript_list = list_path(
-        pod_name, transcripts_path + "/" + user_id + "/" + conv_id
-    )
+    transcript_list = list_path(pod_name, transcripts_path + "/" + user_id + "/" + conv_id)
     assert len(transcript_list) == 1
     transcript = transcript_list[0]
 
@@ -347,26 +340,17 @@ def wait_for_running_pod(
     r = retry_until_timeout_or_success(
         OC_COMMAND_RETRY_COUNT,
         5,
-        lambda: len(
-            get_pod_by_prefix(prefix=name, namespace=namespace, fail_not_found=False)
-        )
-        == 1,
+        lambda: len(get_pod_by_prefix(prefix=name, namespace=namespace, fail_not_found=False)) == 1,
     )
     if not r:
         raise Exception("Timed out waiting for new OLS pod to be ready")
-    pod_name = get_pod_by_prefix(
-        prefix=name, namespace=namespace, fail_not_found=False
-    )[0]
+    pod_name = get_pod_by_prefix(prefix=name, namespace=namespace, fail_not_found=False)[0]
     # wait for the two containers in the server pod to become ready
     retry_until_timeout_or_success(
         OC_COMMAND_RETRY_COUNT,
         5,
         lambda: len(
-            [
-                container
-                for container in get_container_ready_status(pod_name)
-                if container == "true"
-            ]
+            [container for container in get_container_ready_status(pod_name) if container == "true"]
         )
         == 2,
     )

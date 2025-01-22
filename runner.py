@@ -39,9 +39,7 @@ if __name__ == "__main__":
     # else via our code before other envs are set (mainly the gradio).
     from ols import config
 
-    cfg_file = os.environ.get(
-        CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
-    )
+    cfg_file = os.environ.get(CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE)
     config.reload_from_yaml_file(cfg_file)
 
     if "--dump-config" in sys.argv:

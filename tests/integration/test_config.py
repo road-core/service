@@ -24,9 +24,7 @@ def test_load_proper_config():
 
 def test_load_non_existent_config():
     """Test how loading of non-existent config is handled."""
-    with pytest.raises(
-        FileNotFoundError, match="tests/config/non_existent_config.yaml"
-    ):
+    with pytest.raises(FileNotFoundError, match="tests/config/non_existent_config.yaml"):
         config.reload_from_yaml_file("tests/config/non_existent_config.yaml")
 
 
@@ -48,9 +46,7 @@ def write_config_file(cfg_filename, cfg):
         yaml.dump(cfg, fout, default_flow_style=False)
 
 
-def remove_items_one_iteration(
-    original_payload, items_count, remove_flags, selector=None
-):
+def remove_items_one_iteration(original_payload, items_count, remove_flags, selector=None):
     """One iteration of algorithm to remove item or items from the original payload."""
     if selector is None:
         keys = list(original_payload.keys())
@@ -90,9 +86,7 @@ def remove_items(original_payload, selector=None):
 
     # construct new payload with some item(s) removed
     new_payloads = [
-        remove_items_one_iteration(
-            original_payload, items_count, remove_flags, selector
-        )
+        remove_items_one_iteration(original_payload, items_count, remove_flags, selector)
         for remove_flags in remove_flags_list
     ]
     return new_payloads
@@ -142,9 +136,7 @@ def mutate_items_one_iteration(original_payload, how_many):
 
 def mutate_items(original_payload, how_many):
     """Algorithm to mutate items with random values in original payload."""
-    new_payloads = [
-        mutate_items_one_iteration(original_payload, i) for i in range(how_many)
-    ]
+    new_payloads = [mutate_items_one_iteration(original_payload, i) for i in range(how_many)]
     return new_payloads
 
 

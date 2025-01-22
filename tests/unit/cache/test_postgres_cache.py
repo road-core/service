@@ -15,21 +15,15 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 user_id = suid.get_suid()
 conversation_id = suid.get_suid()
-cache_entry_1 = CacheEntry(
-    query=HumanMessage("用户消息"), response=AIMessage("人工智能信息")
-)
-cache_entry_2 = CacheEntry(
-    query=HumanMessage("user message"), response=AIMessage("ai message")
-)
+cache_entry_1 = CacheEntry(query=HumanMessage("用户消息"), response=AIMessage("人工智能信息"))
+cache_entry_2 = CacheEntry(query=HumanMessage("user message"), response=AIMessage("ai message"))
 
 
 @patch("psycopg2.connect")
 def test_init_cache_failure_detection(mock_connect):
     """Test the exception handling for Cache.initialize_cache operation."""
     exception_message = "Exception during initializing the cache."
-    mock_connect.return_value.cursor.return_value.execute.side_effect = Exception(
-        exception_message
-    )
+    mock_connect.return_value.cursor.return_value.execute.side_effect = Exception(exception_message)
 
     # try to connect to mocked Postgres
     config = PostgresConfig()

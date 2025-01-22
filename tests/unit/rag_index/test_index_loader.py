@@ -28,9 +28,7 @@ def test_index_loader_no_id(storage_context):
     index_loader_obj = IndexLoader(config.ols_config.reference_content)
     index = index_loader_obj.vector_index
 
-    assert (
-        index_loader_obj._embed_model == "local:sentence-transformers/all-mpnet-base-v2"
-    )
+    assert index_loader_obj._embed_model == "local:sentence-transformers/all-mpnet-base-v2"
     assert index is None
 
 

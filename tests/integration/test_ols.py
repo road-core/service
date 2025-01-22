@@ -23,7 +23,6 @@ from tests.mock_classes.mock_llm_chain import mock_llm_chain
 from tests.mock_classes.mock_llm_loader import mock_llm_loader
 
 
-
 @pytest.fixture(scope="function")
 def _setup():
     """Setups the test client."""
@@ -229,8 +228,7 @@ def test_unknown_provider_in_post(_setup, endpoint):
     assert response.status_code == requests.codes.unprocessable
     expected_json = {
         "detail": {
-            "cause": "Provider 'some-provider' is not a valid provider. "
-            "Valid providers are: []",
+            "cause": "Provider 'some-provider' is not a valid provider. Valid providers are: []",
             "response": "Unable to process this request",
         }
     }
@@ -276,10 +274,7 @@ def test_post_question_improper_conversation_id(_setup, endpoint) -> None:
     assert config.dev_config is not None
     config.dev_config.disable_auth = True
     answer = constants.SUBJECT_ALLOWED
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question", return_value=answer
-    ):
-
+    with patch("ols.app.endpoints.ols.QuestionValidator.validate_question", return_value=answer):
         conversation_id = "not-correct-uuid"
         response = pytest.client.post(
             endpoint,
@@ -415,8 +410,7 @@ def test_post_query_with_query_filters_response_type(_setup, endpoint) -> None:
                 actual_response = response.text
 
             assert (
-                "test query with redacted_ip will be replaced with redacted_ip"
-                in actual_response
+                "test query with redacted_ip will be replaced with redacted_ip" in actual_response
             )
 
 

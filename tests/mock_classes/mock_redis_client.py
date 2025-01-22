@@ -60,7 +60,5 @@ class MockRedisClient:
         assert isinstance(pattern, str)
 
         # Use fnmatch to match keys against the pattern
-        matching_keys = [
-            key for key in self.cache if fnmatch.fnmatch(key, pattern)
-        ]
+        matching_keys = [key for key in self.cache if fnmatch.fnmatch(key, pattern)]
         return matching_keys

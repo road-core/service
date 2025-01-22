@@ -44,9 +44,7 @@ class AuthDependency(AuthDependencyInterface):
             return DEFAULT_USER_UID, DEFAULT_USER_NAME, self.skip_userid_check
 
         logger.warning("Using no-op dependency authentication!")
-        logger.warning(
-            "The service is in insecure mode meant only to be used in devel environment"
-        )
+        logger.warning("The service is in insecure mode meant only to be used in devel environment")
         # try to read user ID from request
         user_id = request.query_params.get("user_id", DEFAULT_USER_UID)
         logger.info("User ID: %s", user_id)

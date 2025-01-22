@@ -105,9 +105,7 @@ def conversation_request(
             None,
         )
     else:
-        summarizer_response = generate_response(
-            conversation_id, llm_request, previous_input
-        )
+        summarizer_response = generate_response(conversation_id, llm_request, previous_input)
 
     timestamps["generate response"] = time.time()
 
@@ -137,9 +135,7 @@ def conversation_request(
 
     timestamps["store transcripts"] = time.time()
 
-    referenced_documents = ReferencedDocument.from_rag_chunks(
-        summarizer_response.rag_chunks
-    )
+    referenced_documents = ReferencedDocument.from_rag_chunks(summarizer_response.rag_chunks)
 
     timestamps["add references"] = time.time()
     log_processing_durations(timestamps)
@@ -164,9 +160,7 @@ def conversation_request(
 
 def process_request(
     auth: Any, llm_request: LLMRequest
-) -> tuple[
-    str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float], str
-]:
+) -> tuple[str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float], str]:
     """Process incoming request.
 
     Args:
@@ -249,12 +243,8 @@ def log_processing_durations(timestamps: dict[str, float]) -> None:
     retrieve_user_duration = duration("start", "retrieve user")
     retrieve_conversation_duration = duration("retrieve user", "retrieve conversation")
     redact_query_duration = duration("retrieve conversation", "redact query")
-    retrieve_previous_input_duration = duration(
-        "redact query", "retrieve previous input"
-    )
-    append_attachmens_duration = duration(
-        "retrieve previous input", "append attachments"
-    )
+    retrieve_previous_input_duration = duration("redact query", "retrieve previous input")
+    append_attachmens_duration = duration("retrieve previous input", "append attachments")
     validate_question_duration = duration("append attachments", "validate question")
     generate_response_duration = duration("validate question", "generate response")
     store_transcripts_duration = duration("generate response", "store transcripts")
@@ -336,9 +326,7 @@ def retrieve_attachments(llm_request: LLMRequest) -> list[Attachment]:
     # some attachments were send to the service, time to check its metadata
     for attachment in attachments:
         if attachment.attachment_type not in constants.ATTACHMENT_TYPES:
-            message = (
-                f"Attachment with improper type {attachment.attachment_type} detected"
-            )
+            message = f"Attachment with improper type {attachment.attachment_type} detected"
             logger.error(message)
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -380,12 +368,8 @@ def generate_response(
         )
         history = CacheEntry.cache_entries_to_history(previous_input)
         if streaming:
-            return docs_summarizer.generate_response(
-                llm_request.query, config.rag_index, history
-            )
-        response = docs_summarizer.create_response(
-            llm_request.query, config.rag_index, history
-        )
+            return docs_summarizer.generate_response(llm_request.query, config.rag_index, history)
+        response = docs_summarizer.create_response(llm_request.query, config.rag_index, history)
         logger.debug("%s Generated response: %s", conversation_id, response)
         return response
     except PromptTooLongError as summarizer_error:
@@ -400,9 +384,7 @@ def generate_response(
     except Exception as summarizer_error:
         logger.error("Error while obtaining answer for user question")
         logger.exception(summarizer_error)
-        status_code, response_text, cause = errors_parsing.parse_generic_llm_error(
-            summarizer_error
-        )
+        status_code, response_text, cause = errors_parsing.parse_generic_llm_error(summarizer_error)
         raise HTTPException(
             status_code=status_code,
             detail={
@@ -482,9 +464,7 @@ def redact_query(conversation_id: str, llm_request: LLMRequest) -> LLMRequest:
     """Redact query using query_redactor, raise HTTPException in case of any problem."""
     try:
         logger.debug("Redacting query for conversation %s", conversation_id)
-        llm_request.query = config.query_redactor.redact(
-            conversation_id, llm_request.query
-        )
+        llm_request.query = config.query_redactor.redact(conversation_id, llm_request.query)
         return llm_request
     except Exception as redactor_error:
         logger.error(
@@ -501,9 +481,7 @@ def redact_query(conversation_id: str, llm_request: LLMRequest) -> LLMRequest:
         )
 
 
-def redact_attachments(
-    conversation_id: str, attachments: list[Attachment]
-) -> list[Attachment]:
+def redact_attachments(conversation_id: str, attachments: list[Attachment]) -> list[Attachment]:
     """Redact all attachments using query_redactor, raise HTTPException in case of any problem."""
     logger.debug("Redacting attachments for conversation %s", conversation_id)
 
@@ -512,9 +490,7 @@ def redact_attachments(
         for attachment in attachments:
             # might be possible to change attachments "in situ" but it might
             # confuse developers
-            redacted_content = config.query_redactor.redact(
-                conversation_id, attachment.content
-            )
+            redacted_content = config.query_redactor.redact(conversation_id, attachment.content)
             redacted_attachment = Attachment(
                 attachment_type=attachment.attachment_type,
                 content_type=attachment.content_type,
@@ -597,7 +573,6 @@ def _validate_question_keyword(query: str) -> bool:
 def validate_question(conversation_id: str, llm_request: LLMRequest) -> bool:
     """Validate user question."""
     match config.ols_config.query_validation_method:
-
         case constants.QueryValidationMethod.LLM:
             logger.debug("LLM based query validation.")
             return _validate_question_llm(conversation_id, llm_request)

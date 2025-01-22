@@ -106,9 +106,7 @@ def test_post_authorized_no_token():
 def test_is_user_authorized_valid_token(mock_authz_api, mock_authn_api):
     """Tests the is_user_authorized function with a mocked valid-token."""
     # Setup mock responses for valid token
-    mock_authn_api.return_value.create_token_review.side_effect = (
-        mock_token_review_response
-    )
+    mock_authn_api.return_value.create_token_review.side_effect = mock_token_review_response
     mock_authz_api.return_value.create_subject_access_review.side_effect = (
         mock_subject_access_review_response
     )
@@ -133,9 +131,7 @@ def test_is_user_authorized_valid_token(mock_authz_api, mock_authn_api):
 def test_is_user_authorized_invalid_token(mock_authz_api, mock_authn_api):
     """Test the is_user_authorized function with a mocked invalid-token."""
     # Setup mock responses for invalid token
-    mock_authn_api.return_value.create_token_review.side_effect = (
-        mock_token_review_response
-    )
+    mock_authn_api.return_value.create_token_review.side_effect = mock_token_review_response
     mock_authz_api.return_value.create_subject_access_review.side_effect = (
         mock_subject_access_review_response
     )

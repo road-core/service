@@ -18,9 +18,7 @@ class LLMProvidersRegistry:
     def register(cls, provider_type: str, llm_provider: Callable) -> None:
         """Register LLM provider."""
         if not issubclass(llm_provider, LLMProvider):
-            raise TypeError(
-                f"LLMProvider subclass required, got '{type(llm_provider)}'"
-            )
+            raise TypeError(f"LLMProvider subclass required, got '{type(llm_provider)}'")
         cls.llm_providers[provider_type] = llm_provider
         logger.debug("LLM provider '%s' registered", provider_type)
 

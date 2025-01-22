@@ -183,9 +183,7 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.insert_or_append: %s", e)
                 raise CacheError("PostgresCache.insert_or_append", e) from e
 
-    def delete(
-        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
-    ) -> bool:
+    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool = False) -> bool:
         """Delete conversation history for a given user_id and conversation_id.
 
         Args:
@@ -285,13 +283,11 @@ class PostgresCache(Cache):
             limit = count - capacity
             if limit > 0:
                 cursor.execute(
-                    f"{PostgresCache.DELETE_CONVERSATION_HISTORY_STATEMENT} {count-capacity})"
+                    f"{PostgresCache.DELETE_CONVERSATION_HISTORY_STATEMENT} {count - capacity})"
                 )
 
     @staticmethod
-    def _delete(
-        cursor: psycopg2.extensions.cursor, user_id: str, conversation_id: str
-    ) -> bool:
+    def _delete(cursor: psycopg2.extensions.cursor, user_id: str, conversation_id: str) -> bool:
         """Delete conversation history for given user_id and conversation_id."""
         cursor.execute(
             PostgresCache.DELETE_SINGLE_CONVERSATION_STATEMENT,

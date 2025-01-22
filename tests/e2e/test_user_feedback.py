@@ -130,9 +130,7 @@ def test_feedback_improper_conversation_id():
     response_utils.check_content_type(response, "application/json")
     json_response = response.json()
 
-    assert (
-        "detail" in json_response
-    ), "Improper response format: 'detail' node is missing"
+    assert "detail" in json_response, "Improper response format: 'detail' node is missing"
     assert (
         json_response["detail"][0]["msg"]
         == "Value error, Improper conversation ID incorrect-conversation-id"

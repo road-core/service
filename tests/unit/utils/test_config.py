@@ -29,21 +29,11 @@ def check_expected_exception(
 
 def test_malformed_yaml():
     """Check that malformed YAML is handled gracefully."""
-    check_expected_exception(
-        """[foo=123}""", ParserError, "while parsing a flow sequence"
-    )
-    check_expected_exception(
-        """foobar""", AttributeError, "'str' object has no attribute 'get'"
-    )
-    check_expected_exception(
-        """123""", AttributeError, "'int' object has no attribute 'get'"
-    )
-    check_expected_exception(
-        """12.3""", AttributeError, "'float' object has no attribute 'get'"
-    )
-    check_expected_exception(
-        """[1,2,3]""", AttributeError, "'list' object has no attribute 'get'"
-    )
+    check_expected_exception("""[foo=123}""", ParserError, "while parsing a flow sequence")
+    check_expected_exception("""foobar""", AttributeError, "'str' object has no attribute 'get'")
+    check_expected_exception("""123""", AttributeError, "'int' object has no attribute 'get'")
+    check_expected_exception("""12.3""", AttributeError, "'float' object has no attribute 'get'")
+    check_expected_exception("""[1,2,3]""", AttributeError, "'list' object has no attribute 'get'")
 
 
 def test_missing_config_file():
@@ -411,8 +401,7 @@ ols_config:
       password_path: pwd123
 """,
         InvalidConfigurationError,
-        "memory conversation cache type is specified,"
-        " but memory configuration is missing",
+        "memory conversation cache type is specified, but memory configuration is missing",
     )
 
     check_expected_exception(
@@ -460,8 +449,7 @@ ols_config:
       max_entries: 1000
 """,
         InvalidConfigurationError,
-        "redis conversation cache type is specified,"
-        " but redis configuration is missing",
+        "redis conversation cache type is specified, but redis configuration is missing",
     )
 
     check_expected_exception(
@@ -862,9 +850,7 @@ def test_valid_config_file():
 def test_valid_config_file_without_certificate_directory():
     """Check if a valid configuration file is handled correctly."""
     try:
-        config.reload_from_yaml_file(
-            "tests/config/valid_config_without_certificate_directory.yaml"
-        )
+        config.reload_from_yaml_file("tests/config/valid_config_without_certificate_directory.yaml")
 
         expected_config = Config(
             {
@@ -1133,9 +1119,7 @@ def test_valid_config_with_azure_openai():
 def test_valid_config_with_azure_openai_credentials_path_only_in_provider_config():
     """Check if a valid configuration file with Azure OpenAI is handled correctly."""
     try:
-        config.reload_from_yaml_file(
-            "tests/config/valid_config_with_azure_openai_2.yaml"
-        )
+        config.reload_from_yaml_file("tests/config/valid_config_with_azure_openai_2.yaml")
 
         expected_config = Config(
             {
@@ -1187,9 +1171,7 @@ def test_valid_config_with_azure_openai_credentials_path_only_in_provider_config
 def test_valid_config_with_azure_openai_api_version():
     """Check if a valid configuration file with Azure OpenAI is handled correctly."""
     try:
-        config.reload_from_yaml_file(
-            "tests/config/valid_config_with_azure_openai_api_version.yaml"
-        )
+        config.reload_from_yaml_file("tests/config/valid_config_with_azure_openai_api_version.yaml")
 
         expected_config = Config(
             {
@@ -1232,9 +1214,7 @@ def test_valid_config_with_azure_openai_api_version():
             }
         )
         assert config.config == expected_config
-        assert (
-            config.config.llm_providers.providers.get("p1").api_version == "2024-12-31"
-        )
+        assert config.config.llm_providers.providers.get("p1").api_version == "2024-12-31"
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")

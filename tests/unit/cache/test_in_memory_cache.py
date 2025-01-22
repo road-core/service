@@ -11,12 +11,8 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 conversation_id = suid.get_suid()
 user_provided_user_id = "test-user1"
-cache_entry_1 = CacheEntry(
-    query=HumanMessage("user message1"), response=AIMessage("ai message1")
-)
-cache_entry_2 = CacheEntry(
-    query=HumanMessage("user message2"), response=AIMessage("ai message2")
-)
+cache_entry_1 = CacheEntry(query=HumanMessage("user message1"), response=AIMessage("ai message1"))
+cache_entry_2 = CacheEntry(query=HumanMessage("user message2"), response=AIMessage("ai message2"))
 
 
 @pytest.fixture
@@ -46,9 +42,7 @@ def test_insert_or_append_skip_user_id_check(cache):
         user_provided_user_id, conversation_id, cache_entry_1, skip_user_id_check
     )
 
-    assert cache.get(user_provided_user_id, conversation_id, skip_user_id_check) == [
-        cache_entry_1
-    ]
+    assert cache.get(user_provided_user_id, conversation_id, skip_user_id_check) == [cache_entry_1]
 
 
 def test_insert_or_append_existing_key(cache):
@@ -91,9 +85,7 @@ def test_insert_or_append_overflow(cache):
     assert cache.get(f"{user_name_prefix}0", conversation_id) is None
     # Ensure the newest entry is still present
     expected_result = [CacheEntry(query=HumanMessage(f"user query {i}"))]
-    assert (
-        cache.get(f"{user_name_prefix}{capacity}", conversation_id) == expected_result
-    )
+    assert cache.get(f"{user_name_prefix}{capacity}", conversation_id) == expected_result
 
 
 def test_get_nonexistent_user(cache):
