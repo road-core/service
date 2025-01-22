@@ -1,7 +1,7 @@
 """Unit tests for DocsSummarizer class."""
 
 import logging
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, call, patch
 
 import pytest
 
@@ -119,6 +119,30 @@ def test_summarize_truncation():
 
     # truncation should be done
     assert summary.history_truncated
+
+
+@patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4)
+@patch("ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None))
+def test_prepare_prompt_context():
+    """Basic test for DocsSummarizer to check re-structuring of context for the 'temp' prompt."""
+    summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
+    question = "What's the ultimate question with answer 42?"
+    history = ["human: What is Kubernetes?"]
+    rag_index = MockLlamaIndex()
+
+    with patch(
+        "ols.src.query_helpers.docs_summarizer.restructure_rag_context",
+        return_value="patched_history",
+    ) as restructure_rag_context:
+        summarizer.create_response(question, rag_index, history)
+        restructure_rag_context.assert_has_calls([call("sample", ANY)])
+
+    with patch(
+        "ols.src.query_helpers.docs_summarizer.restructure_history",
+        return_value="patched_history",
+    ) as restructure_history:
+        summarizer.create_response(question, rag_index, history)
+        restructure_history.assert_has_calls([call("ai: sample", ANY)])
 
 
 @patch("ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None))
