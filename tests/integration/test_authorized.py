@@ -58,6 +58,7 @@ def test_post_authorized_disabled(caplog):
     assert response.json() == {
         "user_id": constants.DEFAULT_USER_UID,
         "username": constants.DEFAULT_USER_NAME,
+        "skip_user_id_check": False,
     }
 
     # check if the auth checks warning message is found in the log
@@ -83,6 +84,7 @@ def test_post_authorized_disabled_with_logging_suppressed(caplog):
     assert response.json() == {
         "user_id": constants.DEFAULT_USER_UID,
         "username": constants.DEFAULT_USER_NAME,
+        "skip_user_id_check": False
     }
 
     # check if the auth checks warning message is NOT found in the log

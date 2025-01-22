@@ -10,6 +10,7 @@ from ols.utils import suid
 from langchain_core.messages import AIMessage, HumanMessage
 
 conversation_id = suid.get_suid()
+user_provided_user_id = "test-user1"
 cache_entry_1 = CacheEntry(query=HumanMessage("user message1"), response=AIMessage("ai message1"))
 cache_entry_2 = CacheEntry(query=HumanMessage("user message2"), response=AIMessage("ai message2"))
 
@@ -32,6 +33,18 @@ def test_insert_or_append(cache):
     )
 
     assert cache.get(constants.DEFAULT_USER_UID, conversation_id) == [cache_entry_1]
+
+def test_insert_or_append_skip_user_id_check(cache):
+    """Test the behavior of insert_or_append method."""
+    skip_user_id_check = True
+    cache.insert_or_append(
+        user_provided_user_id,
+        conversation_id,
+        cache_entry_1,
+        skip_user_id_check
+    )
+
+    assert cache.get(user_provided_user_id, conversation_id, skip_user_id_check) == [cache_entry_1]
 
 
 def test_insert_or_append_existing_key(cache):
@@ -85,6 +98,88 @@ def test_get_nonexistent_user(cache):
     assert cache.get("ffffffff-ffff-ffff-ffff-ffffffffffff", conversation_id) is None
 
 
+def test_delete_existing_conversation(cache):
+    """Test deleting an existing conversation."""
+    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id, cache_entry_1)
+    
+    result = cache.delete(constants.DEFAULT_USER_UID, conversation_id)
+    
+    assert result is True
+    assert cache.get(constants.DEFAULT_USER_UID, conversation_id) is None
+
+def test_delete_nonexistent_conversation(cache):
+    """Test deleting a conversation that doesn't exist."""
+    result = cache.delete(constants.DEFAULT_USER_UID, conversation_id)
+    assert result is False
+
+
+def test_delete_improper_conversation_id(cache):
+    """Test delete with invalid conversation ID."""
+    with pytest.raises(ValueError, match="Invalid conversation ID"):
+        cache.delete(constants.DEFAULT_USER_UID, "invalid-id")
+
+def test_delete_skip_user_id_check(cache):
+    """Test deleting an existing conversation."""
+    skip_user_id_check = True
+    cache.insert_or_append(user_provided_user_id, conversation_id, cache_entry_1, skip_user_id_check)
+    
+    result = cache.delete(user_provided_user_id, conversation_id, skip_user_id_check)
+    
+    assert result is True
+    assert cache.get(user_provided_user_id, conversation_id, skip_user_id_check) is None
+
+def test_list_conversations(cache):
+    """Test listing conversations for a user."""
+    # Create multiple conversations
+    conversation_id_1 = suid.get_suid()
+    conversation_id_2 = suid.get_suid()
+    
+    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_1, cache_entry_1)
+    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_2, cache_entry_2)
+    
+    conversations = cache.list(constants.DEFAULT_USER_UID)
+    
+    assert len(conversations) == 2
+    assert conversation_id_1 in conversations
+    assert conversation_id_2 in conversations
+
+def test_list_conversations_skip_user_id_check(cache):
+    """Test listing conversations for a user."""
+    # Create multiple conversations
+    conversation_id_1 = suid.get_suid()
+    conversation_id_2 = suid.get_suid()
+    skip_user_id_check=True
+    
+    cache.insert_or_append(user_provided_user_id, conversation_id_1, cache_entry_1, skip_user_id_check)
+    cache.insert_or_append(user_provided_user_id, conversation_id_2, cache_entry_2, skip_user_id_check)
+    
+    conversations = cache.list(user_provided_user_id, skip_user_id_check)
+    
+    assert len(conversations) == 2
+    assert conversation_id_1 in conversations
+    assert conversation_id_2 in conversations
+
+def test_list_no_conversations(cache):
+    """Test listing conversations for a user with no conversations."""
+    conversations = cache.list(constants.DEFAULT_USER_UID)
+    assert len(conversations) == 0
+
+def test_list_after_delete(cache):
+    """Test listing conversations after deleting some."""
+    conversation_id_1 = suid.get_suid()
+    conversation_id_2 = suid.get_suid()
+    
+    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_1, cache_entry_1)
+    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_2, cache_entry_2)
+    
+    cache.delete(constants.DEFAULT_USER_UID, conversation_id_1)
+    
+    conversations = cache.list(constants.DEFAULT_USER_UID)
+    assert len(conversations) == 1
+    assert conversation_id_2 in conversations
+    assert conversation_id_1 not in conversations
+
+
 improper_user_uuids = [
     None,
     "",
@@ -97,6 +192,18 @@ improper_user_uuids = [
     "ffffffff:ffff:ffff:ffff:ffffffffffff",
 ]
 
+@pytest.mark.parametrize("uuid", improper_user_uuids)
+def test_list_improper_user_id(cache, uuid):
+    """Test list with invalid user ID."""
+    with pytest.raises(ValueError, match=f"Invalid user ID {uuid}"):
+        cache.list(uuid)
+
+
+@pytest.mark.parametrize("uuid", improper_user_uuids)
+def test_delete_improper_user_id(cache, uuid):
+    """Test delete with invalid user ID."""
+    with pytest.raises(ValueError, match=f"Invalid user ID {uuid}"):
+        cache.delete(uuid, conversation_id)
 
 @pytest.mark.parametrize("uuid", improper_user_uuids)
 def test_get_improper_user_id(cache, uuid):

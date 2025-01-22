@@ -13,7 +13,7 @@ from ols import config
 from ols.app.endpoints.ols import (
     retrieve_user_id,
     retrieve_previous_input,
-    retrieve_skip_user_id_check
+    retrieve_skip_user_id_check,
 )
 from ols.app.models.models import (
     ErrorResponse,
@@ -22,6 +22,7 @@ from ols.app.models.models import (
     ChatHistoryResponse,
     ConversationDeletionResponse,
     ListConversationsResponse,
+    CacheEntry
 )
 from ols.src.auth.auth import get_auth_dependency
 
@@ -69,8 +70,7 @@ def get_conversation(
         List of conversation messages.
     """
     # Initialize variables
-    previous_input = []
-    chat_history: list[BaseMessage] = []
+    chat_history = []
 
     user_id = retrieve_user_id(auth)
     logger.info("User ID %s", user_id)
@@ -79,7 +79,11 @@ def get_conversation(
     # Log incoming request (after redaction)
     logger.info("Getting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
     try:
-        previous_input = retrieve_previous_input(user_id, conversation_id, skip_user_id_check)
+        chat_history=CacheEntry.cache_entries_to_history(retrieve_previous_input(user_id, conversation_id, skip_user_id_check))
+        if chat_history.__len__() == 0:
+            logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
+            raise Exception( f"Conversation {conversation_id} not found") 
+        return ChatHistoryResponse(chat_history=chat_history)
     except Exception as e:
         logger.error("Error retrieving previous chat history: %s", e)
         raise HTTPException(
@@ -89,20 +93,6 @@ def get_conversation(
                 "cause": str(e),
             },
         )
-    if previous_input.__len__() == 0:
-        logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "response": "Error retrieving previous chat history",
-                "cause": f"Conversation {conversation_id} not found"
-            },
-        ) 
-    for entry in previous_input:
-        chat_history.append(entry.query)
-        chat_history.append(entry.response)
-
-    return ChatHistoryResponse(chat_history=chat_history)
 
 
 delete_conversation_response: dict[int | str, dict[str, Any]] = {
@@ -125,7 +115,7 @@ delete_conversation_response: dict[int | str, dict[str, Any]] = {
 }
 
 @router.delete("/conversations/{conversation_id}", responses=delete_conversation_response)
-def get_conversation(
+def delete_conversation(
     conversation_id: str,
     auth: Any = Depends(auth_dependency)
 ) -> ConversationDeletionResponse:
@@ -179,7 +169,7 @@ list_conversations_response: dict[int | str, dict[str, Any]] = {
 }
 
 @router.get("/conversations", responses=list_conversations_response)
-def get_conversation(
+def list_conversations(
     auth: Any = Depends(auth_dependency)
 ) -> ListConversationsResponse:
     """List all conversations for a given user.
@@ -198,4 +188,3 @@ def get_conversation(
     logger.info("Listing all conversations for user: %s ", user_id)
 
     return ListConversationsResponse(conversations=config.conversation_cache.list(user_id, skip_user_id_check))
-
