@@ -42,6 +42,7 @@ class "DevConfig" as ols.app.models.config.DevConfig {
   llm_params : dict
   pyroscope_url : Optional[str]
   run_on_localhost : bool
+  uvicorn_port_number : Optional[int]
 }
 class "InMemoryCacheConfig" as ols.app.models.config.InMemoryCacheConfig {
   max_entries : Optional[int]
