@@ -5,10 +5,9 @@ from collections import OrderedDict
 from typing import Any, Dict, Optional, Self, Union
 
 from langchain.llms.base import LLM
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from pydantic import BaseModel, field_validator, model_validator
 from pydantic.dataclasses import dataclass
-
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 
 from ols.constants import MEDIA_TYPE_JSON, MEDIA_TYPE_TEXT
 from ols.customize import prompts

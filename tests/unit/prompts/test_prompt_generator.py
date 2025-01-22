@@ -8,6 +8,7 @@ from langchain.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols.constants import (
     GPT35_TURBO,
@@ -20,8 +21,6 @@ from ols.src.prompts.prompt_generator import (
     restructure_rag_context_post,
     restructure_rag_context_pre,
 )
-
-from langchain_core.messages import AIMessage, HumanMessage
 
 model = [GRANITE_13B_CHAT_V2, GPT35_TURBO]
 

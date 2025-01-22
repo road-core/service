@@ -4,11 +4,11 @@ from math import ceil
 from unittest import TestCase, mock
 
 import pytest
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols.constants import TOKEN_BUFFER_WEIGHT, ModelFamily
 from ols.utils.token_handler import PromptTooLongError, TokenHandler
 from tests.mock_classes.mock_retrieved_node import MockRetrievedNode
-from langchain_core.messages import HumanMessage, AIMessage
 
 
 class TestTokenHandler(TestCase):

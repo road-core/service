@@ -1,13 +1,13 @@
 """Unit tests for InMemoryCache class."""
 
 import pytest
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import constants
 from ols.app.models.config import InMemoryCacheConfig
 from ols.app.models.models import CacheEntry
 from ols.src.cache.in_memory_cache import InMemoryCache
 from ols.utils import suid
-from langchain_core.messages import AIMessage, HumanMessage
 
 conversation_id = suid.get_suid()
 user_provided_user_id = "test-user1"

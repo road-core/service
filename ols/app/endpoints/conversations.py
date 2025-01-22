@@ -11,18 +11,18 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from ols import config
 from ols.app.endpoints.ols import (
-    retrieve_user_id,
     retrieve_previous_input,
     retrieve_skip_user_id_check,
+    retrieve_user_id,
 )
 from ols.app.models.models import (
-    ErrorResponse,
-    ForbiddenResponse,
-    UnauthorizedResponse,
+    CacheEntry,
     ChatHistoryResponse,
     ConversationDeletionResponse,
+    ErrorResponse,
+    ForbiddenResponse,
     ListConversationsResponse,
-    CacheEntry,
+    UnauthorizedResponse,
 )
 from ols.src.auth.auth import get_auth_dependency
 

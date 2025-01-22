@@ -37,7 +37,6 @@ from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
 
-
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["query"])

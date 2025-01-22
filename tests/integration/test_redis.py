@@ -7,7 +7,6 @@ from ols.app.models.config import RedisConfig
 from ols.app.models.models import CacheEntry
 from ols.src.cache.redis_cache import RedisCache
 
-
 USER_ID = "00000000-0000-0000-0000-000000000001"
 CONVERSATION_ID = "00000000-0000-0000-0000-000000000002"
 

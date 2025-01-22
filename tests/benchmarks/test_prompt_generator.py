@@ -3,6 +3,7 @@
 # pylint: disable=W0621
 
 import pytest
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols.constants import (
     GPT35_TURBO,
@@ -16,7 +17,6 @@ from ols.constants import (
     PROVIDER_WATSONX,
 )
 from ols.src.prompts.prompt_generator import GeneratePrompt
-from langchain_core.messages import AIMessage, HumanMessage
 
 # providers and models used by parametrized benchmarks
 provider_and_model = (

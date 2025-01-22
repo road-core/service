@@ -1,6 +1,7 @@
 """Unit tests for the API models."""
 
 import pytest
+from langchain_core.messages import AIMessage, HumanMessage
 from pydantic import ValidationError
 
 from ols.app.models.models import (
@@ -18,7 +19,6 @@ from ols.app.models.models import (
 )
 from ols.constants import MEDIA_TYPE_JSON, MEDIA_TYPE_TEXT
 from ols.utils import suid
-from langchain_core.messages import AIMessage, HumanMessage
 
 
 class TestLLM:

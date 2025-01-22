@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from fastapi import HTTPException
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
 from ols.app.endpoints import ols
@@ -25,7 +26,6 @@ from ols.utils import suid
 from ols.utils.errors_parsing import DEFAULT_ERROR_MESSAGE
 from ols.utils.redactor import Redactor, RegexFilter
 from ols.utils.token_handler import PromptTooLongError
-from langchain_core.messages import AIMessage, HumanMessage
 
 
 @pytest.fixture(scope="function")
