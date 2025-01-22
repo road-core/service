@@ -161,7 +161,10 @@ class TokenHandler:
             logger.debug("RAG Node available_tokens: %d.", available_tokens)
 
             if available_tokens < MINIMUM_CONTEXT_TOKEN_LIMIT:
-                logger.debug("RAG Node available %d tokens are less than threshold.", available_tokens)
+                logger.debug(
+                    "RAG Node available %d tokens are less than threshold.",
+                    available_tokens,
+                )
                 break
 
             node_text = self.tokens_to_text(tokens[:available_tokens])

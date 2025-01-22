@@ -17,7 +17,7 @@ from ols.constants import (
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
     restructure_history,
-    restructure_rag_context
+    restructure_rag_context,
 )
 
 model = [GRANITE_13B_CHAT_V2, GPT35_TURBO]
@@ -32,9 +32,7 @@ conversation_history = ["human: First human message", "ai: First AI message"]
 
 def _restructure_prompt_input(rag_context, conversation_history, model):
     """Restructure prompt input."""
-    rag_formatted = [
-        restructure_rag_context(text, model) for text in rag_context
-    ]
+    rag_formatted = [restructure_rag_context(text, model) for text in rag_context]
     history_formatted = [
         restructure_history(history, model) for history in conversation_history
     ]
