@@ -21,7 +21,7 @@ class AuthDependency(AuthDependencyInterface):
         # skip user_id suid check if noop auth to allow consumers provide user_id
         self.skip_userid_check = True
 
-    async def __call__(self, request: Request) -> tuple[str, str]:
+    async def __call__(self, request: Request) -> tuple[str, str, bool]:
         """Validate FastAPI Requests for authentication and authorization.
 
         Args:

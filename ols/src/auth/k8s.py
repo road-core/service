@@ -229,7 +229,7 @@ class AuthDependency(AuthDependencyInterface):
         """Initialize the required allowed paths for authorization checks."""
         self.virtual_path = virtual_path
 
-    async def __call__(self, request: Request) -> tuple[str, str]:
+    async def __call__(self, request: Request) -> tuple[str, str, bool]:
         """Validate FastAPI Requests for authentication and authorization.
 
         Validates the bearer token from the request,

@@ -71,7 +71,7 @@ class DocsSummarizer(QueryHelper):
         """
         # if history is not provided, initialize to empty history
         if history is None:
-            history: list[BaseMessage] = []
+            history = []
 
         settings_string = (
             f"query: {query}, "
