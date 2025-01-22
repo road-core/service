@@ -91,7 +91,9 @@ def provider_config_with_specific_parameters():
 
 def test_basic_interface(provider_config, fake_certifi_store):
     """Test basic interface."""
-    rhelai_vllm = RHELAIVLLM(model="uber-model", params={}, provider_config=provider_config)
+    rhelai_vllm = RHELAIVLLM(
+        model="uber-model", params={}, provider_config=provider_config
+    )
     llm = rhelai_vllm.load()
     assert isinstance(llm, ChatOpenAI)
     assert rhelai_vllm.default_params
@@ -119,7 +121,9 @@ def test_params_handling(provider_config, fake_certifi_store):
         "verbose": True,
     }
 
-    rhelai_vllm = RHELAIVLLM(model="uber-model", params=params, provider_config=provider_config)
+    rhelai_vllm = RHELAIVLLM(
+        model="uber-model", params=params, provider_config=provider_config
+    )
     llm = rhelai_vllm.load()
     assert isinstance(llm, ChatOpenAI)
     assert rhelai_vllm.default_params
@@ -204,7 +208,9 @@ def test_none_params_handling(provider_config, fake_certifi_store):
         "cache": None,
     }
 
-    rhelai_vllm = RHELAIVLLM(model="uber-model", params=params, provider_config=provider_config)
+    rhelai_vllm = RHELAIVLLM(
+        model="uber-model", params=params, provider_config=provider_config
+    )
     llm = rhelai_vllm.load()
     assert isinstance(llm, ChatOpenAI)
     assert rhelai_vllm.default_params
@@ -220,7 +226,9 @@ def test_none_params_handling(provider_config, fake_certifi_store):
 def test_params_replace_default_values_with_none(provider_config, fake_certifi_store):
     """Test if default values are replaced by None values."""
     # provider initialization with empty set of params
-    rhelai_vllm = RHELAIVLLM(model="uber-model", params={}, provider_config=provider_config)
+    rhelai_vllm = RHELAIVLLM(
+        model="uber-model", params={}, provider_config=provider_config
+    )
     rhelai_vllm.load()
 
     # check default value
@@ -230,7 +238,9 @@ def test_params_replace_default_values_with_none(provider_config, fake_certifi_s
     # try to override default parameter
     params = {"base_url": None}
 
-    rhelai_vllm = RHELAIVLLM(model="uber-model", params=params, provider_config=provider_config)
+    rhelai_vllm = RHELAIVLLM(
+        model="uber-model", params=params, provider_config=provider_config
+    )
     rhelai_vllm.load()
 
     # known parameter(s) should be there, now with None values

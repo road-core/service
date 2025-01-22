@@ -7,7 +7,9 @@ from ols.app.models.config import LoggingConfig
 
 def configure_logging(logging_config: LoggingConfig) -> None:
     """Configure application logging according to the configuration."""
-    log_msg_fmt = "%(asctime)s [%(name)s:%(filename)s:%(lineno)d] %(levelname)s: %(message)s"
+    log_msg_fmt = (
+        "%(asctime)s [%(name)s:%(filename)s:%(lineno)d] %(levelname)s: %(message)s"
+    )
     log_config_dict = {
         "version": 1,
         "disable_existing_loggers": False,

@@ -8,7 +8,9 @@ from fastapi.openapi.utils import get_openapi
 
 # we need to import OLS app from directory above, so it is needed to update
 # search path accordingly
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+)
 
 # pylint: disable-next=C0413
 from ols import config

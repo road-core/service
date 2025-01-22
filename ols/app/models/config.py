@@ -65,7 +65,9 @@ class ModelConfig(BaseModel):
             raise checks.InvalidConfigurationError("model options must be dictionary")
         for key in options:
             if not isinstance(key, str):
-                raise checks.InvalidConfigurationError("key for model option must be string")
+                raise checks.InvalidConfigurationError(
+                    "key for model option must be string"
+                )
         return options
 
     @model_validator(mode="after")
@@ -87,14 +89,20 @@ class TLSConfig(BaseModel):
     tls_key_path: Optional[FilePath] = None
     tls_key_password: Optional[str] = None
 
-    def __init__(self, data: Optional[dict] = None, ignore_missing_certs: bool = False) -> None:
+    def __init__(
+        self, data: Optional[dict] = None, ignore_missing_certs: bool = False
+    ) -> None:
         """Initialize configuration and perform basic validation."""
         super().__init__()
         self._ignore_missing_certs = ignore_missing_certs
         if data:
-            self.tls_certificate_path = data.get("tls_certificate_path", self.tls_certificate_path)
+            self.tls_certificate_path = data.get(
+                "tls_certificate_path", self.tls_certificate_path
+            )
             self.tls_key_path = data.get("tls_key_path", self.tls_key_path)
-            self.tls_key_password = checks.get_attribute_from_file(data, "tls_key_password_path")
+            self.tls_key_password = checks.get_attribute_from_file(
+                data, "tls_key_password_path"
+            )
 
     def validate_yaml(self, disable_tls: bool = False) -> None:
         """Validate TLS config."""
@@ -282,7 +290,9 @@ class ProviderConfig(BaseModel):
         self.setup_models_config(data)
 
         if self.type == constants.PROVIDER_AZURE_OPENAI:
-            self.api_version = data.get("api_version", constants.DEFAULT_AZURE_API_VERSION)
+            self.api_version = data.get(
+                "api_version", constants.DEFAULT_AZURE_API_VERSION
+            )
             # deployment_name only required when using Azure OpenAI
             self.deployment_name = data.get("deployment_name", None)
             # note: it can be overwritten in azure_config
@@ -290,7 +300,9 @@ class ProviderConfig(BaseModel):
             self.certificates_store = os.path.join(
                 certificate_directory, constants.CERTIFICATE_STORAGE_FILENAME
             )
-        self.tls_security_profile = TLSSecurityProfile(data.get("tlsSecurityProfile", None))
+        self.tls_security_profile = TLSSecurityProfile(
+            data.get("tlsSecurityProfile", None)
+        )
 
     def set_provider_type(self, data: dict) -> None:
         """Set the provider type."""
@@ -549,10 +561,12 @@ class RedisConfig(BaseModel):
         self.ca_cert_path = data.get("ca_cert_path", None)
         self.password = checks.get_attribute_from_file(data, "password_path")
         self.retry_on_error = (
-            str(data.get("retry_on_error", constants.REDIS_RETRY_ON_ERROR)).lower() == "true"
+            str(data.get("retry_on_error", constants.REDIS_RETRY_ON_ERROR)).lower()
+            == "true"
         )
         self.retry_on_timeout = (
-            str(data.get("retry_on_timeout", constants.REDIS_RETRY_ON_TIMEOUT)).lower() == "true"
+            str(data.get("retry_on_timeout", constants.REDIS_RETRY_ON_TIMEOUT)).lower()
+            == "true"
         )
         self.number_of_retries = int(
             data.get("number_of_retries", constants.REDIS_NUMBER_OF_RETRIES)
@@ -580,7 +594,9 @@ class RedisConfig(BaseModel):
             self.max_memory_policy is not None
             and self.max_memory_policy not in constants.REDIS_CACHE_MAX_MEMORY_POLICIES
         ):
-            valid_polices = ", ".join(str(p) for p in constants.REDIS_CACHE_MAX_MEMORY_POLICIES)
+            valid_polices = ", ".join(
+                str(p) for p in constants.REDIS_CACHE_MAX_MEMORY_POLICIES
+            )
             raise checks.InvalidConfigurationError(
                 f"invalid Redis max_memory_policy {self.max_memory_policy},"
                 f" valid policies are ({valid_polices})"
@@ -599,7 +615,9 @@ class InMemoryCacheConfig(BaseModel):
             return
 
         try:
-            self.max_entries = int(data.get("max_entries", constants.IN_MEMORY_CACHE_MAX_ENTRIES))
+            self.max_entries = int(
+                data.get("max_entries", constants.IN_MEMORY_CACHE_MAX_ENTRIES)
+            )
             if self.max_entries < 0:
                 raise ValueError
         except ValueError as e:
@@ -694,14 +712,18 @@ class ConversationCacheConfig(BaseModel):
                             "memory conversation cache type is specified,"
                             " but memory configuration is missing"
                         )
-                    self.memory = InMemoryCacheConfig(data.get(constants.CACHE_TYPE_MEMORY))
+                    self.memory = InMemoryCacheConfig(
+                        data.get(constants.CACHE_TYPE_MEMORY)
+                    )
                 case constants.CACHE_TYPE_POSTGRES:
                     if constants.CACHE_TYPE_POSTGRES not in data:
                         raise checks.InvalidConfigurationError(
                             "Postgres conversation cache type is specified,"
                             " but Postgres configuration is missing"
                         )
-                    self.postgres = PostgresConfig(**data.get(constants.CACHE_TYPE_POSTGRES))
+                    self.postgres = PostgresConfig(
+                        **data.get(constants.CACHE_TYPE_POSTGRES)
+                    )
                 case _:
                     raise checks.InvalidConfigurationError(
                         f"unknown conversation cache type: {self.type}"
@@ -792,7 +814,10 @@ class ReferenceContent(BaseModel):
                     "product_docs_index_path is specified but product_docs_index_id is missing"
                 )
 
-        if self.product_docs_index_id is not None and self.product_docs_index_path is None:
+        if (
+            self.product_docs_index_id is not None
+            and self.product_docs_index_path is None
+        ):
             raise checks.InvalidConfigurationError(
                 "product_docs_index_id is specified but product_docs_index_path is missing"
             )
@@ -845,13 +870,17 @@ class OLSConfig(BaseModel):
     extra_ca: list[FilePath] = []
     certificate_directory: Optional[str] = None
 
-    def __init__(self, data: Optional[dict] = None, ignore_missing_certs: bool = False) -> None:
+    def __init__(
+        self, data: Optional[dict] = None, ignore_missing_certs: bool = False
+    ) -> None:
         """Initialize configuration and perform basic validation."""
         super().__init__()
         if data is None:
             return
 
-        self.conversation_cache = ConversationCacheConfig(data.get("conversation_cache", None))
+        self.conversation_cache = ConversationCacheConfig(
+            data.get("conversation_cache", None)
+        )
         self.logging_config = LoggingConfig(**data.get("logging_config", {}))
         if data.get("reference_content") is not None:
             self.reference_content = ReferenceContent(data.get("reference_content"))
@@ -861,7 +890,9 @@ class OLSConfig(BaseModel):
         self.expire_llm_is_ready_persistent_state = data.get(
             "expire_llm_is_ready_persistent_state", -1
         )
-        self.authentication_config = AuthenticationConfig(**data.get("authentication_config", {}))
+        self.authentication_config = AuthenticationConfig(
+            **data.get("authentication_config", {})
+        )
         # setup the authentication module, which is optional in configuration file
         if self.authentication_config.module is None:
             self.authentication_config.module = constants.DEFAULT_AUTHENTICATION_MODULE
@@ -874,7 +905,9 @@ class OLSConfig(BaseModel):
         self.query_validation_method = data.get(
             "query_validation_method", constants.QueryValidationMethod.DISABLED
         )
-        self.user_data_collection = UserDataCollection(**data.get("user_data_collection", {}))
+        self.user_data_collection = UserDataCollection(
+            **data.get("user_data_collection", {})
+        )
         # read file containing system prompt
         # if not specified, the prompt will remain None, which will be handled
         # by system prompt infrastructure
@@ -884,7 +917,9 @@ class OLSConfig(BaseModel):
         self.certificate_directory = data.get(
             "certificate_directory", constants.DEFAULT_CERTIFICATE_DIRECTORY
         )
-        self.tls_security_profile = TLSSecurityProfile(data.get("tlsSecurityProfile", None))
+        self.tls_security_profile = TLSSecurityProfile(
+            data.get("tlsSecurityProfile", None)
+        )
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
@@ -957,7 +992,8 @@ class DevConfig(BaseModel):
                 and self.pyroscope_url == other.pyroscope_url
                 and self.k8s_auth_token == other.k8s_auth_token
                 and self.run_on_localhost == other.run_on_localhost
-                and self.enable_system_prompt_override == other.enable_system_prompt_override
+                and self.enable_system_prompt_override
+                == other.enable_system_prompt_override
             )
         return False
 
@@ -1017,7 +1053,9 @@ class Config(BaseModel):
                 v, ignore_llm_secrets, self.ols_config.certificate_directory
             )
         else:
-            raise checks.InvalidConfigurationError("no LLM providers config section found")
+            raise checks.InvalidConfigurationError(
+                "no LLM providers config section found"
+            )
         # Always initialize dev config, even if there's no config for it.
         self.dev_config = DevConfig(**data.get("dev_config", {}))
         self.user_data_collector_config = UserDataCollectorConfig(
@@ -1027,7 +1065,10 @@ class Config(BaseModel):
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
         if isinstance(other, Config):
-            return self.ols_config == other.ols_config and self.llm_providers == other.llm_providers
+            return (
+                self.ols_config == other.ols_config
+                and self.llm_providers == other.llm_providers
+            )
         return False
 
     def _validate_default_provider_and_model(self) -> None:

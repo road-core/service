@@ -82,7 +82,9 @@ class AppConfig:
         """Return the RAG index."""
         # TODO: OLS-380 Config object mirrors configuration
         if self._rag_index is None:
-            self._rag_index = IndexLoader(self.ols_config.reference_content).vector_index
+            self._rag_index = IndexLoader(
+                self.ols_config.reference_content
+            ).vector_index
         return self._rag_index
 
     def reload_empty(self) -> None:

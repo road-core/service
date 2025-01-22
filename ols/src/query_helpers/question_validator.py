@@ -31,7 +31,9 @@ class QuestionValidator(QueryHelper):
         }
         super().__init__(*args, **dict(kwargs, generic_llm_params=generic_llm_params))
 
-    def validate_question(self, conversation_id: str, query: str, verbose: bool = False) -> bool:
+    def validate_question(
+        self, conversation_id: str, query: str, verbose: bool = False
+    ) -> bool:
         """Validate a question and provides a one-word response.
 
         Args:
@@ -84,7 +86,9 @@ class QuestionValidator(QueryHelper):
             )
         clean_response = str(response["text"]).strip()
 
-        logger.debug("%s query validation response: %s", conversation_id, clean_response)
+        logger.debug(
+            "%s query validation response: %s", conversation_id, clean_response
+        )
 
         # Default to be permissive(allow the question) if we don't get a clean
         # rejection from the LLM.

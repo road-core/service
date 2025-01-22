@@ -12,14 +12,14 @@ def start_uvicorn(config: config_model.Config) -> None:
     """Start Uvicorn-based REST API service."""
     # use workers=1 so config loaded can be accessed from other modules
     host = (
-        "localhost" if config.dev_config.run_on_localhost else "0.0.0.0"  # noqa: S104 # nosec: B104
+        "localhost"
+        if config.dev_config.run_on_localhost
+        else "0.0.0.0"  # noqa: S104 # nosec: B104
     )
     port = (
         config.dev_config.uvicorn_port_number
         if config.dev_config.uvicorn_port_number
-        else 8080
-        if config.dev_config.disable_tls
-        else 8443
+        else 8080 if config.dev_config.disable_tls else 8443
     )
     log_level = config.ols_config.logging_config.uvicorn_log_level
 

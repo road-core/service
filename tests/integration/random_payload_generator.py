@@ -42,7 +42,11 @@ class RandomPayloadGenerator:
 
         # Dtto for string contents.
         self.string_value_characters = (
-            string.ascii_lowercase + string.ascii_uppercase + "_" + string.punctuation + " "
+            string.ascii_lowercase
+            + string.ascii_uppercase
+            + "_"
+            + string.punctuation
+            + " "
         )
 
     def generate_random_string(self, n, uppercase=False, punctuations=False):
@@ -76,7 +80,10 @@ class RandomPayloadGenerator:
         """Generate list filled in with random values."""
         # Generate random list which is to be heterogenous - it's items can
         # have (almost) any data type.
-        return [self.generate_random_payload((int, str, float, bool, list, dict)) for i in range(n)]
+        return [
+            self.generate_random_payload((int, str, float, bool, list, dict))
+            for i in range(n)
+        ]
 
     def generate_random_dict(self, n):
         """Generate dictionary filled in with random values."""
@@ -85,9 +92,9 @@ class RandomPayloadGenerator:
         # zipping these two data structures.
         dict_content = (int, str, list, dict)
         return {
-            self.generate_random_string(self.max_string_length): self.generate_random_payload(
-                dict_content
-            )
+            self.generate_random_string(
+                self.max_string_length
+            ): self.generate_random_payload(dict_content)
             for i in range(n)
         }
 

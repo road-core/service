@@ -80,7 +80,9 @@ class GradioUI:
 
         try:
             # Make the HTTP POST request, wait for response with 90 seconds timeout
-            response = requests.post(self.ols_url, headers=headers, data=json_data, timeout=90)
+            response = requests.post(
+                self.ols_url, headers=headers, data=json_data, timeout=90
+            )
 
             # Check if the request was successful (status code 200)
             if response.status_code == requests.codes.ok:

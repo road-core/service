@@ -13,8 +13,12 @@ from tests.mock_classes.mock_redis_client import MockRedisClient
 from langchain_core.messages import AIMessage, HumanMessage
 
 conversation_id = suid.get_suid()
-cache_entry_1 = CacheEntry(query=HumanMessage("user message1"), response=AIMessage("ai message1"))
-cache_entry_2 = CacheEntry(query=HumanMessage("user message2"), response=AIMessage("ai message2"))
+cache_entry_1 = CacheEntry(
+    query=HumanMessage("user message1"), response=AIMessage("ai message1")
+)
+cache_entry_2 = CacheEntry(
+    query=HumanMessage("user message2"), response=AIMessage("ai message2")
+)
 user_provided_user_id = "test-user1"
 
 
@@ -265,7 +269,9 @@ def test_initialize_redis_with_tls_certs():
         cache.initialize_redis(config)
         assert cache.redis_client.kwargs["ssl"] is True
         assert cache.redis_client.kwargs["ssl_cert_reqs"] == "required"
-        assert cache.redis_client.kwargs["ssl_ca_certs"] == "test/config/redis_ca_cert.crt"
+        assert (
+            cache.redis_client.kwargs["ssl_ca_certs"] == "test/config/redis_ca_cert.crt"
+        )
 
 
 def test_initialize_redis_default_retry_settings():

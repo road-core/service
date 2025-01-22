@@ -79,7 +79,8 @@ async def log_requests_responses(
     """Middleware for logging of HTTP requests and responses, at debug level."""
     # Bail out early if not logging or Prometheus metrics logging is suppressed
     if not logger.isEnabledFor(logging.DEBUG) or (
-        config.ols_config.logging_config.suppress_metrics_in_log and request.url.path == "/metrics"
+        config.ols_config.logging_config.suppress_metrics_in_log
+        and request.url.path == "/metrics"
     ):
         return await call_next(request)
 
@@ -93,7 +94,9 @@ async def log_requests_responses(
         port = request.client.port
 
     request_log_message = f"Request from {host}:{port} "
-    request_log_message += _log_headers(request.headers, constants.HTTP_REQUEST_HEADERS_TO_REDACT)
+    request_log_message += _log_headers(
+        request.headers, constants.HTTP_REQUEST_HEADERS_TO_REDACT
+    )
     request_log_message += ", Body: "
 
     request_body = await request.body()

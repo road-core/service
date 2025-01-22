@@ -106,7 +106,9 @@ class AzureOpenAI(LLMProvider):
                 TokenCache.expires_on = int(time.time() + access_token.expires_on - 30)
         return TokenCache.access_token
 
-    def retrieve_access_token(self, azure_config: AzureOpenAIConfig) -> Optional[AccessToken]:
+    def retrieve_access_token(
+        self, azure_config: AzureOpenAIConfig
+    ) -> Optional[AccessToken]:
         """Retrieve access token to call Azure OpenAI."""
         if azure_config is None:
             raise ValueError(

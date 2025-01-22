@@ -53,7 +53,9 @@ class K8sClientSingleton:
                     and config.dev_config.k8s_auth_token is not None
                 ):
                     logger.info("loading kubeconfig from app Config config")
-                    configuration.api_key["authorization"] = config.dev_config.k8s_auth_token
+                    configuration.api_key["authorization"] = (
+                        config.dev_config.k8s_auth_token
+                    )
                     configuration.api_key_prefix["authorization"] = "Bearer"
                 else:
                     logger.debug(
@@ -62,12 +64,16 @@ class K8sClientSingleton:
                     )
                     try:
                         logger.info("loading in-cluster config")
-                        kubernetes.config.load_incluster_config(client_configuration=configuration)
+                        kubernetes.config.load_incluster_config(
+                            client_configuration=configuration
+                        )
                     except ConfigException as e:
                         logger.debug("unable to load in-cluster config: %s", e)
                         try:
                             logger.info("loading config from kube-config file")
-                            kubernetes.config.load_kube_config(client_configuration=configuration)
+                            kubernetes.config.load_kube_config(
+                                client_configuration=configuration
+                            )
                         except ConfigException as ce:
                             logger.error(
                                 "failed to load kubeconfig, in-cluster config\
@@ -76,7 +82,8 @@ class K8sClientSingleton:
                             )
 
                 configuration.host = (
-                    config.ols_config.authentication_config.k8s_cluster_api or configuration.host
+                    config.ols_config.authentication_config.k8s_cluster_api
+                    or configuration.host
                 )
                 configuration.verify_ssl = (
                     not config.ols_config.authentication_config.skip_tls_verification
@@ -138,10 +145,14 @@ class K8sClientSingleton:
             cls._cluster_id = cluster_id
             return cluster_id
         except KeyError as e:
-            logger.error("Failed to get cluster_id from cluster, missing keys in version object")
+            logger.error(
+                "Failed to get cluster_id from cluster, missing keys in version object"
+            )
             raise ClusterIDUnavailableError("Failed to get cluster ID") from e
         except TypeError as e:
-            logger.error("Failed to get cluster_id, version object is: %s", version_data)
+            logger.error(
+                "Failed to get cluster_id, version object is: %s", version_data
+            )
             raise ClusterIDUnavailableError("Failed to get cluster ID") from e
         except ApiException as e:
             logger.error("API exception during ClusterInfo: %s", e)
@@ -247,7 +258,9 @@ class AuthDependency(AuthDependencyInterface):
             return DEFAULT_USER_UID, DEFAULT_USER_NAME, False
         authorization_header = request.headers.get("Authorization")
         if not authorization_header:
-            raise HTTPException(status_code=401, detail="Unauthorized: No auth header found")
+            raise HTTPException(
+                status_code=401, detail="Unauthorized: No auth header found"
+            )
         token = _extract_bearer_token(authorization_header)
         if not token:
             raise HTTPException(
@@ -256,7 +269,9 @@ class AuthDependency(AuthDependencyInterface):
             )
         user_info = get_user_info(token)
         if user_info is None:
-            raise HTTPException(status_code=403, detail="Forbidden: Invalid or expired token")
+            raise HTTPException(
+                status_code=403, detail="Forbidden: Invalid or expired token"
+            )
         if user_info.user.username == "kube:admin":
             user_info.user.uid = K8sClientSingleton.get_cluster_id()
         authorization_api = K8sClientSingleton.get_authz_api()
@@ -273,7 +288,9 @@ class AuthDependency(AuthDependencyInterface):
         try:
             response = authorization_api.create_subject_access_review(sar)
             if not response.status.allowed:
-                raise HTTPException(status_code=403, detail="Forbidden: User does not have access")
+                raise HTTPException(
+                    status_code=403, detail="Forbidden: User does not have access"
+                )
         except ApiException as e:
             logger.error("API exception during SubjectAccessReview: %s", e)
             raise HTTPException(status_code=403, detail="Internal server error") from e

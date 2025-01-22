@@ -20,7 +20,9 @@ def create_and_config_sas() -> tuple[str, str]:
     Returns:
         tuple containing token and metrics token.
     """
-    cluster_utils.run_oc(["project", "openshift-lightspeed"], ignore_existing_resource=True)
+    cluster_utils.run_oc(
+        ["project", "openshift-lightspeed"], ignore_existing_resource=True
+    )
     cluster_utils.create_user("test-user", ignore_existing_resource=True)
     cluster_utils.create_user("metrics-test-user", ignore_existing_resource=True)
     token = cluster_utils.get_token_for("test-user")
@@ -126,7 +128,9 @@ def install_ols() -> tuple[str, str, str]:  # pylint: disable=R0915
         cluster_utils.run_oc(
             ["create", "ns", "openshift-lightspeed"], ignore_existing_resource=True
         )
-        cluster_utils.run_oc(["project", "openshift-lightspeed"], ignore_existing_resource=True)
+        cluster_utils.run_oc(
+            ["project", "openshift-lightspeed"], ignore_existing_resource=True
+        )
         print("created OLS project")
 
         # install the ImageDigestMirrorSet to mirror images
@@ -165,7 +169,9 @@ def install_ols() -> tuple[str, str, str]:  # pylint: disable=R0915
             )
         # TODO: add run_command func
         except subprocess.CalledProcessError as e:
-            print(f"Error running operator-sdk: {e}, stdout: {e.output}, stderr: {e.stderr}")
+            print(
+                f"Error running operator-sdk: {e}, stdout: {e.output}, stderr: {e.stderr}"
+            )
             raise
 
     token, metrics_token = create_and_config_sas()
@@ -334,14 +340,22 @@ def install_ols() -> tuple[str, str, str]:  # pylint: disable=R0915
     print("All pods")
     print(cluster_utils.run_oc(["get", "pods"]).stdout)
     print("Running pods")
-    print(cluster_utils.run_oc(["get", "pods", "--field-selector=status.phase=Running"]).stdout)
+    print(
+        cluster_utils.run_oc(
+            ["get", "pods", "--field-selector=status.phase=Running"]
+        ).stdout
+    )
     pod_name = cluster_utils.get_pod_by_prefix()[0]
     print(f"Found new running OLS pod {pod_name}")
     print("-" * 50)
 
     # Print the deployment so we can confirm the configuration is what we
     # expect it to be (must-gather will also collect this)
-    print(cluster_utils.run_oc(["get", "deployment", "lightspeed-app-server", "-o", "yaml"]).stdout)
+    print(
+        cluster_utils.run_oc(
+            ["get", "deployment", "lightspeed-app-server", "-o", "yaml"]
+        ).stdout
+    )
     print("-" * 50)
 
     # disable collector script by default to avoid running during all

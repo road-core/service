@@ -42,7 +42,9 @@ def logger():
 
 def test_add_ca_to_certificates_store(logger, fake_certifi_store):
     """Test if the certificate is added to the certifi store."""
-    add_ca_to_certificates_store(logger, extra_cert_path, cert_location=fake_certifi_store)
+    add_ca_to_certificates_store(
+        logger, extra_cert_path, cert_location=fake_certifi_store
+    )
 
     extra_cert = load_certs(extra_cert_path)[0]
     cert_store_certs = load_certs(fake_certifi_store)
@@ -51,11 +53,17 @@ def test_add_ca_to_certificates_store(logger, fake_certifi_store):
     assert extra_cert in cert_store_certs
 
 
-def test_add_ca_to_certificates_store_no_cert_multiplication(logger, fake_certifi_store):
+def test_add_ca_to_certificates_store_no_cert_multiplication(
+    logger, fake_certifi_store
+):
     """Test if the certificate is not added multiple times to the certifi store."""
     # add the same cert twice
-    add_ca_to_certificates_store(logger, extra_cert_path, cert_location=fake_certifi_store)
-    add_ca_to_certificates_store(logger, extra_cert_path, cert_location=fake_certifi_store)
+    add_ca_to_certificates_store(
+        logger, extra_cert_path, cert_location=fake_certifi_store
+    )
+    add_ca_to_certificates_store(
+        logger, extra_cert_path, cert_location=fake_certifi_store
+    )
 
     extra_cert = load_certs(extra_cert_path)[0]
     cert_store_certs = load_certs(fake_certifi_store)
@@ -66,7 +74,9 @@ def test_add_ca_to_certificates_store_no_cert_multiplication(logger, fake_certif
 
 def test_add_ca_to_certificates_store_only_appends(logger, fake_certifi_store):
     """Test if the certificate is only appended to the certifi store."""
-    add_ca_to_certificates_store(logger, extra_cert_path, cert_location=fake_certifi_store)
+    add_ca_to_certificates_store(
+        logger, extra_cert_path, cert_location=fake_certifi_store
+    )
 
     cert_in_certificates_store = load_certs(cert_in_certificates_store_path)[0]
     extra_cert = load_certs(extra_cert_path)[0]
@@ -85,10 +95,14 @@ def test_generate_certificates_file(logger, fake_certifi_store, tmpdir):
 
     # check that cert store is created
     final_filename = os.path.join(tmpdir, constants.CERTIFICATE_STORAGE_FILENAME)
-    assert os.path.exists(final_filename), f"Certificate file {final_filename} was not created"
+    assert os.path.exists(
+        final_filename
+    ), f"Certificate file {final_filename} was not created"
 
 
-def test_generate_certificates_file_append_custom_certificate(logger, fake_certifi_store, tmpdir):
+def test_generate_certificates_file_append_custom_certificate(
+    logger, fake_certifi_store, tmpdir
+):
     """Test the generation of certificates file with appending custom certificate into it."""
     ols_config = config_model.OLSConfig()
     ols_config.certificate_directory = tmpdir
@@ -97,7 +111,9 @@ def test_generate_certificates_file_append_custom_certificate(logger, fake_certi
 
     # check that cert store is created
     final_filename = os.path.join(tmpdir, constants.CERTIFICATE_STORAGE_FILENAME)
-    assert os.path.exists(final_filename), f"Certificate file {final_filename} was not created"
+    assert os.path.exists(
+        final_filename
+    ), f"Certificate file {final_filename} was not created"
 
     # check that extra cert has been added
     cert_store_certs = load_certs(final_filename)

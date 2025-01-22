@@ -58,7 +58,9 @@ class GenericTokenCounter(BaseCallbackHandler):
         self.token_counter.llm = llm  # actual LLM instance
         self.token_handler = TokenHandler()  # used for counting input and output tokens
 
-    def on_llm_start(self, serialized: dict[str, Any], prompts: list[str], **kwargs: Any) -> None:
+    def on_llm_start(
+        self, serialized: dict[str, Any], prompts: list[str], **kwargs: Any
+    ) -> None:
         """Run when LLM starts running."""
         self.token_counter.llm_calls += 1
         self.token_counter.input_tokens_counted = 0

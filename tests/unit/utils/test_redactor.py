@@ -26,11 +26,11 @@ class TestRedactor(TestCase):
                 "REDACTED_IP",
             ),
         ]
-        query = "write a deployment yaml for the mongodb image with nodeip as 1.123.0.99"
-        redacted_question = self.query_filter.redact("test_id", query)
-        expected_output = (
-            "write a deployment yaml for the mongodb REDACTED_image with nodeip as REDACTED_IP"
+        query = (
+            "write a deployment yaml for the mongodb image with nodeip as 1.123.0.99"
         )
+        redacted_question = self.query_filter.redact("test_id", query)
+        expected_output = "write a deployment yaml for the mongodb REDACTED_image with nodeip as REDACTED_IP"
         assert redacted_question == expected_output
 
     def test_redact_question_mongopart_url_phone(self):

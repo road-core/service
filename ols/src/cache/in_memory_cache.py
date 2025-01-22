@@ -89,7 +89,9 @@ class InMemoryCache(Cache):
                 self.cache[key] = old_value
             self.deque.appendleft(key)
 
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool = False) -> bool:
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> bool:
         """Delete all entries for a given conversation.
 
         Args:

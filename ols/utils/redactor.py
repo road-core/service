@@ -39,7 +39,11 @@ class Redactor:
         """Redact the input using regex built."""
         logger.debug("Redacting conversation %s", conversation_id)
         for regex_filter in self.regex_filters:
-            text_input, count = regex_filter.pattern.subn(regex_filter.replace_with, text_input)
-            logger.debug("Replaced: %d matched with filter: %s", count, regex_filter.name)
+            text_input, count = regex_filter.pattern.subn(
+                regex_filter.replace_with, text_input
+            )
+            logger.debug(
+                "Replaced: %d matched with filter: %s", count, regex_filter.name
+            )
         logger.debug("Redacted conversation %s input: %s", conversation_id, text_input)
         return text_input

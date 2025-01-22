@@ -125,12 +125,18 @@ class RedisCache(Cache):
                 # )
                 self.redis_client.set(
                     key,
-                    json.dumps([entry.to_dict() for entry in old_value], cls=MessageEncoder),
+                    json.dumps(
+                        [entry.to_dict() for entry in old_value], cls=MessageEncoder
+                    ),
                 )
             else:
-                self.redis_client.set(key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder))
+                self.redis_client.set(
+                    key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder)
+                )
 
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool = False) -> bool:
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> bool:
         """Delete conversation history for a given user_id and conversation_id.
 
         Args:

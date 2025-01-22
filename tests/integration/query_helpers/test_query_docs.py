@@ -28,7 +28,9 @@ def setup_faiss():
 
 def test_retrieve_top_k_similarity_search(setup_faiss):
     """Fetch top k similarity search."""
-    docs = QueryDocs().get_relevant_docs(vectordb=setup_faiss, query="foo", search_kwargs={"k": 1})
+    docs = QueryDocs().get_relevant_docs(
+        vectordb=setup_faiss, query="foo", search_kwargs={"k": 1}
+    )
 
     assert len(docs) == 1
     assert docs[0].page_content == "foo"
@@ -89,7 +91,9 @@ def test_for_filtering(setup_faiss):
 
 def test_invalid_search_type(setup_faiss):
     """Test for invalid search type."""
-    with pytest.raises(RetrieveDocsExceptionError, match="search type is invalid: stuff"):
+    with pytest.raises(
+        RetrieveDocsExceptionError, match="search type is invalid: stuff"
+    ):
         QueryDocs().get_relevant_docs(
             vectordb=setup_faiss,
             query="foo",

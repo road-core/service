@@ -31,7 +31,9 @@ def test_on_llm_start():
     assert generic_token_counter.token_counter.input_tokens_counted == 0
 
     # check the textual representation as well
-    expected = "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    )
     assert str(generic_token_counter) == expected
 
     # token count for empty input
@@ -42,7 +44,9 @@ def test_on_llm_start():
     assert generic_token_counter.token_counter.input_tokens_counted == 0
 
     # check the textual representation as well
-    expected = "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 1"
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 1"
+    )
     assert str(generic_token_counter) == expected
 
     # now the prompt will be tokenized into 5 tokens
@@ -51,7 +55,9 @@ def test_on_llm_start():
     assert generic_token_counter.token_counter.input_tokens_counted == 5
 
     # check the textual representation as well
-    expected = "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 5 LLM calls: 2"
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 5 LLM calls: 2"
+    )
     assert str(generic_token_counter) == expected
 
 
@@ -90,7 +96,9 @@ def test_on_llm_end():
     assert generic_token_counter.token_counter.output_tokens == 0
 
     # check the textual representation as well
-    expected = "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    )
     assert str(generic_token_counter) == expected
 
     # empty response
@@ -102,7 +110,9 @@ def test_on_llm_end():
     assert generic_token_counter.token_counter.output_tokens == 0
 
     # check the textual representation as well
-    expected = "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    expected = (
+        "GenericTokenCounter: input_tokens: 0 output_tokens: 0 counted: 0 LLM calls: 0"
+    )
     assert str(generic_token_counter) == expected
 
     # non-empty response

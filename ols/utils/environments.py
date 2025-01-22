@@ -27,5 +27,7 @@ def configure_hugging_face_envs(ols_config: config_model.OLSConfig) -> None:
         and hasattr(ols_config.reference_content, "embeddings_model_path")
         and ols_config.reference_content.embeddings_model_path
     ):
-        os.environ["TRANSFORMERS_CACHE"] = str(ols_config.reference_content.embeddings_model_path)
+        os.environ["TRANSFORMERS_CACHE"] = str(
+            ols_config.reference_content.embeddings_model_path
+        )
         os.environ["TRANSFORMERS_OFFLINE"] = "1"

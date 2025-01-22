@@ -48,7 +48,9 @@ def test_singleton_pattern():
 async def test_auth_dependency_valid_token(mock_authz_api, mock_authn_api):
     """Tests the auth dependency with a mocked valid-token."""
     # Setup mock responses for valid token
-    mock_authn_api.return_value.create_token_review.side_effect = mock_token_review_response
+    mock_authn_api.return_value.create_token_review.side_effect = (
+        mock_token_review_response
+    )
     mock_authz_api.return_value.create_subject_access_review.side_effect = (
         mock_subject_access_review_response
     )
@@ -73,7 +75,9 @@ async def test_auth_dependency_valid_token(mock_authz_api, mock_authn_api):
 async def test_auth_dependency_invalid_token(mock_authz_api, mock_authn_api):
     """Test the auth dependency with a mocked invalid-token."""
     # Setup mock responses for invalid token
-    mock_authn_api.return_value.create_token_review.side_effect = mock_token_review_response
+    mock_authn_api.return_value.create_token_review.side_effect = (
+        mock_token_review_response
+    )
     mock_authz_api.return_value.create_subject_access_review.side_effect = (
         mock_subject_access_review_response
     )
@@ -108,7 +112,9 @@ async def test_cluster_id_is_used_for_kube_admin(mock_authz_api):
     with (
         patch(
             "ols.src.auth.k8s.get_user_info",
-            return_value=MockK8sResponseStatus(True, True, "kube:admin", "some-uuid", "ols-group"),
+            return_value=MockK8sResponseStatus(
+                True, True, "kube:admin", "some-uuid", "ols-group"
+            ),
         ),
         patch(
             "ols.src.auth.k8s.K8sClientSingleton.get_cluster_id",
@@ -131,12 +137,12 @@ def test_auth_dependency_config():
 
     authn_client = K8sClientSingleton.get_authn_api()
     authz_client = K8sClientSingleton.get_authz_api()
-    assert isinstance(authn_client, AuthenticationV1Api), (
-        "authn_client is not an instance of AuthenticationV1Api"
-    )
-    assert isinstance(authz_client, AuthorizationV1Api), (
-        "authz_client is not an instance of AuthorizationV1Api"
-    )
+    assert isinstance(
+        authn_client, AuthenticationV1Api
+    ), "authn_client is not an instance of AuthenticationV1Api"
+    assert isinstance(
+        authz_client, AuthorizationV1Api
+    ), "authz_client is not an instance of AuthorizationV1Api"
 
 
 @patch("ols.src.auth.k8s.K8sClientSingleton.get_custom_objects_api")

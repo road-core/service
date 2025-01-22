@@ -38,7 +38,9 @@ class DocsSummarizer(QueryHelper):
         self.generic_llm_params = {
             GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response  # noqa: E501
         }
-        self.bare_llm = self.llm_loader(self.provider, self.model, self.generic_llm_params)
+        self.bare_llm = self.llm_loader(
+            self.provider, self.model, self.generic_llm_params
+        )
 
     def _get_system_prompt(self) -> None:
         """Retrieve the system prompt."""

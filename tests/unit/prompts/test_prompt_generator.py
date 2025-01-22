@@ -42,7 +42,9 @@ def _restructure_prompt_input(rag_context, conversation_history, model):
         restructure_rag_context_post(restructure_rag_context_pre(text, model), model)
         for text in rag_context
     ]
-    history_formatted = [restructure_history(history, model) for history in conversation_history]
+    history_formatted = [
+        restructure_history(history, model) for history in conversation_history
+    ]
     return rag_formatted, history_formatted
 
 

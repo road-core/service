@@ -189,7 +189,9 @@ def provider_config_access_token_related_parameters():
 
 def test_basic_interface(provider_config):
     """Test basic interface."""
-    azure_openai = AzureOpenAI(model="uber-model", params={}, provider_config=provider_config)
+    azure_openai = AzureOpenAI(
+        model="uber-model", params={}, provider_config=provider_config
+    )
     llm = azure_openai.load()
     assert isinstance(llm, AzureChatOpenAI)
     assert azure_openai.default_params
@@ -277,7 +279,9 @@ def test_params_handling(provider_config):
         "api_version": "2023-12-31",
     }
 
-    azure_openai = AzureOpenAI(model="uber-model", params=params, provider_config=provider_config)
+    azure_openai = AzureOpenAI(
+        model="uber-model", params=params, provider_config=provider_config
+    )
     llm = azure_openai.load()
     assert isinstance(llm, AzureChatOpenAI)
     assert azure_openai.default_params
@@ -307,7 +311,9 @@ def test_api_version_can_not_be_none(provider_config):
         "api_version": None,
     }
 
-    azure_openai = AzureOpenAI(model="uber-model", params=params, provider_config=provider_config)
+    azure_openai = AzureOpenAI(
+        model="uber-model", params=params, provider_config=provider_config
+    )
 
     # api_version is required parameter and can not be None
     # in new OpenAI library it is checked internally!
@@ -327,7 +333,9 @@ def test_none_params_handling(provider_config):
         "cache": None,
     }
 
-    azure_openai = AzureOpenAI(model="uber-model", params=params, provider_config=provider_config)
+    azure_openai = AzureOpenAI(
+        model="uber-model", params=params, provider_config=provider_config
+    )
     llm = azure_openai.load()
     assert isinstance(llm, AzureChatOpenAI)
     assert azure_openai.default_params
@@ -357,7 +365,9 @@ def test_missing_credentials_check(provider_config_without_credentials):
 
 def test_missing_tenant_id(provider_config_without_tenant_id):
     """Test that check for missing tenant_id is in place ."""
-    with pytest.raises(ValueError, match="tenant_id should be set in azure_openai_config"):
+    with pytest.raises(
+        ValueError, match="tenant_id should be set in azure_openai_config"
+    ):
         AzureOpenAI(
             model="uber-model",
             params={},
@@ -367,7 +377,9 @@ def test_missing_tenant_id(provider_config_without_tenant_id):
 
 def test_missing_client_id(provider_config_without_client_id):
     """Test that check for missing client_id is in place ."""
-    with pytest.raises(ValueError, match="client_id should be set in azure_openai_config"):
+    with pytest.raises(
+        ValueError, match="client_id should be set in azure_openai_config"
+    ):
         AzureOpenAI(
             model="uber-model",
             params={},
@@ -377,7 +389,9 @@ def test_missing_client_id(provider_config_without_client_id):
 
 def test_missing_client_secret(provider_config_without_client_secret):
     """Test that check for missing credentials_path is in place ."""
-    with pytest.raises(ValueError, match="client_secret should be set in azure_openai_config"):
+    with pytest.raises(
+        ValueError, match="client_secret should be set in azure_openai_config"
+    ):
         AzureOpenAI(
             model="uber-model",
             params={},
@@ -427,7 +441,9 @@ def mocked_token_cache():
     return MockedTokenCache
 
 
-@patch("ols.src.llms.providers.azure_openai.ClientSecretCredential", new=MockedCredential)
+@patch(
+    "ols.src.llms.providers.azure_openai.ClientSecretCredential", new=MockedCredential
+)
 def test_retrieve_access_token(provider_config_access_token_related_parameters):
     """Test that access token is being retrieved."""
     azure_openai = AzureOpenAI(
@@ -437,7 +453,8 @@ def test_retrieve_access_token(provider_config_access_token_related_parameters):
     )
     assert "api_key" not in azure_openai.default_params
     assert (
-        azure_openai.default_params["azure_ad_token"] == "this-is-access-token"  # noqa: S105
+        azure_openai.default_params["azure_ad_token"]
+        == "this-is-access-token"  # noqa: S105
     )
 
 
@@ -491,7 +508,9 @@ def test_token_is_not_reused(provider_config, mocked_token_cache):
             "ols.src.llms.providers.azure_openai.AzureOpenAI.retrieve_access_token",
             return_value=retrieved_access_token,
         ),
-        patch("ols.src.llms.providers.azure_openai.token_is_expired", return_value=True),
+        patch(
+            "ols.src.llms.providers.azure_openai.token_is_expired", return_value=True
+        ),
         patch("ols.src.llms.providers.azure_openai.TokenCache", new=mocked_token_cache),
     ):
         access_token = AzureOpenAI(
@@ -510,7 +529,9 @@ def test_token_is_reused(provider_config, mocked_token_cache):
             "ols.src.llms.providers.azure_openai.AzureOpenAI.retrieve_access_token",
             return_value=retrieved_access_token,
         ),
-        patch("ols.src.llms.providers.azure_openai.token_is_expired", return_value=False),
+        patch(
+            "ols.src.llms.providers.azure_openai.token_is_expired", return_value=False
+        ),
         patch("ols.src.llms.providers.azure_openai.TokenCache", new=mocked_token_cache),
     ):
         access_token = AzureOpenAI(

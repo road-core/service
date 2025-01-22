@@ -126,7 +126,10 @@ class TestTokenHandler(TestCase):
                 rag_chunks[i].text
                 == "\nDocument:\n" + self._mock_retrieved_obj[i].get_text() + "\n"
             )
-            assert rag_chunks[i].doc_url == self._mock_retrieved_obj[i].metadata["docs_url"]
+            assert (
+                rag_chunks[i].doc_url
+                == self._mock_retrieved_obj[i].metadata["docs_url"]
+            )
         assert available_tokens == 473
 
     @mock.patch("ols.utils.token_handler.TOKEN_BUFFER_WEIGHT", 1.05)
@@ -140,7 +143,10 @@ class TestTokenHandler(TestCase):
         )
 
         assert len(rag_chunks) == 1
-        assert rag_chunks[0].text == "\nDocument:\n" + self._mock_retrieved_obj[0].get_text() + "\n"
+        assert (
+            rag_chunks[0].text
+            == "\nDocument:\n" + self._mock_retrieved_obj[0].get_text() + "\n"
+        )
         assert available_tokens == 491
 
     @mock.patch("ols.utils.token_handler.TOKEN_BUFFER_WEIGHT", 1.05)
@@ -204,16 +210,20 @@ class TestTokenHandler(TestCase):
         # then 2 tokens for the tags. Total tokens are 6.
         # As tokens are increased by 5% (ceil), final count becomes 7 per message.
 
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 1000
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 1000
+            )
         )
         # history must remain the same and truncate flag should be False
         assert truncated_history == history
         assert not truncated
 
         # try to truncate to 28 tokens
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 28
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 28
+            )
         )
         # history should truncate to 4 newest messages only and flag should be True
         assert len(truncated_history) == 4
@@ -221,8 +231,10 @@ class TestTokenHandler(TestCase):
         assert truncated
 
         # try to truncate to 14 tokens
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 14
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 14
+            )
         )
         # history should truncate to 2 messages only and flag should be True
         assert len(truncated_history) == 2
@@ -230,8 +242,10 @@ class TestTokenHandler(TestCase):
         assert truncated
 
         # try to truncate to 13 tokens
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 13
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 13
+            )
         )
         # history should truncate to 1 message
         assert len(truncated_history) == 1
@@ -239,8 +253,10 @@ class TestTokenHandler(TestCase):
         assert truncated
 
         # try to truncate to 7 tokens - this means just one message
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 7
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 7
+            )
         )
         # history should truncate to one message only and flag should be True
         assert len(truncated_history) == 1
@@ -248,16 +264,20 @@ class TestTokenHandler(TestCase):
         assert truncated
 
         # try to truncate to zero tokens
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 0
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 0
+            )
         )
         # history should truncate to empty list and flag should be True
         assert truncated_history == []
         assert truncated
 
         # try to truncate to one token, but the 1st message is already longer than 1 token
-        truncated_history, truncated = self._token_handler_obj.limit_conversation_history(
-            history, ModelFamily.GPT, 1
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(
+                history, ModelFamily.GPT, 1
+            )
         )
         # history should truncate to empty list and flag should be True
         assert truncated_history == []

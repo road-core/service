@@ -75,9 +75,9 @@ def test_invalid_question_without_conversation_id():
         )
 
         # new conversation ID should be generated
-        assert suid.check_suid(json_response["conversation_id"]), (
-            "Conversation ID is not in UUID format"
-        )
+        assert suid.check_suid(
+            json_response["conversation_id"]
+        ), "Conversation ID is not in UUID format"
 
 
 def test_query_call_without_payload():
@@ -163,10 +163,12 @@ def test_valid_question_missing_conversation_id() -> None:
         json_response = response.json()
 
         # new conversation ID should be returned
-        assert "conversation_id" in json_response, "New conversation ID was not generated"
-        assert suid.check_suid(json_response["conversation_id"]), (
-            "Conversation ID is not in UUID format"
-        )
+        assert (
+            "conversation_id" in json_response
+        ), "New conversation ID was not generated"
+        assert suid.check_suid(
+            json_response["conversation_id"]
+        ), "Conversation ID is not in UUID format"
 
 
 def test_too_long_question() -> None:
@@ -250,7 +252,9 @@ def test_ocp_docs_version_same_as_cluster_version() -> None:
 
 def test_valid_question_tokens_counter() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
+    model, provider = metrics_utils.get_enabled_model_and_provider(
+        pytest.metrics_client
+    )
 
     with (
         metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, QUERY_ENDPOINT),
@@ -267,7 +271,9 @@ def test_valid_question_tokens_counter() -> None:
 
 def test_invalid_question_tokens_counter() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
+    model, provider = metrics_utils.get_enabled_model_and_provider(
+        pytest.metrics_client
+    )
 
     with (
         metrics_utils.RestAPICallCounterChecker(pytest.metrics_client, QUERY_ENDPOINT),
@@ -284,7 +290,9 @@ def test_invalid_question_tokens_counter() -> None:
 
 def test_token_counters_for_query_call_without_payload() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
+    model, provider = metrics_utils.get_enabled_model_and_provider(
+        pytest.metrics_client
+    )
 
     with (
         metrics_utils.RestAPICallCounterChecker(
@@ -310,7 +318,9 @@ def test_token_counters_for_query_call_without_payload() -> None:
 
 def test_token_counters_for_query_call_with_improper_payload() -> None:
     """Check how the tokens counter are updated accordingly."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
+    model, provider = metrics_utils.get_enabled_model_and_provider(
+        pytest.metrics_client
+    )
 
     with (
         metrics_utils.RestAPICallCounterChecker(
@@ -528,9 +538,14 @@ def test_query_with_unknown_provider() -> None:
         json_response = response.json()
 
         # explicit response and cause check
-        assert "detail" in json_response, "Improper response format: 'detail' node is missing"
+        assert (
+            "detail" in json_response
+        ), "Improper response format: 'detail' node is missing"
         assert "Unable to process this request" in json_response["detail"]["response"]
-        assert "Provider 'foo' is not a valid provider." in json_response["detail"]["cause"]
+        assert (
+            "Provider 'foo' is not a valid provider."
+            in json_response["detail"]["cause"]
+        )
 
 
 def test_query_with_unknown_model() -> None:
@@ -560,6 +575,8 @@ def test_query_with_unknown_model() -> None:
         json_response = response.json()
 
         # explicit response and cause check
-        assert "detail" in json_response, "Improper response format: 'detail' node is missing"
+        assert (
+            "detail" in json_response
+        ), "Improper response format: 'detail' node is missing"
         assert "Unable to process this request" in json_response["detail"]["response"]
         assert "Model 'bar' is not a valid model " in json_response["detail"]["cause"]

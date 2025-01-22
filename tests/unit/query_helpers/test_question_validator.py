@@ -30,14 +30,30 @@ def test_passing_parameters():
 
     question_validator = QuestionValidator()
     assert question_validator.generic_llm_params is not None
-    assert GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE in question_validator.generic_llm_params
-    assert question_validator.generic_llm_params[GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE] == 4
+    assert (
+        GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE
+        in question_validator.generic_llm_params
+    )
+    assert (
+        question_validator.generic_llm_params[
+            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE
+        ]
+        == 4
+    )
 
     question_validator = QuestionValidator(generic_llm_params={})
     # the generic_llm_params should be rewritten in constructor
     assert question_validator.generic_llm_params is not None
-    assert GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE in question_validator.generic_llm_params
-    assert question_validator.generic_llm_params[GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE] == 4
+    assert (
+        GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE
+        in question_validator.generic_llm_params
+    )
+    assert (
+        question_validator.generic_llm_params[
+            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE
+        ]
+        == 4
+    )
 
 
 @patch("ols.src.query_helpers.question_validator.LLMChain", new=mock_llm_chain(None))
@@ -59,4 +75,6 @@ def test_validate_question_llm_loader():
 
     # just run the validation, we just need to check parameters passed to LLM
     # that is performed in mock object
-    question_validator.validate_question("123e4567-e89b-12d3-a456-426614174000", "query")
+    question_validator.validate_question(
+        "123e4567-e89b-12d3-a456-426614174000", "query"
+    )

@@ -31,7 +31,9 @@ expected_counters = (
 @pytest.fixture(scope="function", autouse=True)
 @patch.dict(
     os.environ,
-    {CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests.yaml"},
+    {
+        CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests.yaml"
+    },
 )
 def _setup():
     """Setups the test client."""
@@ -60,9 +62,9 @@ def test_metrics():
 
     # check if all counters are present
     for expected_counter in expected_counters:
-        assert f"{expected_counter} " in response_text, (
-            f"Counter {expected_counter} not found in {response_text}"
-        )
+        assert (
+            f"{expected_counter} " in response_text
+        ), f"Counter {expected_counter} not found in {response_text}"
 
 
 def test_metrics_with_debug_log(caplog):
@@ -77,9 +79,9 @@ def test_metrics_with_debug_log(caplog):
 
     # check if all counters are present
     for expected_counter in expected_counters:
-        assert f"{expected_counter} " in response_text, (
-            f"Counter {expected_counter} not found in {response_text}"
-        )
+        assert (
+            f"{expected_counter} " in response_text
+        ), f"Counter {expected_counter} not found in {response_text}"
 
     # check if the metrics are also found in the log
     captured_out = caplog.text
@@ -101,9 +103,9 @@ def test_metrics_with_debug_logging_suppressed(caplog):
 
     # check if all counters are present
     for expected_counter in expected_counters:
-        assert f"{expected_counter} " in response_text, (
-            f"Counter {expected_counter} not found in {response_text}"
-        )
+        assert (
+            f"{expected_counter} " in response_text
+        ), f"Counter {expected_counter} not found in {response_text}"
 
     # check if the metrics are NOT found in the log
     captured_out = caplog.text
@@ -173,10 +175,14 @@ def test_metrics_duration():
     assert 'response_duration_seconds_sum{path="/metrics"}' in response_text
 
     # second: check the histogram itself
-    pattern = re.compile(r"response_duration_seconds_bucket{le=\"0\.[0-9]+\",path=\"\/metrics\"}")
+    pattern = re.compile(
+        r"response_duration_seconds_bucket{le=\"0\.[0-9]+\",path=\"\/metrics\"}"
+    )
     # re.findall() returns empty list if not found, and this empty list is treated as False
     assert re.findall(pattern, response_text)
-    pattern = re.compile(r"response_duration_seconds_bucket{le=\"\+Inf\",path=\"\/metrics\"}")
+    pattern = re.compile(
+        r"response_duration_seconds_bucket{le=\"\+Inf\",path=\"\/metrics\"}"
+    )
     assert re.findall(pattern, response_text)
 
 

@@ -148,7 +148,9 @@ def test_metrics() -> None:
 
 def test_model_provider():
     """Read configured model and provider from metrics."""
-    model, provider = metrics_utils.get_enabled_model_and_provider(pytest.metrics_client)
+    model, provider = metrics_utils.get_enabled_model_and_provider(
+        pytest.metrics_client
+    )
 
     # enabled model must be one of our expected combinations
     assert model, provider in {
@@ -163,7 +165,9 @@ def test_one_default_model_provider():
     """Check if one model and provider is selected as default."""
     states = metrics_utils.get_enable_status_for_all_models(pytest.metrics_client)
     enabled_states = [state for state in states if state is True]
-    assert len(enabled_states) == 1, "one model and provider should be selected as default"
+    assert (
+        len(enabled_states) == 1
+    ), "one model and provider should be selected as default"
 
 
 @pytest.mark.cluster
@@ -229,7 +233,9 @@ def test_transcripts_storing_cluster():
     )
     assert response.status_code == requests.codes.ok
 
-    transcript = cluster_utils.get_single_existing_transcript(pod_name, transcripts_path)
+    transcript = cluster_utils.get_single_existing_transcript(
+        pod_name, transcripts_path
+    )
 
     assert transcript["metadata"]  # just check if it is not empty
     assert transcript["redacted_query"] == "what is kubernetes?"
@@ -271,7 +277,9 @@ def test_openapi_endpoint():
 
     # check the metadata nodes
     for attribute in ("openapi", "info", "components", "paths"):
-        assert attribute in payload, f"Required metadata attribute {attribute} not found"
+        assert (
+            attribute in payload
+        ), f"Required metadata attribute {attribute} not found"
 
     # check application description
     info = payload["info"]
@@ -291,9 +299,9 @@ def test_openapi_endpoint():
     del payload["info"]["license"]
 
     # compare schemas (as dicts)
-    assert payload == expected_schema, (
-        "OpenAPI schema returned from service does not have expected content."
-    )
+    assert (
+        payload == expected_schema
+    ), "OpenAPI schema returned from service does not have expected content."
 
 
 def test_cache_existence(postgres_connection):
@@ -374,7 +382,9 @@ def test_user_data_collection():
         # enable collector script
         if pod_name is not None:
             cluster_utils.remove_file(pod_name, OLS_COLLECTOR_DISABLING_FILE)
-            assert "disable_collector" not in cluster_utils.list_path(pod_name, OLS_USER_DATA_PATH)
+            assert "disable_collector" not in cluster_utils.list_path(
+                pod_name, OLS_USER_DATA_PATH
+            )
 
         def filter_logs(logs: str, last_log_line: str) -> str:
             filtered_logs = []
@@ -409,7 +419,9 @@ def test_user_data_collection():
 
         # data shoud be pruned now and this is the point from which we want
         # to check the logs
-        container_log = cluster_utils.get_container_log(pod_name, data_collection_container_name)
+        container_log = cluster_utils.get_container_log(
+            pod_name, data_collection_container_name
+        )
         last_log_line = get_last_log_line(container_log)
 
         # wait the collection period for some extra to give the script a
@@ -417,7 +429,9 @@ def test_user_data_collection():
         time.sleep(OLS_USER_DATA_COLLECTION_INTERVAL + 1)
 
         # we just check that there are no data and the script is working
-        container_log = cluster_utils.get_container_log(pod_name, data_collection_container_name)
+        container_log = cluster_utils.get_container_log(
+            pod_name, data_collection_container_name
+        )
         logs = filter_logs(container_log, last_log_line)
 
         assert "collected" not in logs
@@ -446,7 +460,9 @@ def test_user_data_collection():
         time.sleep(OLS_USER_DATA_COLLECTION_INTERVAL + 5)
 
         # check that data was packaged, sent and removed
-        container_log = cluster_utils.get_container_log(pod_name, data_collection_container_name)
+        container_log = cluster_utils.get_container_log(
+            pod_name, data_collection_container_name
+        )
         logs = filter_logs(container_log, last_log_line)
         assert "collected 1 files (splitted to 1 chunks) from" in logs
         assert "data uploaded with request_id:" in logs
@@ -564,7 +580,9 @@ def test_ca_service_certs_rotation():
     cluster_utils.restart_deployment(
         name="lightspeed-operator-controller-manager", namespace="openshift-lightspeed"
     )
-    cluster_utils.restart_deployment(name="lightspeed-app-server", namespace="openshift-lightspeed")
+    cluster_utils.restart_deployment(
+        name="lightspeed-app-server", namespace="openshift-lightspeed"
+    )
     cluster_utils.restart_deployment(
         name="lightspeed-console-plugin", namespace="openshift-lightspeed"
     )

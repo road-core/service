@@ -58,7 +58,9 @@ class IndexLoader:
             # pylint: disable=C0415
             from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-            logger.debug("Loading embedding model info from path %s", self._embed_model_path)
+            logger.debug(
+                "Loading embedding model info from path %s", self._embed_model_path
+            )
             return HuggingFaceEmbedding(model_name=self._embed_model_path)
 
         logger.warning("Embedding model path is not set.")

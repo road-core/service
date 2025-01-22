@@ -34,14 +34,18 @@ class Cache(ABC):
             raise ValueError(f"Invalid conversation ID {conversation_id}")
 
     @staticmethod
-    def construct_key(user_id: str, conversation_id: str, skip_user_id_check: bool) -> str:
+    def construct_key(
+        user_id: str, conversation_id: str, skip_user_id_check: bool
+    ) -> str:
         """Construct key to cache."""
         Cache._check_user_id(user_id, skip_user_id_check)
         Cache._check_conversation_id(conversation_id)
         return f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}{conversation_id}"
 
     @abstractmethod
-    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> list[CacheEntry]:
+    def get(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool
+    ) -> list[CacheEntry]:
         """Abstract method to retrieve a value from the cache.
 
         Args:
@@ -71,7 +75,9 @@ class Cache(ABC):
         """
 
     @abstractmethod
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool) -> bool:
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool
+    ) -> bool:
         """Delete all entries for a given conversation.
 
         Args:

@@ -125,9 +125,13 @@ class LLMRequest(BaseModel):
     def validate_provider_and_model(self) -> Self:
         """Perform validation on the provider and model."""
         if self.model and not self.provider:
-            raise ValueError("LLM provider must be specified when the model is specified.")
+            raise ValueError(
+                "LLM provider must be specified when the model is specified."
+            )
         if self.provider and not self.model:
-            raise ValueError("LLM model must be specified when the provider is specified.")
+            raise ValueError(
+                "LLM model must be specified when the provider is specified."
+            )
         if self.media_type not in (MEDIA_TYPE_TEXT, MEDIA_TYPE_JSON):
             raise ValueError(
                 f"Invalid media type: '{self.media_type}', must be "
@@ -685,7 +689,9 @@ class CacheEntry(BaseModel):
         return cls(
             query=data["human_query"],
             response=data["ai_response"],
-            attachments=[Attachment(**attachment) for attachment in data["attachments"]],
+            attachments=[
+                Attachment(**attachment) for attachment in data["attachments"]
+            ],
         )
 
     @staticmethod

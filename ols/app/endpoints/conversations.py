@@ -122,7 +122,9 @@ delete_conversation_response: dict[int | str, dict[str, Any]] = {
 }
 
 
-@router.delete("/conversations/{conversation_id}", responses=delete_conversation_response)
+@router.delete(
+    "/conversations/{conversation_id}", responses=delete_conversation_response
+)
 def delete_conversation(
     conversation_id: str, auth: Any = Depends(auth_dependency)
 ) -> ConversationDeletionResponse:

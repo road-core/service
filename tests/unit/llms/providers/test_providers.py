@@ -31,8 +31,12 @@ def test_providers_are_registered():
     assert LLMProvidersRegistry.llm_providers[constants.PROVIDER_OPENAI] == OpenAI
     assert LLMProvidersRegistry.llm_providers[constants.PROVIDER_BAM] == BAM
     assert LLMProvidersRegistry.llm_providers[constants.PROVIDER_WATSONX] == Watsonx
-    assert LLMProvidersRegistry.llm_providers[constants.PROVIDER_RHELAI_VLLM] == RHELAIVLLM
-    assert LLMProvidersRegistry.llm_providers[constants.PROVIDER_RHOAI_VLLM] == RHOAIVLLM
+    assert (
+        LLMProvidersRegistry.llm_providers[constants.PROVIDER_RHELAI_VLLM] == RHELAIVLLM
+    )
+    assert (
+        LLMProvidersRegistry.llm_providers[constants.PROVIDER_RHOAI_VLLM] == RHOAIVLLM
+    )
     assert LLMProvidersRegistry.llm_providers[constants.PROVIDER_FAKE] == FakeProvider
 
 
@@ -71,7 +75,9 @@ def test_llm_provider_params_order__inputs_overrides_defaults():
         def load(self):
             return
 
-    my_provider = MyProvider(model="bla", params={"provider-param": 2}, provider_config=None)
+    my_provider = MyProvider(
+        model="bla", params={"provider-param": 2}, provider_config=None
+    )
 
     assert my_provider.params["provider-param"] == 2
     assert my_provider.params["not-to-be-overwritten-param"] == "foo"
@@ -89,7 +95,9 @@ def test_llm_provider_params_order__config_overrides_everything():
         def load(self):
             return
 
-    my_provider = MyProvider(model="bla", params={"provider-param": 2}, provider_config=None)
+    my_provider = MyProvider(
+        model="bla", params={"provider-param": 2}, provider_config=None
+    )
 
     assert my_provider.params["provider-param"] == 3
     assert my_provider.params["not-to-be-overwritten-param"] == "foo"

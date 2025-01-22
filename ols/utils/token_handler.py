@@ -100,7 +100,9 @@ class TokenHandler:
         # includes prompt AND response. Hence we need to subtract the
         # prompt tokens and max tokens for response from the context
         # window size.
-        available_tokens = context_window_size - max_tokens_for_response - prompt_token_count
+        available_tokens = (
+            context_window_size - max_tokens_for_response - prompt_token_count
+        )
 
         if available_tokens <= 0:
             limit = context_window_size - max_tokens_for_response
@@ -192,7 +194,9 @@ class TokenHandler:
             # if total length of already checked messages is higher than limit
             # then skip all remaining messages (we need to skip from top)
             if total_length > limit:
-                logger.debug("History truncated, it exceeds available %d tokens.", limit)
+                logger.debug(
+                    "History truncated, it exceeds available %d tokens.", limit
+                )
                 return formatted_history[::-1], True
             formatted_history.append(message)
 

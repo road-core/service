@@ -40,7 +40,9 @@ authorized_responses: dict[int | str, dict[str, Any]] = {
 
 
 @router.post("/authorized", responses=authorized_responses)
-def is_user_authorized(request: Request, user_id: Optional[str] = None) -> AuthorizationResponse:
+def is_user_authorized(
+    request: Request, user_id: Optional[str] = None
+) -> AuthorizationResponse:
     """Validate if the logged-in user is authorized to access OLS.
 
     Parameters:

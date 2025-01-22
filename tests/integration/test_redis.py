@@ -55,7 +55,9 @@ def test_conversation_in_redis():
     assert retrieved == cache_entry
 
     # append more conversation
-    cache_entry_2 = CacheEntry(query="Second human message", response="Second AI response")
+    cache_entry_2 = CacheEntry(
+        query="Second human message", response="Second AI response"
+    )
 
     pytest.redis_cache.insert_or_append(USER_ID, CONVERSATION_ID, cache_entry_2)
 

@@ -60,7 +60,9 @@ def generate_prompt(provider, model, query, history, rag_content):
 
 
 @pytest.mark.parametrize(("provider", "model"), provider_and_model)
-def test_generate_prompt_default_prompt(benchmark, provider, model, conversation_history):
+def test_generate_prompt_default_prompt(
+    benchmark, provider, model, conversation_history
+):
     """Benchmark for prompt generator."""
     query = "What is Kubernetes?"
     rag_context = "context"
@@ -92,7 +94,9 @@ def test_generate_prompt_long_query(benchmark, provider, model, conversation_his
 
 
 @pytest.mark.parametrize(("provider", "model"), provider_and_model)
-def test_generate_prompt_without_rag_context(benchmark, provider, model, conversation_history):
+def test_generate_prompt_without_rag_context(
+    benchmark, provider, model, conversation_history
+):
     """Benchmark what prompt will be returned for non-existent RAG context."""
     query = "What is Kubernetes?"
     rag_context = ""
@@ -124,7 +128,9 @@ def test_generate_prompt_without_history(benchmark, provider, model, empty_histo
 
 
 @pytest.mark.parametrize(("provider", "model"), provider_and_model)
-def test_generate_prompt_without_rag_context_nor_history(benchmark, provider, model, empty_history):
+def test_generate_prompt_without_rag_context_nor_history(
+    benchmark, provider, model, empty_history
+):
     """Benchmark what prompt will be returned for non-existent RAG context."""
     query = "What is Kubernetes?"
     rag_context = ""

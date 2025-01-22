@@ -158,14 +158,22 @@ def test_delete_conversation_with_history(_setup, endpoint):
         assert len(response.json()["chat_history"]) == 2
 
         # Delete the conversation
-        response = pytest.client.delete(endpoint.format(conversation_id=conversation_id))
+        response = pytest.client.delete(
+            endpoint.format(conversation_id=conversation_id)
+        )
         assert response.status_code == requests.codes.ok
-        assert f"Conversation {conversation_id} successfully deleted" in response.json()["response"]
+        assert (
+            f"Conversation {conversation_id} successfully deleted"
+            in response.json()["response"]
+        )
 
         # Verify conversation is gone
         response = pytest.client.get(endpoint.format(conversation_id=conversation_id))
         assert response.status_code == requests.codes.internal_server_error
-        assert "Error retrieving previous chat history" in response.json()["detail"]["response"]
+        assert (
+            "Error retrieving previous chat history"
+            in response.json()["detail"]["response"]
+        )
 
 
 def test_get_conversation_not_found(_setup):
@@ -176,7 +184,10 @@ def test_get_conversation_not_found(_setup):
         response = pytest.client.get(f"/conversations/{conversation_id}")
 
         assert response.status_code == 500
-        assert response.json()["detail"]["cause"] == f"Conversation {conversation_id} not found"
+        assert (
+            response.json()["detail"]["cause"]
+            == f"Conversation {conversation_id} not found"
+        )
 
 
 def test_delete_conversation_not_found(_setup):
@@ -187,7 +198,10 @@ def test_delete_conversation_not_found(_setup):
         response = pytest.client.delete(f"/conversations/{conversation_id}")
 
         assert response.status_code == 500
-        assert response.json()["detail"]["cause"] == f"Conversation {conversation_id} not found"
+        assert (
+            response.json()["detail"]["cause"]
+            == f"Conversation {conversation_id} not found"
+        )
 
 
 def test_invalid_conversation_id(_setup):

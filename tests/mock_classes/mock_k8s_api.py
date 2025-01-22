@@ -7,9 +7,13 @@ class MockK8sResponse:
     This class is designed to mock Kubernetes API responses for testing purposes.
     """
 
-    def __init__(self, authenticated=None, allowed=None, username=None, uid=None, groups=None):
+    def __init__(
+        self, authenticated=None, allowed=None, username=None, uid=None, groups=None
+    ):
         """Init function."""
-        self.status = MockK8sResponseStatus(authenticated, allowed, username, uid, groups)
+        self.status = MockK8sResponseStatus(
+            authenticated, allowed, username, uid, groups
+        )
 
 
 class MockK8sUser:
@@ -56,7 +60,9 @@ def mock_token_review_response(token_review):
         A MockK8sResponse object with authentication status and user details.
     """
     if token_review.spec.token == "valid-token":  # noqa: S105
-        return MockK8sResponse(True, username="valid-user", uid="valid-uid", groups=["ols-group"])
+        return MockK8sResponse(
+            True, username="valid-user", uid="valid-uid", groups=["ols-group"]
+        )
     return MockK8sResponse(False)
 
 

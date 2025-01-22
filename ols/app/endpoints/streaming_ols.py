@@ -98,7 +98,9 @@ def conversation_request(
     summarizer_response = (
         invalid_response_generator()
         if not valid
-        else generate_response(conversation_id, llm_request, previous_input, streaming=True)
+        else generate_response(
+            conversation_id, llm_request, previous_input, streaming=True
+        )
     )
 
     return StreamingResponse(
@@ -161,12 +163,18 @@ def stream_end_event(
                 "data": {
                     "referenced_documents": ref_docs,
                     "truncated": truncated,
-                    "input_tokens": (0 if token_counter is None else token_counter.input_tokens),
-                    "output_tokens": (0 if token_counter is None else token_counter.output_tokens),
+                    "input_tokens": (
+                        0 if token_counter is None else token_counter.input_tokens
+                    ),
+                    "output_tokens": (
+                        0 if token_counter is None else token_counter.output_tokens
+                    ),
                 },
             }
         )
-    ref_docs_string = "\n".join(f"{item['doc_title']}: {item['doc_url']}" for item in ref_docs)
+    ref_docs_string = "\n".join(
+        f"{item['doc_title']}: {item['doc_url']}" for item in ref_docs
+    )
     return f"\n\n---\n\n{ref_docs_string}" if ref_docs_string else ""
 
 
