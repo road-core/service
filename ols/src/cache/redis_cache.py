@@ -161,7 +161,6 @@ class RedisCache(Cache):
         Returns:
             A list of conversation ids from the cache
         """
-
         # Get all keys matching the user_id prefix
         super()._check_user_id(user_id, skip_user_id_check)
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"

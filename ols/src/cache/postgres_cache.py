@@ -214,7 +214,6 @@ class PostgresCache(Cache):
             A list of conversation ids from the cache
 
         """
-
         with self.conn.cursor() as cursor:
             try:
                 cursor.execute(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,))

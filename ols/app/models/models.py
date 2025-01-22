@@ -711,18 +711,27 @@ class CacheEntry(BaseModel):
 
 
 class MessageEncoder(json.JSONEncoder):
-    """Convert Message objects to serializable dictionaries.
-
-    Args:
-        o: The object to serialize. Expected to be either a HumanMessage
-           or AIMessage instance.
-
-    Returns:
-        dict: A dictionary containing the message attributes if the input is
-             a Message object.
-    """
+    """Convert Message objects to serializable dictionaries."""
 
     def default(self, o):
+        """Convert a Message object into a serializable dictionary.
+
+        This method is called when an object cannot be serialized by default
+        methods. If the object is an instance of HumanMessage or AIMessage,
+        it is converted into a dictionary. Otherwise, the default JSONEncoder
+        behavior is used.
+
+
+        Args:
+            o: The object to serialize. Expected to be either a HumanMessage
+            or AIMessage instance.
+
+        Returns:
+            dict: A dictionary containing the message attributes if the input is
+                a Message object.
+            Any: The result of the parent class's default method for other
+                 object types.
+        """
         if isinstance(o, (HumanMessage, AIMessage)):
             return {
                 "type": o.type,

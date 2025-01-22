@@ -136,7 +136,6 @@ def delete_conversation(
         user_id: (Optional)The user ID to delete the conversation for.
 
     """
-
     user_id = retrieve_user_id(auth)
     logger.info("User ID %s", user_id)
     skip_user_id_check = retrieve_skip_user_id_check(auth)
@@ -198,7 +197,6 @@ def list_conversations(
         user_id: (Optional)The user ID to get all conversations for.
 
     """
-
     user_id = retrieve_user_id(auth)
     logger.info("User ID %s", user_id)
     skip_user_id_check = retrieve_skip_user_id_check(auth)
