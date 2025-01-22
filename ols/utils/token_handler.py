@@ -5,6 +5,7 @@ from math import ceil
 
 from llama_index.core.schema import NodeWithScore
 from tiktoken import get_encoding
+from langchain_core.messages import BaseMessage
 
 from ols.app.models.models import RagChunk
 from ols.constants import (
@@ -18,8 +19,6 @@ from ols.src.prompts.prompt_generator import (
     restructure_rag_context_post,
     restructure_rag_context_pre,
 )
-
-from langchain_core.messages import BaseMessage
 
 logger = logging.getLogger(__name__)
 

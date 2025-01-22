@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 import requests
 from fastapi.testclient import TestClient
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
 from ols.app.models.config import (
@@ -20,7 +21,7 @@ from ols.utils.logging_configurator import configure_logging
 from tests.mock_classes.mock_langchain_interface import mock_langchain_interface
 from tests.mock_classes.mock_llm_chain import mock_llm_chain
 from tests.mock_classes.mock_llm_loader import mock_llm_loader
-from langchain_core.messages import AIMessage, HumanMessage
+
 
 
 @pytest.fixture(scope="function")

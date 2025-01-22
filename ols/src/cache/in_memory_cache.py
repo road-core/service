@@ -128,7 +128,7 @@ class InMemoryCache(Cache):
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
 
         with self._lock:
-            for key in self.cache.keys():
+            for key in self.cache:
                 if key.startswith(prefix):
                     # Extract conversation_id from the key
                     conversation_id = key[len(prefix) :]

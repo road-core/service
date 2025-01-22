@@ -5,6 +5,7 @@ from typing import Any, AsyncGenerator, Optional
 
 from langchain.chains import LLMChain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage, BaseMessage
 from llama_index.core import VectorStoreIndex
 
 from ols import config
@@ -15,7 +16,7 @@ from ols.customize import prompts, reranker
 from ols.src.prompts.prompt_generator import GeneratePrompt
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
-from langchain_core.messages import AIMessage, BaseMessage
+
 
 logger = logging.getLogger(__name__)
 

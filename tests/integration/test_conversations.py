@@ -1,8 +1,9 @@
-import pytest
-from fastapi.testclient import TestClient
-from unittest.mock import patch
+"""Integration tests for /conversations REST API endpoints."""
 
+from unittest.mock import patch
+import pytest
 import requests
+from fastapi.testclient import TestClient
 
 from ols import config
 from ols.utils import suid
@@ -25,10 +26,6 @@ def _setup():
 @pytest.mark.parametrize("endpoint", ("/conversations/{conversation_id}",))
 def test_get_conversation_with_history(_setup, endpoint):
     """Test getting conversation history after creating some chat history."""
-    # we need to import it here because these modules triggers config
-    # load too -> causes exception in auth module because of missing config
-    # values
-    from ols.app.models.models import CacheEntry
 
     ml = mock_langchain_interface("test response")
     with (

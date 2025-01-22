@@ -1,6 +1,6 @@
 """Prompt generator based on model / context."""
-
-from langchain_core.messages import AIMessage, HumanMessage
+from copy import copy
+from langchain_core.messages import  HumanMessage, BaseMessage
 from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
@@ -8,10 +8,10 @@ from langchain_core.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
-from copy import copy
+
 from ols.constants import ModelFamily
 from ols.customize import prompts
-from langchain_core.messages import BaseMessage
+
 
 
 def restructure_rag_context_pre(text: str, model: str) -> str:
@@ -34,13 +34,13 @@ def restructure_history(message: BaseMessage, model: str) -> BaseMessage:
         # No processing required here for gpt.
         return message
 
-    newMessage = copy(message)
+    new_message = copy(message)
     # Granite specific formatting for history
     if isinstance(message, HumanMessage):
-        newMessage.content = "\n<|user|>\n" + message.content
+        new_message.content = "\n<|user|>\n" + message.content
     else:
-        newMessage.content = "\n<|assistant|>\n" + message.content
-    return newMessage
+        new_message.content = "\n<|assistant|>\n" + message.content
+    return new_message
 
 
 class GeneratePrompt:
@@ -72,12 +72,6 @@ class GeneratePrompt:
             )
 
         if len(self._history) > 0:
-            # chat_history = []
-            # for h in self._history:
-            #     if h.type == "human":
-            #         chat_history.append(HumanMessage(content=h.removeprefix("human: ")))
-            #     else:
-            #         chat_history.append(AIMessage(content=h.removeprefix("ai: ")))
             llm_input_values["chat_history"] = self._history
 
             sys_intruction = (
@@ -113,7 +107,6 @@ class GeneratePrompt:
             llm_input_values["chat_history"] = ""
             for message in self._history:
                 llm_input_values["chat_history"] += message.content
-            # llm_input_values["chat_history"] = "".join(self._history)
 
         if "context" in llm_input_values:
             prompt_message = prompt_message + "\n{context}"

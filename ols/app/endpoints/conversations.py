@@ -26,8 +26,6 @@ from ols.app.models.models import (
 )
 from ols.src.auth.auth import get_auth_dependency
 
-from langchain_core.messages import BaseMessage
-
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["conversations"])
@@ -85,7 +83,7 @@ def get_conversation(
         chat_history = CacheEntry.cache_entries_to_history(
             retrieve_previous_input(user_id, conversation_id, skip_user_id_check)
         )
-        if chat_history.__len__() == 0:
+        if len(chat_history) == 0:
             logger.info(
                 "No chat history found for user: %s with conversation_id: %s",
                 user_id,
@@ -154,19 +152,19 @@ def delete_conversation(
         return ConversationDeletionResponse(
             response=f"Conversation {conversation_id} successfully deleted"
         )
-    else:
-        logger.info(
-            "No chat history found for user: %s with conversation_id: %s",
-            user_id,
-            conversation_id,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "response": "Error deleting conversation",
-                "cause": f"Conversation {conversation_id} not found",
-            },
-        )
+
+    logger.info(
+        "No chat history found for user: %s with conversation_id: %s",
+        user_id,
+        conversation_id,
+    )
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail={
+            "response": "Error deleting conversation",
+            "cause": f"Conversation {conversation_id} not found",
+        },
+    )
 
 
 list_conversations_response: dict[int | str, dict[str, Any]] = {

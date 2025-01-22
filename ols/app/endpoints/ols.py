@@ -11,6 +11,7 @@ from typing import Any, Generator, Optional, Union
 
 import pytz
 from fastapi import APIRouter, Depends, HTTPException, status
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
 from ols.app import metrics
@@ -28,14 +29,14 @@ from ols.app.models.models import (
     UnauthorizedResponse,
 )
 from ols.customize import keywords, prompts
-from ols.src.auth.auth import get_auth_dependency, noop
+from ols.src.auth.auth import get_auth_dependency
 from ols.src.llms.llm_loader import LLMConfigurationError, resolve_provider_config
 from ols.src.query_helpers.attachment_appender import append_attachments_to_query
 from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
-from langchain_core.messages import AIMessage, HumanMessage
+
 
 logger = logging.getLogger(__name__)
 

@@ -8,12 +8,12 @@ from langchain.llms.base import LLM
 from pydantic import BaseModel, field_validator, model_validator
 from pydantic.dataclasses import dataclass
 
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+
 from ols.constants import MEDIA_TYPE_JSON, MEDIA_TYPE_TEXT
 from ols.customize import prompts
 from ols.utils import suid
 
-
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 
 
 class Attachment(BaseModel):
@@ -712,27 +712,63 @@ class CacheEntry(BaseModel):
 
 
 class MessageEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, (HumanMessage, AIMessage)):
+    """Convert Message objects to serializable dictionaries.
+
+    Args:
+        o: The object to serialize. Expected to be either a HumanMessage
+           or AIMessage instance.
+
+    Returns:
+        dict: A dictionary containing the message attributes if the input is
+             a Message object.
+    """
+
+    def default(self, o):
+        if isinstance(o, (HumanMessage, AIMessage)):
             return {
-                "type": obj.type,
-                "content": obj.content,
-                "response_metadata": obj.response_metadata,
-                "additional_kwargs": obj.additional_kwargs,
+                "type": o.type,
+                "content": o.content,
+                "response_metadata": o.response_metadata,
+                "additional_kwargs": o.additional_kwargs,
             }
-        return super().default(obj)
+        return super().default(o)
 
 
 class MessageDecoder(json.JSONDecoder):
-    def __init__(self, *args, **kwargs):
-        super().__init__(object_hook=self.object_hook, *args, **kwargs)
+    """Custom JSON decoder for deserializing Message objects.
 
-    def object_hook(self, dct):
+    This decoder extends the default JSONDecoder to handle JSON representations of
+    HumanMessage and AIMessage objects, converting them back into their respective
+    Python objects. It processes JSON objects containing 'type', 'content',
+    'response_metadata', and 'additional_kwargs' fields.
+
+    Example:
+        >>> decoder = MessageDecoder()
+        >>> json.loads('{"type": "human", "content": "Hello", ...}', cls=MessageDecoder)
+        HumanMessage(content="Hello", ...)
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the MessageDecoder with custom object hook."""
+        super().__init__(object_hook=self._decode_message, *args, **kwargs)
+
+    def _decode_message(self, dct):
+        """Decode JSON dictionary into Message objects if applicable.
+
+        Args:
+            dct (dict): Dictionary to decode, potentially representing a Message.
+
+        Returns:
+            Union[HumanMessage, AIMessage, dict]: A Message object if the input
+            dictionary represents a message, otherwise returns the original dictionary.
+        """
         if "type" in dct:
             if dct["type"] == "human":
                 message = HumanMessage(content=dct["content"])
             elif dct["type"] == "ai":
                 message = AIMessage(content=dct["content"])
+            else:
+                return dct
             message.additional_kwargs = dct["additional_kwargs"]
             message.response_metadata = dct["response_metadata"]
             return message
