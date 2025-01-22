@@ -76,7 +76,7 @@ class PostgresCache(Cache):
     QUERY_CACHE_SIZE = """
         SELECT count(*) FROM cache;
         """
-    
+
     DELETE_SINGLE_CONVERSATION_STATEMENT = """
         DELETE FROM cache 
          WHERE user_id=%s AND conversation_id=%s
@@ -118,7 +118,9 @@ class PostgresCache(Cache):
         cur.close()
         self.conn.commit()
 
-    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool = False) -> list[CacheEntry]:
+    def get(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
@@ -181,15 +183,16 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.insert_or_append: %s", e)
                 raise CacheError("PostgresCache.insert_or_append", e) from e
 
-
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> bool:
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> bool:
         """Delete conversation history for a given user_id and conversation_id.
-        
+
         Args:
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             skip_user_id_check: Skip user_id suid check.
-            
+
         Returns:
             bool: True if the conversation was deleted, False if not found.
 
@@ -201,18 +204,17 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.delete: %s", e)
                 raise CacheError("PostgresCache.delete", e) from e
 
-
-    def list(self, user_id: str, skip_user_id_check: bool=False) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
         """List all conversations for a given user_id.
-        
+
         Args:
             user_id: User identification.
-            
+
         Returns:
             A list of conversation ids from the cache
-            
+
         """
-        
+
         with self.conn.cursor() as cursor:
             try:
                 cursor.execute(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,))
@@ -222,10 +224,12 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.list: %s", e)
                 raise CacheError("PostgresCache.list", e) from e
 
-
     @staticmethod
     def _select(
-        cursor: psycopg2.extensions.cursor, user_id: str, conversation_id: str, skip_user_id_check: bool=False
+        cursor: psycopg2.extensions.cursor,
+        user_id: str,
+        conversation_id: str,
+        skip_user_id_check: bool = False,
     ) -> Any:
         """Select conversation history for given user_id and conversation_id."""
         cursor.execute(
@@ -243,7 +247,7 @@ class PostgresCache(Cache):
             raise ValueError("Invalid value read from cache:", value)
 
         # try to deserialize the value
-        return json.loads(value[0],cls=MessageDecoder)
+        return json.loads(value[0], cls=MessageDecoder)
 
     @staticmethod
     def _update(
@@ -286,9 +290,7 @@ class PostgresCache(Cache):
 
     @staticmethod
     def _delete(
-        cursor: psycopg2.extensions.cursor,
-        user_id: str, 
-        conversation_id: str
+        cursor: psycopg2.extensions.cursor, user_id: str, conversation_id: str
     ) -> bool:
         """Delete conversation history for given user_id and conversation_id."""
         cursor.execute(
@@ -296,4 +298,3 @@ class PostgresCache(Cache):
             (user_id, conversation_id),
         )
         return cursor.fetchone() is not None
-    

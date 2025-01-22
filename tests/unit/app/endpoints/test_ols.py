@@ -62,7 +62,9 @@ def test_retrieve_conversation_id_existing_id():
 def test_retrieve_previous_input_no_previous_history():
     """Check how function to retrieve previous input handle empty history."""
     llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=None)
-    llm_input = ols.retrieve_previous_input(constants.DEFAULT_USER_UID, llm_request.conversation_id)
+    llm_input = ols.retrieve_previous_input(
+        constants.DEFAULT_USER_UID, llm_request.conversation_id
+    )
     assert llm_input == []
 
 
@@ -218,7 +220,10 @@ def test_store_conversation_history(insert_or_append):
 
     expected_history = CacheEntry(query=HumanMessage(query))
     insert_or_append.assert_called_with(
-        constants.DEFAULT_USER_UID, conversation_id, expected_history, skip_user_id_check
+        constants.DEFAULT_USER_UID,
+        conversation_id,
+        expected_history,
+        skip_user_id_check,
     )
 
 
@@ -238,7 +243,9 @@ def test_store_conversation_history_some_response(insert_or_append):
     expected_history = CacheEntry(
         query=HumanMessage(query), response=AIMessage(response)
     )
-    insert_or_append.assert_called_with(user_id, conversation_id, expected_history, skip_user_id_check)
+    insert_or_append.assert_called_with(
+        user_id, conversation_id, expected_history, skip_user_id_check
+    )
 
 
 @pytest.mark.usefixtures("_load_config")

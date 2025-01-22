@@ -28,7 +28,7 @@ def restructure_rag_context_post(text: str, model: str) -> str:
     return "\n" + text.lstrip("\n") + "\n"
 
 
-def restructure_history(message: BaseMessage , model: str) -> BaseMessage:
+def restructure_history(message: BaseMessage, model: str) -> BaseMessage:
     """Restructure history."""
     if ModelFamily.GRANITE not in model:
         # No processing required here for gpt.
@@ -119,7 +119,6 @@ class GeneratePrompt:
             prompt_message = prompt_message + "\n{context}"
         if "chat_history" in llm_input_values:
             prompt_message = prompt_message + "\n{chat_history}"
-            
 
         prompt_message = prompt_message + "\n<|user|>\n{query}\n<|assistant|>\n"
         return PromptTemplate.from_template(prompt_message), llm_input_values

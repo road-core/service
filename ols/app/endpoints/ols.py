@@ -90,7 +90,7 @@ def conversation_request(
         attachments,
         valid,
         timestamps,
-        skip_user_id_check
+        skip_user_id_check,
     ) = process_request(auth, llm_request)
 
     summarizer_response: SummarizerResponse | Generator
@@ -111,7 +111,12 @@ def conversation_request(
     timestamps["generate response"] = time.time()
 
     store_conversation_history(
-        user_id, conversation_id, llm_request, summarizer_response.response, attachments, skip_user_id_check
+        user_id,
+        conversation_id,
+        llm_request,
+        summarizer_response.response,
+        attachments,
+        skip_user_id_check,
     )
 
     if config.ols_config.user_data_collection.transcripts_disabled:
@@ -158,7 +163,9 @@ def conversation_request(
 
 def process_request(
     auth: Any, llm_request: LLMRequest
-) -> tuple[str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float], str]:
+) -> tuple[
+    str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float], str
+]:
     """Process incoming request.
 
     Args:
@@ -191,7 +198,9 @@ def process_request(
     # Log incoming request (after redaction)
     logger.info("%s Incoming request: %s", conversation_id, llm_request.query)
 
-    previous_input = retrieve_previous_input(user_id, llm_request.conversation_id, skip_user_id_check)
+    previous_input = retrieve_previous_input(
+        user_id, llm_request.conversation_id, skip_user_id_check
+    )
     timestamps["retrieve previous input"] = time.time()
 
     # Retrieve attachments from the request
@@ -225,7 +234,7 @@ def process_request(
         attachments,
         valid,
         timestamps,
-        skip_user_id_check
+        skip_user_id_check,
     )
 
 
@@ -268,6 +277,7 @@ def retrieve_user_id(auth: Any) -> str:
     # auth contains tuple with user ID (in UUID format) and user name
     return auth[0]
 
+
 def retrieve_skip_user_id_check(auth: Any) -> bool:
     """Retrieve skip user_id check from the token processed by auth. mechanism."""
     return auth[2]
@@ -285,7 +295,9 @@ def retrieve_conversation_id(llm_request: LLMRequest) -> str:
     return conversation_id
 
 
-def retrieve_previous_input(user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> list[CacheEntry]:
+def retrieve_previous_input(
+    user_id: str, conversation_id: str, skip_user_id_check: bool = False
+) -> list[CacheEntry]:
     """Retrieve previous user input, if exists."""
     try:
         previous_input = []
@@ -424,7 +436,7 @@ def store_conversation_history(
     llm_request: LLMRequest,
     response: Optional[str],
     attachments: list[Attachment],
-    skip_user_id_check: bool=False,
+    skip_user_id_check: bool = False,
 ) -> None:
     """Store conversation history into selected cache.
 

@@ -212,6 +212,7 @@ class LLMResponse(BaseModel):
         }
     }
 
+
 class ChatHistoryResponse(BaseModel):
     """Model representing a response to a list conversation request.
 
@@ -227,19 +228,20 @@ class ChatHistoryResponse(BaseModel):
             "examples": [
                 {
                     "chat_history": [
-                            {
-                                "content": "what is openshift",
-                                "type": "human",
-                            },
-                            {
-                                "content": " OpenShift is a container orchestration platform built by Red Hat...",
-                                "type": "ai",
-                            }
-                        ]
+                        {
+                            "content": "what is openshift",
+                            "type": "human",
+                        },
+                        {
+                            "content": " OpenShift is a container orchestration platform built by Red Hat...",
+                            "type": "ai",
+                        },
+                    ]
                 }
             ]
         }
     }
+
 
 class ListConversationsResponse(BaseModel):
     """Model representing a response to a request to retrieve a conversation history.
@@ -256,14 +258,15 @@ class ListConversationsResponse(BaseModel):
             "examples": [
                 {
                     "conversations": [
-                           "15a78660-a18e-447b-9fea-9deb27b63b5f",
-                           "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
-                           "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
-                        ]
+                        "15a78660-a18e-447b-9fea-9deb27b63b5f",
+                        "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
+                        "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                    ]
                 }
             ]
         }
     }
+
 
 class ConversationDeletionResponse(BaseModel):
     """Model representing a response to a conversation deletion request.
@@ -662,7 +665,7 @@ class CacheEntry(BaseModel):
     """
 
     query: HumanMessage
-    response: Optional[AIMessage]= AIMessage("") 
+    response: Optional[AIMessage] = AIMessage("")
     attachments: list[Attachment] = []
 
     @field_validator("response")
@@ -693,7 +696,9 @@ class CacheEntry(BaseModel):
         )
 
     @staticmethod
-    def cache_entries_to_history(cache_entries: list["CacheEntry"]) -> list[BaseMessage]:
+    def cache_entries_to_history(
+        cache_entries: list["CacheEntry"],
+    ) -> list[BaseMessage]:
         """Convert cache entries to a history."""
         history: list[BaseMessage] = []
         for entry in cache_entries:
@@ -706,7 +711,6 @@ class CacheEntry(BaseModel):
         return history
 
 
-
 class MessageEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (HumanMessage, AIMessage)):
@@ -714,9 +718,10 @@ class MessageEncoder(json.JSONEncoder):
                 "type": obj.type,
                 "content": obj.content,
                 "response_metadata": obj.response_metadata,
-                "additional_kwargs": obj.additional_kwargs
+                "additional_kwargs": obj.additional_kwargs,
             }
         return super().default(obj)
+
 
 class MessageDecoder(json.JSONDecoder):
     def __init__(self, *args, **kwargs):

@@ -22,7 +22,7 @@ from ols.app.models.models import (
     ChatHistoryResponse,
     ConversationDeletionResponse,
     ListConversationsResponse,
-    CacheEntry
+    CacheEntry,
 )
 from ols.src.auth.auth import get_auth_dependency
 
@@ -56,8 +56,7 @@ chat_history_response: dict[int | str, dict[str, Any]] = {
 
 @router.get("/conversations/{conversation_id}", responses=chat_history_response)
 def get_conversation(
-    conversation_id: str,
-    auth: Any = Depends(auth_dependency)
+    conversation_id: str, auth: Any = Depends(auth_dependency)
 ) -> ChatHistoryResponse:
     """Get conversation history for a given conversation ID.
 
@@ -77,12 +76,22 @@ def get_conversation(
     skip_user_id_check = retrieve_skip_user_id_check(auth)
 
     # Log incoming request (after redaction)
-    logger.info("Getting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
+    logger.info(
+        "Getting chat history for user: %s with conversation_id: %s",
+        user_id,
+        conversation_id,
+    )
     try:
-        chat_history=CacheEntry.cache_entries_to_history(retrieve_previous_input(user_id, conversation_id, skip_user_id_check))
+        chat_history = CacheEntry.cache_entries_to_history(
+            retrieve_previous_input(user_id, conversation_id, skip_user_id_check)
+        )
         if chat_history.__len__() == 0:
-            logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
-            raise Exception( f"Conversation {conversation_id} not found") 
+            logger.info(
+                "No chat history found for user: %s with conversation_id: %s",
+                user_id,
+                conversation_id,
+            )
+            raise Exception(f"Conversation {conversation_id} not found")
         return ChatHistoryResponse(chat_history=chat_history)
     except Exception as e:
         logger.error("Error retrieving previous chat history: %s", e)
@@ -114,10 +123,12 @@ delete_conversation_response: dict[int | str, dict[str, Any]] = {
     },
 }
 
-@router.delete("/conversations/{conversation_id}", responses=delete_conversation_response)
+
+@router.delete(
+    "/conversations/{conversation_id}", responses=delete_conversation_response
+)
 def delete_conversation(
-    conversation_id: str,
-    auth: Any = Depends(auth_dependency)
+    conversation_id: str, auth: Any = Depends(auth_dependency)
 ) -> ConversationDeletionResponse:
     """Delete conversation history for a given conversation ID.
 
@@ -133,20 +144,29 @@ def delete_conversation(
     skip_user_id_check = retrieve_skip_user_id_check(auth)
 
     # Log incoming request (after redaction)
-    logger.info("Deleting chat history for user: %s with conversation_id: %s", user_id, conversation_id)
+    logger.info(
+        "Deleting chat history for user: %s with conversation_id: %s",
+        user_id,
+        conversation_id,
+    )
 
     if config.conversation_cache.delete(user_id, conversation_id, skip_user_id_check):
-        return ConversationDeletionResponse(response=f"Conversation {conversation_id} successfully deleted")
+        return ConversationDeletionResponse(
+            response=f"Conversation {conversation_id} successfully deleted"
+        )
     else:
-        logger.info("No chat history found for user: %s with conversation_id: %s", user_id, conversation_id)
+        logger.info(
+            "No chat history found for user: %s with conversation_id: %s",
+            user_id,
+            conversation_id,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "response": "Error deleting conversation",
-                "cause": f"Conversation {conversation_id} not found"
+                "cause": f"Conversation {conversation_id} not found",
             },
-        ) 
-
+        )
 
 
 list_conversations_response: dict[int | str, dict[str, Any]] = {
@@ -168,9 +188,10 @@ list_conversations_response: dict[int | str, dict[str, Any]] = {
     },
 }
 
+
 @router.get("/conversations", responses=list_conversations_response)
 def list_conversations(
-    auth: Any = Depends(auth_dependency)
+    auth: Any = Depends(auth_dependency),
 ) -> ListConversationsResponse:
     """List all conversations for a given user.
 
@@ -187,4 +208,6 @@ def list_conversations(
     # Log incoming request (after redaction)
     logger.info("Listing all conversations for user: %s ", user_id)
 
-    return ListConversationsResponse(conversations=config.conversation_cache.list(user_id, skip_user_id_check))
+    return ListConversationsResponse(
+        conversations=config.conversation_cache.list(user_id, skip_user_id_check)
+    )

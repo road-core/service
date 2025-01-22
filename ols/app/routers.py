@@ -2,7 +2,14 @@
 
 from fastapi import FastAPI
 
-from ols.app.endpoints import authorized, feedback, health, ols, streaming_ols, conversations
+from ols.app.endpoints import (
+    authorized,
+    feedback,
+    health,
+    ols,
+    streaming_ols,
+    conversations,
+)
 from ols.app.metrics import metrics
 
 

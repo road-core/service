@@ -35,7 +35,9 @@ class InMemoryCache(Cache):
         self.deque: deque[str] = deque()
         self.cache: dict[str, list[dict[str, Any]]] = {}
 
-    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> list[CacheEntry]:
+    def get(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
@@ -87,49 +89,49 @@ class InMemoryCache(Cache):
                 self.cache[key] = old_value
             self.deque.appendleft(key)
 
-
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> bool:
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> bool:
         """Delete all entries for a given conversation.
-        
+
         Args:
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             skip_user_id_check: Skip user_id suid check.
-            
+
         Returns:
             bool: True if entries were deleted, False if key wasn't found.
         """
-        key = super().construct_key(user_id, conversation_id,skip_user_id_check)
-        
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
+
         with self._lock:
             if key not in self.cache:
                 return False
-                
+
             # Remove from both cache and deque
             del self.cache[key]
             self.deque.remove(key)
             return True
-        
 
-    def list(self, user_id: str, skip_user_id_check: bool=False) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
         """List all conversations for a given user_id.
-        
+
         Args:
             user_id: User identification.
             skip_user_id_check: Skip user_id suid check.
-            
+
         Returns:
             A list of conversation ids from the cache
         """
         conversation_ids = []
         super()._check_user_id(user_id, skip_user_id_check)
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
-        
+
         with self._lock:
             for key in self.cache.keys():
                 if key.startswith(prefix):
                     # Extract conversation_id from the key
-                    conversation_id = key[len(prefix):]
+                    conversation_id = key[len(prefix) :]
                     conversation_ids.append(conversation_id)
-        
+
         return conversation_ids

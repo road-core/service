@@ -1,6 +1,8 @@
 """Mock for StrictRedis client."""
 
 import fnmatch
+
+
 class MockRedisClient:
     """Mock for StrictRedis client.
 
@@ -51,12 +53,14 @@ class MockRedisClient:
             del self.cache[key]
             return True  # successfuly deleted, return True
         return False  # Key did not exist, return False
-    
+
     def keys(self, pattern):
         """List keys matching a given pattern (implementation of KEYS command)."""
         # real Redis accepts patterns as strings only
         assert isinstance(pattern, str)
 
         # Use fnmatch to match keys against the pattern
-        matching_keys = [key for key in self.cache.keys() if fnmatch.fnmatch(key, pattern)]
+        matching_keys = [
+            key for key in self.cache.keys() if fnmatch.fnmatch(key, pattern)
+        ]
         return matching_keys

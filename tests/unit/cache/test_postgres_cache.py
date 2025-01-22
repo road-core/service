@@ -7,7 +7,7 @@ import psycopg2
 import pytest
 
 from ols.app.models.config import PostgresConfig
-from ols.app.models.models import CacheEntry, MessageEncoder,MessageDecoder
+from ols.app.models.models import CacheEntry, MessageEncoder, MessageDecoder
 from ols.src.cache.cache_error import CacheError
 from ols.src.cache.postgres_cache import PostgresCache
 from ols.utils import suid
@@ -15,8 +15,12 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 user_id = suid.get_suid()
 conversation_id = suid.get_suid()
-cache_entry_1 = CacheEntry(query=HumanMessage("用户消息"), response=AIMessage("人工智能信息"))
-cache_entry_2 = CacheEntry(query=HumanMessage("user message"), response=AIMessage("ai message"))
+cache_entry_1 = CacheEntry(
+    query=HumanMessage("用户消息"), response=AIMessage("人工智能信息")
+)
+cache_entry_2 = CacheEntry(
+    query=HumanMessage("user message"), response=AIMessage("ai message")
+)
 
 
 @patch("psycopg2.connect")

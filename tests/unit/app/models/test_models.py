@@ -353,14 +353,18 @@ class TestCacheEntry:
         assert cache_entry.query == HumanMessage("query")
         assert cache_entry.response == AIMessage("")
 
-        cache_entry = CacheEntry(query=HumanMessage("query"), response=AIMessage("response"))
+        cache_entry = CacheEntry(
+            query=HumanMessage("query"), response=AIMessage("response")
+        )
         assert cache_entry.query == HumanMessage("query")
         assert cache_entry.response == AIMessage("response")
 
     @staticmethod
     def test_to_dict():
         """Test the to_dict method of the CacheEntry model."""
-        cache_entry = CacheEntry(query=HumanMessage("query"),response=AIMessage("response"))
+        cache_entry = CacheEntry(
+            query=HumanMessage("query"), response=AIMessage("response")
+        )
         assert cache_entry.to_dict() == {
             "human_query": HumanMessage("query"),
             "ai_response": AIMessage("response"),
@@ -405,7 +409,10 @@ class TestCacheEntry:
     def test_cache_entries_to_history_no_whitespace():
         """Test content is stripped."""
         cache_entries = [
-            CacheEntry(query=HumanMessage("\ngood\nmorning\n"), response=AIMessage("\ngood\nnight\n")),
+            CacheEntry(
+                query=HumanMessage("\ngood\nmorning\n"),
+                response=AIMessage("\ngood\nnight\n"),
+            ),
         ]
         history = CacheEntry.cache_entries_to_history(cache_entries)
         assert history == [

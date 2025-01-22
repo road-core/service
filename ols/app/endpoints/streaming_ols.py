@@ -92,7 +92,7 @@ def conversation_request(
         attachments,
         valid,
         timestamps,
-        skip_user_id_check
+        skip_user_id_check,
     ) = process_request(auth, llm_request)
 
     summarizer_response = (
@@ -268,7 +268,7 @@ def store_data(
     rag_chunks: list[RagChunk],
     history_truncated: bool,
     timestamps: dict[str, float],
-    skip_user_id_check: bool
+    skip_user_id_check: bool,
 ) -> None:
     """Store conversation history and transcript if enabled.
 

@@ -189,7 +189,9 @@ class TokenHandler:
         for original_message in reversed(history):
             # Restructure messages as per model
             message = restructure_history(original_message, model)
-            message_length = TokenHandler._get_token_count(self.text_to_tokens(f"{message.type}: {message.content}"))
+            message_length = TokenHandler._get_token_count(
+                self.text_to_tokens(f"{message.type}: {message.content}")
+            )
             total_length += message_length
             # if total length of already checked messages is higher than limit
             # then skip all remaining messages (we need to skip from top)
@@ -200,4 +202,4 @@ class TokenHandler:
                 return formatted_history[::-1], True
             formatted_history.append(message)
 
-        return formatted_history[::-1], False # reverse back to original order
+        return formatted_history[::-1], False  # reverse back to original order

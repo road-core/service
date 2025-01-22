@@ -71,7 +71,9 @@ class RedisCache(Cache):
         self.redis_client.config_set("maxmemory", config.max_memory)
         self.redis_client.config_set("maxmemory-policy", config.max_memory_policy)
 
-    def get(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> list[CacheEntry]:
+    def get(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
@@ -88,14 +90,17 @@ class RedisCache(Cache):
         if value is None:
             return None
 
-        return [CacheEntry.from_dict(cache_entry) for cache_entry in json.loads(value, cls=MessageDecoder)]
+        return [
+            CacheEntry.from_dict(cache_entry)
+            for cache_entry in json.loads(value, cls=MessageDecoder)
+        ]
 
     def insert_or_append(
         self,
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
-        skip_user_id_check: bool=False,
+        skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
 
@@ -118,20 +123,27 @@ class RedisCache(Cache):
                 # self.redis_client.set(
                 #     key, json.dumps(old_value, default=lambda o: o.to_dict(), cls=MessageEncoder)
                 # )
-                self.redis_client.set(key, json.dumps([entry.to_dict() for entry in old_value], cls=MessageEncoder))
+                self.redis_client.set(
+                    key,
+                    json.dumps(
+                        [entry.to_dict() for entry in old_value], cls=MessageEncoder
+                    ),
+                )
             else:
-                self.redis_client.set(key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder))
-                
+                self.redis_client.set(
+                    key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder)
+                )
 
-
-    def delete(self, user_id: str, conversation_id: str, skip_user_id_check: bool=False) -> bool:
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> bool:
         """Delete conversation history for a given user_id and conversation_id.
-        
+
         Args:
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             skip_user_id_check: Skip user_id suid check.
-            
+
         Returns:
             bool: True if the conversation was deleted, False if not found.
         """
@@ -139,15 +151,13 @@ class RedisCache(Cache):
         # Redis del() returns the number of keys that were removed
         return bool(self.redis_client.delete(key))
 
-
-
-    def list(self, user_id: str, skip_user_id_check: bool=False) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
         """List all conversations for a given user_id.
-        
+
         Args:
             user_id: User identification.
             skip_user_id_check: Skip user_id suid check.
-            
+
         Returns:
             A list of conversation ids from the cache
         """
@@ -157,12 +167,12 @@ class RedisCache(Cache):
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
         pattern = f"{prefix}*"
         keys = self.redis_client.keys(pattern)
-        
+
         # Extract conversation_ids from the keys
         user_conversation_ids = []
         for key in keys:
             # Remove the prefix to get just the conversation_id
-            conversation_id = key[len(prefix):]
+            conversation_id = key[len(prefix) :]
             user_conversation_ids.append(conversation_id)
-            
+
         return user_conversation_ids

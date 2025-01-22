@@ -470,7 +470,11 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
         )
         assert response.status_code == requests.codes.ok
         chat_history_expected = [
-            CacheEntry(query=HumanMessage("Query1"), response=AIMessage("Query1"), attachments=[])
+            CacheEntry(
+                query=HumanMessage("Query1"),
+                response=AIMessage("Query1"),
+                attachments=[],
+            )
         ]
         assert actual_returned_history == chat_history_expected
 

@@ -222,6 +222,7 @@ def _extract_bearer_token(header: str) -> str:
 
 class AuthDependency(AuthDependencyInterface):
     """Create an AuthDependency Class that allows customizing the acces Scope path to check."""
+
     skip_userid_check = False
 
     def __init__(self, virtual_path: str = "/ols-access") -> None:
