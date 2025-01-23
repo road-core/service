@@ -304,25 +304,25 @@ def test_openapi_endpoint():
     ), "OpenAPI schema returned from service does not have expected content."
 
 
-def test_cache_existence(postgres_connection):
+def test_cache_existence(postgres_db_connection):
     """Test the cache existence."""
-    if postgres_connection is None:
+    if postgres_db_connection is None:
         pytest.skip("Postgres is not accessible.")
 
-    value = read_conversation_history_count(postgres_connection)
+    value = read_conversation_history_count(postgres_db_connection)
     # check if history exists at all
     assert value is not None
 
 
-def test_conversation_in_postgres_cache(postgres_connection) -> None:
+def test_conversation_in_postgres_cache(postgres_db_connection) -> None:
     """Check how/if the conversation is stored in cache."""
-    if postgres_connection is None:
+    if postgres_db_connection is None:
         pytest.skip("Postgres is not accessible.")
 
     cid = suid.get_suid()
     client_utils.perform_query(pytest.client, cid, "what is kubernetes?")
 
-    conversation, updated_at = read_conversation_history(postgres_connection, cid)
+    conversation, updated_at = read_conversation_history(postgres_db_connection, cid)
     assert conversation is not None
     assert updated_at is not None
 
@@ -342,7 +342,7 @@ def test_conversation_in_postgres_cache(postgres_connection) -> None:
     # second question
     client_utils.perform_query(pytest.client, cid, "what is openshift virtualization?")
 
-    conversation, updated_at = read_conversation_history(postgres_connection, cid)
+    conversation, updated_at = read_conversation_history(postgres_db_connection, cid)
     assert conversation is not None
 
     # unpickle conversation into list of messages
