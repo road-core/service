@@ -4,7 +4,7 @@ import logging
 from unittest.mock import ANY, call, patch
 
 import pytest
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config
 from ols.app.models.config import LoggingConfig
@@ -143,7 +143,7 @@ def test_prepare_prompt_context():
         return_value="patched_history",
     ) as restructure_history:
         summarizer.create_response(question, rag_index, history)
-        restructure_history.assert_has_calls([call("ai: sample", ANY)])
+        restructure_history.assert_has_calls([call(AIMessage("sample"), ANY)])
 
 
 @patch("ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None))
