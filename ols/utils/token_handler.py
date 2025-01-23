@@ -103,7 +103,7 @@ class TokenHandler:
             context_window_size - max_tokens_for_response - prompt_token_count
         )
 
-        if available_tokens <= 0:
+        if available_tokens < 0:
             limit = context_window_size - max_tokens_for_response
             raise PromptTooLongError(
                 f"Prompt length {prompt_token_count} exceeds LLM "
