@@ -11,7 +11,6 @@ from ols.app.models.models import CacheEntry, MessageDecoder, MessageEncoder
 from ols.src.cache.cache import Cache
 from ols.src.cache.cache_error import CacheError
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -78,14 +77,14 @@ class PostgresCache(Cache):
         """
 
     DELETE_SINGLE_CONVERSATION_STATEMENT = """
-        DELETE FROM cache 
+        DELETE FROM cache
          WHERE user_id=%s AND conversation_id=%s
         """
 
     LIST_CONVERSATIONS_STATEMENT = """
-        SELECT conversation_id 
-        FROM cache 
-        WHERE user_id=%s 
+        SELECT conversation_id
+        FROM cache
+        WHERE user_id=%s
         ORDER BY updated_at DESC
     """
 
@@ -209,6 +208,7 @@ class PostgresCache(Cache):
 
         Args:
             user_id: User identification.
+            skip_user_id_check: Skip user_id suid check.
 
         Returns:
             A list of conversation ids from the cache

@@ -3,9 +3,9 @@
 import logging
 from math import ceil
 
+from langchain_core.messages import BaseMessage
 from llama_index.core.schema import NodeWithScore
 from tiktoken import get_encoding
-from langchain_core.messages import BaseMessage
 
 from ols.app.models.models import RagChunk
 from ols.constants import (

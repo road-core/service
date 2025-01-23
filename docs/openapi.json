@@ -608,7 +608,7 @@
                                     "type": "human"
                                 },
                                 {
-                                    "content": " OpenShift is a container orchestration platform built by Red Hat...",
+                                    "content": "OpenShift is a container orchestration platform ...",
                                     "type": "ai"
                                 }
                             ]
@@ -630,7 +630,7 @@
                     "type": "object"
                 },
                 "ConversationDeletionResponse": {
-                    "description": "Model representing a response to a conversation deletion request.\n\n  Attributes:\n  response: The response of the conversation deletion request.\n\n  Example:\n    ```python\n    conversation_deletion_response = ConversationDeletionResponse(response='conversation deleted')\n    ```",
+                    "description": "Model representing a response to a conversation deletion request.\n\n  Attributes:\n  response: The response of the conversation deletion request.\n\n  Example:\n    ```python\n    response = ConversationDeletionResponse(response='conversation deleted')\n    ```",
                     "examples": [
                         {
                             "response": "conversation deleted"

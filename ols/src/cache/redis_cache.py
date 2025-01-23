@@ -6,13 +6,8 @@ from typing import Any, Optional
 
 import redis
 from redis.backoff import ExponentialBackoff
-from redis.exceptions import (
-    BusyLoadingError,
-    RedisError,
-)
-from redis.exceptions import (
-    ConnectionError as RedisConnectionError,
-)
+from redis.exceptions import BusyLoadingError, RedisError
+from redis.exceptions import ConnectionError as RedisConnectionError
 from redis.retry import Retry
 
 from ols.app.models.config import RedisConfig

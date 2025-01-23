@@ -28,7 +28,7 @@ async def test_noop_auth_dependency_call():
     # Check if the correct user info has been returned
     assert user_uid == DEFAULT_USER_UID
     assert username == DEFAULT_USER_NAME
-    assert skip_user_id_check == True
+    assert skip_user_id_check is True
 
 
 @pytest.mark.asyncio
@@ -44,7 +44,7 @@ async def test_noop_auth_dependency_call_disable_auth():
     # Check if the correct user info has been returned
     assert user_uid == DEFAULT_USER_UID
     assert username == DEFAULT_USER_NAME
-    assert skip_user_id_check == True
+    assert skip_user_id_check is True
 
 
 @pytest.mark.asyncio
@@ -66,4 +66,4 @@ async def test_noop_auth_dependency_call_with_user_id():
     # Check if the correct user info has been returned
     assert user_uid == user_id_in_request
     assert username == DEFAULT_USER_NAME
-    assert skip_user_id_check == True
+    assert skip_user_id_check is True

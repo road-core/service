@@ -10,9 +10,7 @@ from ols import config, constants
 # needs to be setup there before is_user_authorized is imported
 config.ols_config.authentication_config.module = "k8s"
 
-from ols.app.endpoints.authorized import (  # noqa:E402
-    is_user_authorized,
-)
+from ols.app.endpoints.authorized import is_user_authorized  # noqa:E402
 from ols.app.models.models import AuthorizationResponse  # noqa:E402
 from tests.mock_classes.mock_k8s_api import (  # noqa:E402
     mock_subject_access_review_response,

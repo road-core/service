@@ -4,8 +4,8 @@ import logging
 from typing import Any, AsyncGenerator, Optional
 
 from langchain.chains import LLMChain
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.prompts import ChatPromptTemplate
 from llama_index.core import VectorStoreIndex
 
 from ols import config
@@ -20,7 +20,6 @@ from ols.src.prompts.prompt_generator import (
 )
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
-
 
 logger = logging.getLogger(__name__)
 

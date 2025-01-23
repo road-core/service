@@ -65,7 +65,7 @@ async def test_auth_dependency_valid_token(mock_authz_api, mock_authn_api):
     # Check if the correct user info has been returned
     assert user_uid == "valid-uid"
     assert username == "valid-user"
-    assert skip_user_id_check == False
+    assert skip_user_id_check is False
 
 
 @pytest.mark.usefixtures("_setup")
@@ -126,7 +126,7 @@ async def test_cluster_id_is_used_for_kube_admin(mock_authz_api):
     # check if the correct user info has been returned
     assert user_uid == "some-cluster-id"
     assert username == "kube:admin"
-    assert skip_user_id_check == False
+    assert skip_user_id_check is False
 
 
 @pytest.mark.usefixtures("_setup")

@@ -27,7 +27,6 @@ def _setup():
 @pytest.mark.parametrize("endpoint", ("/conversations/{conversation_id}",))
 def test_get_conversation_with_history(_setup, endpoint):
     """Test getting conversation history after creating some chat history."""
-
     ml = mock_langchain_interface("test response")
     with (
         patch(

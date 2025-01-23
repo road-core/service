@@ -6,9 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from requests.exceptions import RequestException
 
-from ols.utils.pyroscope import (
-    start_with_pyroscope_enabled,
-)
+from ols.utils.pyroscope import start_with_pyroscope_enabled
 
 
 @pytest.fixture

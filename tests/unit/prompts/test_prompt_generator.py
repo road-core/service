@@ -10,11 +10,7 @@ from langchain.prompts import (
 )
 from langchain_core.messages import AIMessage, HumanMessage
 
-from ols.constants import (
-    GPT35_TURBO,
-    GRANITE_13B_CHAT_V2,
-    ModelFamily,
-)
+from ols.constants import GPT35_TURBO, GRANITE_13B_CHAT_V2, ModelFamily
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
     restructure_history,

@@ -1,7 +1,8 @@
 """Prompt generator based on model / context."""
 
 from copy import copy
-from langchain_core.messages import HumanMessage, BaseMessage
+
+from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,

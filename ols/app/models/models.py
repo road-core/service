@@ -231,7 +231,7 @@ class ChatHistoryResponse(BaseModel):
                             "type": "human",
                         },
                         {
-                            "content": " OpenShift is a container orchestration platform built by Red Hat...",
+                            "content": "OpenShift is a container orchestration platform ...",
                             "type": "ai",
                         },
                     ]
@@ -274,7 +274,7 @@ class ConversationDeletionResponse(BaseModel):
 
     Example:
         ```python
-        conversation_deletion_response = ConversationDeletionResponse(response="conversation deleted")
+        response = ConversationDeletionResponse(response="conversation deleted")
         ```
     """
 

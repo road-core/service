@@ -128,7 +128,7 @@ def test_prepare_prompt_context():
     """Basic test for DocsSummarizer to check re-structuring of context for the 'temp' prompt."""
     summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
     question = "What's the ultimate question with answer 42?"
-    history = ["human: What is Kubernetes?"]
+    history = [HumanMessage("What is Kubernetes?")]
     rag_index = MockLlamaIndex()
 
     with patch(

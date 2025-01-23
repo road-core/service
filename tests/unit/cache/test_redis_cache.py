@@ -7,7 +7,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import constants
 from ols.app.models.config import RedisConfig
-from ols.app.models.models import CacheEntry, MessageDecoder, MessageEncoder
+from ols.app.models.models import CacheEntry
 from ols.src.cache.redis_cache import RedisCache
 from ols.utils import suid
 from tests.mock_classes.mock_redis_client import MockRedisClient
