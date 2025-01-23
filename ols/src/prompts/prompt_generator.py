@@ -14,6 +14,11 @@ from ols.constants import ModelFamily
 from ols.customize import prompts
 
 
+def restructure_rag_context(text: str, model: str) -> str:
+    """Restructure rag text by appending special characters.."""
+    return restructure_rag_context_post(restructure_rag_context_pre(text, model), model)
+
+
 def restructure_rag_context_pre(text: str, model: str) -> str:
     """Restructure rag text - pre truncation."""
     if ModelFamily.GRANITE in model:

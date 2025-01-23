@@ -510,6 +510,10 @@
                     "username": {
                         "type": "string",
                         "title": "Username"
+                    },
+                    "skip_user_id_check": {
+                        "type": "boolean",
+                        "title": "Skip User Id Check"
                     }
                 },
                 "type": "object",
@@ -518,14 +522,132 @@
                     "username"
                 ],
                 "title": "AuthorizationResponse",
-                "description": "Model representing a response to an authorization request.\n\nAttributes:\n    user_id: The ID of the logged in user.\n    username: The name of the logged in user.",
+                "description": "Model representing a response to an authorization request.\n\nAttributes:\n    user_id: The ID of the logged in user.\n    username: The name of the logged in user.\n   skip_user_id_check: Skip user_id suid check.",
                 "examples": [
                     {
                         "user_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "username": "user1"
+                        "username": "user1",
+                        "skip_user_id_check": false
                     }
                 ]
             },
+            "BaseMessage": {
+                    "additionalProperties": true,
+                    "description": "Base abstract message class.\n\n  Messages are the inputs and outputs of ChatModels.",
+                    "properties": {
+                        "additional_kwargs": {
+                            "title": "Additional Kwargs",
+                            "type": "object"
+                        },
+                        "content": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "object"
+                                            }
+                                        ]
+                                    },
+                                    "type": "array"
+                                }
+                            ],
+                            "title": "Content"
+                        },
+                        "id": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Id"
+                        },
+                        "name": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Name"
+                        },
+                        "response_metadata": {
+                            "title": "Response Metadata",
+                            "type": "object"
+                        },
+                        "type": {
+                            "title": "Type",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "content",
+                        "type"
+                    ],
+                    "title": "BaseMessage",
+                    "type": "object"
+                },
+                "ChatHistoryResponse": {
+                    "description": "Model representing a response to a list conversation request.\n\n  Attributes:\n    chat_history: List of conversation messages.",
+                    "examples": [
+                        {
+                            "chat_history": [
+                                {
+                                    "content": "what is openshift",
+                                    "type": "human"
+                                },
+                                {
+                                    "content": " OpenShift is a container orchestration platform built by Red Hat...",
+                                    "type": "ai"
+                                }
+                            ]
+                        }
+                    ],
+                    "properties": {
+                        "chat_history": {
+                            "items": {
+                                "$ref": "#/components/schemas/BaseMessage"
+                            },
+                            "title": "Chat History",
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "chat_history"
+                    ],
+                    "title": "ChatHistoryResponse",
+                    "type": "object"
+                },
+                "ConversationDeletionResponse": {
+                    "description": "Model representing a response to a conversation deletion request.\n\n  Attributes:\n  response: The response of the conversation deletion request.\n\n  Example:\n    ```python\n    conversation_deletion_response = ConversationDeletionResponse(response='conversation deleted')\n    ```",
+                    "examples": [
+                        {
+                            "response": "conversation deleted"
+                        }
+                    ],
+                    "properties": {
+                        "response": {
+                            "title": "Response",
+                         "type": "string"
+                      }
+                 },
+                "required": [
+                    "response"
+                 ],
+                "title": "ConversationDeletionResponse",
+                "type": "object"
+           },
             "ErrorResponse": {
                 "properties": {
                     "detail": {
