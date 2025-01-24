@@ -34,6 +34,7 @@ def get_model_response(query, provider, model, mode, api_client=None):
     provider_config = config.config.llm_providers.providers[provider]
     model_config = provider_config.models[model]
     llm = VANILLA_MODEL[provider_config.type](model, provider_config).load()
+
     if mode == "ols_param":
         max_resp_tokens = model_config.parameters.max_tokens_for_response
         override_params = {
@@ -49,5 +50,6 @@ def get_model_response(query, provider, model, mode, api_client=None):
         prompt, prompt_input = GeneratePrompt(
             query, rag_chunks, [], BASIC_PROMPT
         ).generate_prompt(model)
+
     llm_chain = LLMChain(llm=llm, prompt=prompt, verbose=True)
     return llm_chain(inputs=prompt_input)["text"].strip()

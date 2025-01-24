@@ -23,18 +23,12 @@ llm_providers:
     credentials_path: ols_api_key.txt
     models:
       - name: granite3-8b
-  # - name: my_rhoai
-  #   type: openai
-  #   url: "https://granite3-1-8b-wisdom-model-staging.apps.stage2-west.v2dz.p1.openshiftapps.com/v1"
-  #   credentials_path: rhoai_api_key.txt
-  #   models:
-  #     - name: granite3-1-8b
 ols_config:
   # max_workers: 1
   reference_content:
-    product_docs_index_path: "./vector_db/vector_db/aap_product_docs/2.5"
-    product_docs_index_id: aap-product-docs-2_5
-    embeddings_model_path: "./vector_db/embeddings_model"
+    # product_docs_index_path: "./vector_db/vector_db/aap_product_docs/2.5"
+    # product_docs_index_id: aap-product-docs-2_5
+    # embeddings_model_path: "./vector_db/embeddings_model"
   conversation_cache:
     type: memory
     memory:
