@@ -26,7 +26,9 @@ def read_version_from_pyproject():
     # the PDM tool itself is able to retrieve the version, even if the version
     # is generated dynamically
     completed = subprocess.run(  # noqa: S603
-        ["pdm", "show", "--version"], capture_output=True, check=True  # noqa: S607
+        ["pdm", "show", "--version"],
+        capture_output=True,
+        check=True,  # noqa: S607
     )
     return completed.stdout.decode("utf-8").strip()
 

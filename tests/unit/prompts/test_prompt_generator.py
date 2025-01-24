@@ -8,12 +8,9 @@ from langchain.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
+from langchain_core.messages import AIMessage, HumanMessage
 
-from ols.constants import (
-    GPT35_TURBO,
-    GRANITE_13B_CHAT_V2,
-    ModelFamily,
-)
+from ols.constants import GPT35_TURBO, GRANITE_13B_CHAT_V2, ModelFamily
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
     restructure_history,
@@ -27,7 +24,10 @@ Answer user queries in the context of openshift.
 """
 query = "What is Kubernetes?"
 rag_context = ["context 1", "context 2"]
-conversation_history = ["human: First human message", "ai: First AI message"]
+conversation_history = [
+    HumanMessage("First human message"),
+    AIMessage("First AI message"),
+]
 
 
 def _restructure_prompt_input(rag_context, conversation_history, model):
@@ -311,7 +311,5 @@ def test_generate_prompt_without_rag_without_history(model):
             "Answer user queries in the context of openshift.\n"
         )
         assert prompt.format(**llm_input_values) == (
-            "System: Answer user queries in the context of openshift.\n"
-            "\n"
-            f"Human: {query}"
+            f"System: Answer user queries in the context of openshift.\n\nHuman: {query}"
         )

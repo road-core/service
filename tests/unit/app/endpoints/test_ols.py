@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from fastapi import HTTPException
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
 from ols.app.endpoints import ols
@@ -37,7 +38,7 @@ def _load_config():
 def auth():
     """Tuple containing user ID and user name, mocking auth. output."""
     # we can use any UUID, so let's use randomly generated one
-    return ("2a3dfd17-1f42-4831-aaa6-e28e7cb8e26b", "name")
+    return ("2a3dfd17-1f42-4831-aaa6-e28e7cb8e26b", "name", False)
 
 
 @pytest.mark.usefixtures("_load_config")
@@ -61,7 +62,9 @@ def test_retrieve_conversation_id_existing_id():
 def test_retrieve_previous_input_no_previous_history():
     """Check how function to retrieve previous input handle empty history."""
     llm_request = LLMRequest(query="Tell me about Kubernetes", conversation_id=None)
-    llm_input = ols.retrieve_previous_input(constants.DEFAULT_USER_UID, llm_request)
+    llm_input = ols.retrieve_previous_input(
+        constants.DEFAULT_USER_UID, llm_request.conversation_id
+    )
     assert llm_input == []
 
 
@@ -74,9 +77,9 @@ def test_retrieve_previous_input_empty_user_id():
     )
     # cache must check if user ID is correct
     with pytest.raises(HTTPException, match="Invalid user ID"):
-        ols.retrieve_previous_input("", llm_request)
+        ols.retrieve_previous_input("", llm_request.conversation_id)
     with pytest.raises(HTTPException, match="Invalid user ID"):
-        ols.retrieve_previous_input(None, llm_request)
+        ols.retrieve_previous_input(None, llm_request.conversation_id)
 
 
 @pytest.mark.usefixtures("_load_config")
@@ -88,7 +91,7 @@ def test_retrieve_previous_input_improper_user_id():
     )
     # cache must check if user ID is correct
     with pytest.raises(HTTPException, match="Invalid user ID improper_user_id"):
-        ols.retrieve_previous_input("improper_user_id", llm_request)
+        ols.retrieve_previous_input("improper_user_id", llm_request.conversation_id)
 
 
 @pytest.mark.usefixtures("_load_config")
@@ -101,7 +104,7 @@ def test_retrieve_previous_input_for_previous_history(get):
         query="Tell me about Kubernetes", conversation_id=conversation_id
     )
     previous_input = ols.retrieve_previous_input(
-        constants.DEFAULT_USER_UID, llm_request
+        constants.DEFAULT_USER_UID, llm_request.conversation_id
     )
     assert previous_input == "input"
 
@@ -207,17 +210,20 @@ def test_retrieve_attachments_on_improper_content_type():
 def test_store_conversation_history(insert_or_append):
     """Test if operation to store conversation history to cache is called."""
     conversation_id = suid.get_suid()
+    skip_user_id_check = False
     query = "Tell me about Kubernetes"
     llm_request = LLMRequest(query=query)
-    response = ""
 
     ols.store_conversation_history(
-        constants.DEFAULT_USER_UID, conversation_id, llm_request, response, []
+        constants.DEFAULT_USER_UID, conversation_id, llm_request, "", []
     )
 
-    expected_history = CacheEntry(query="Tell me about Kubernetes")
+    expected_history = CacheEntry(query=HumanMessage(query))
     insert_or_append.assert_called_with(
-        constants.DEFAULT_USER_UID, conversation_id, expected_history
+        constants.DEFAULT_USER_UID,
+        conversation_id,
+        expected_history,
+        skip_user_id_check,
     )
 
 
@@ -230,13 +236,16 @@ def test_store_conversation_history_some_response(insert_or_append):
     query = "Tell me about Kubernetes"
     llm_request = LLMRequest(query=query)
     response = "*response*"
+    skip_user_id_check = False
 
     ols.store_conversation_history(user_id, conversation_id, llm_request, response, [])
 
     expected_history = CacheEntry(
-        query="Tell me about Kubernetes", response="*response*"
+        query=HumanMessage(query), response=AIMessage(response)
     )
-    insert_or_append.assert_called_with(user_id, conversation_id, expected_history)
+    insert_or_append.assert_called_with(
+        user_id, conversation_id, expected_history, skip_user_id_check
+    )
 
 
 @pytest.mark.usefixtures("_load_config")
@@ -746,7 +755,7 @@ def test_question_validation_in_conversation_start(auth):
 @pytest.mark.usefixtures("_load_config")
 @patch(
     "ols.app.endpoints.ols.retrieve_previous_input",
-    new=Mock(return_value=[CacheEntry(query="some question")]),
+    new=Mock(return_value=[CacheEntry(query=HumanMessage("some question"))]),
 )
 @patch(
     "ols.app.endpoints.ols.validate_question",

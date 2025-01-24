@@ -4,6 +4,7 @@ import logging
 from typing import Any, AsyncGenerator, Optional
 
 from langchain.chains import LLMChain
+from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 from llama_index.core import VectorStoreIndex
 
@@ -58,7 +59,7 @@ class DocsSummarizer(QueryHelper):
         self,
         query: str,
         vector_index: Optional[VectorStoreIndex] = None,
-        history: Optional[list[str]] = None,
+        history: Optional[list[BaseMessage]] = None,
     ) -> tuple[ChatPromptTemplate, dict[str, str], list[RagChunk], bool]:
         """Summarize the given query based on the provided conversation context.
 
@@ -71,6 +72,10 @@ class DocsSummarizer(QueryHelper):
             A tuple containing the final prompt, input values, RAG chunks,
             and a flag for truncated history.
         """
+        # if history is not provided, initialize to empty history
+        if history is None:
+            history = []
+
         settings_string = (
             f"query: {query}, "
             f"provider: {self.provider}, "
@@ -88,10 +93,9 @@ class DocsSummarizer(QueryHelper):
             # to ensure the further right available token calculation.
             query,
             [restructure_rag_context("sample", self.model)],
-            [restructure_history("ai: sample", self.model)],
+            [restructure_history(AIMessage("sample"), self.model)],
             self._system_prompt,
         ).generate_prompt(self.model)
-
         available_tokens = token_handler.calculate_and_check_available_tokens(
             temp_prompt.format(**temp_prompt_input),
             self.model_config.context_window_size,
@@ -144,6 +148,7 @@ class DocsSummarizer(QueryHelper):
             query, vector_index, history
         )
 
+        print(final_prompt.format(**llm_input_values))
         chat_engine = LLMChain(
             llm=self.bare_llm,
             prompt=final_prompt,
@@ -159,7 +164,6 @@ class DocsSummarizer(QueryHelper):
                 input=llm_input_values,
                 config={"callbacks": [generic_token_counter]},
             )
-
         # retrieve text response returned from LLM, strip whitespace characters from beginning/end
         response = summary["text"].strip()
         # TODO: Better handling of stop token.

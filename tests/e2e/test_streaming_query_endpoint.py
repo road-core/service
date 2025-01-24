@@ -20,7 +20,7 @@ STREAMING_QUERY_ENDPOINT = "/v1/streaming_query"
 
 def parse_streaming_response_to_events(response: str) -> list[dict]:
     """Parse streaming response to events."""
-    return json.loads(f'[{response.replace("}{", "},{")}]')
+    return json.loads(f"[{response.replace('}{', '},{')}]")
 
 
 def construct_response_from_streamed_events(events: dict) -> str:

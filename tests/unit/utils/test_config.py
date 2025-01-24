@@ -411,8 +411,7 @@ ols_config:
       password_path: pwd123
 """,
         InvalidConfigurationError,
-        "memory conversation cache type is specified,"
-        " but memory configuration is missing",
+        "memory conversation cache type is specified, but memory configuration is missing",
     )
 
     check_expected_exception(
@@ -460,8 +459,7 @@ ols_config:
       max_entries: 1000
 """,
         InvalidConfigurationError,
-        "redis conversation cache type is specified,"
-        " but redis configuration is missing",
+        "redis conversation cache type is specified, but redis configuration is missing",
     )
 
     check_expected_exception(

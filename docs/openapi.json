@@ -1,1035 +1,1380 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Swagger Road-core service - OpenAPI",
-        "description": "Road-core service API specification.",
-        "version": "0.2.1"
+      "title": "Swagger Road-core service - OpenAPI",
+      "description": "Road-core service API specification.",
+      "version": "0.2.1"
     },
     "paths": {
-        "/v1/query": {
-            "post": {
-                "tags": [
-                    "query"
+      "/v1/query": {
+        "post": {
+          "tags": [
+            "query"
+          ],
+          "summary": "Conversation Request",
+          "description": "Handle conversation requests for the OLS endpoint.\n\nArgs:\n    llm_request: The request containing a query, conversation ID, and optional attachments.\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n    user_id: Optional user ID used only when no-op auth is enabled.\n\nReturns:\n    Response containing the processed information.",
+          "operationId": "conversation_request_v1_query_post",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
-                "summary": "Conversation Request",
-                "description": "Handle conversation requests for the OLS endpoint.\n\nArgs:\n    llm_request: The request containing a query, conversation ID, and optional attachments.\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n    user_id: Optional user ID used only when no-op auth is enabled.\n\nReturns:\n    Response containing the processed information.",
-                "operationId": "conversation_request_v1_query_post",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "null"
-                                }
-                            ],
-                            "title": "User Id"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LLMRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Query is valid and correct response from LLM is returned",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LLMResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials provided by client",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UnauthorizedResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Client does not have permission to access resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ForbiddenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "413": {
-                        "description": "Prompt is too long",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PromptTooLongResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Query can not be validated, LLM is not accessible or other internal error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
+                "title": "User Id"
+              }
             }
-        },
-        "/v1/streaming_query": {
-            "post": {
-                "tags": [
-                    "streaming_query"
-                ],
-                "summary": "Conversation Request",
-                "description": "Handle conversation requests for the OLS endpoint.\n\nArgs:\n    llm_request: The incoming request containing query details.\n    auth: The authentication context, provided by dependency injection.\n    user_id: Optional user ID used only when no-op auth is enabled.\n\nReturns:\n    StreamingResponse: The streaming response generated for the query.",
-                "operationId": "conversation_request_v1_streaming_query_post",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "null"
-                                }
-                            ],
-                            "title": "User Id"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LLMRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Query is valid and stream/events from endpoint is returned",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "string",
-                                    "title": "Response 200 Conversation Request V1 Streaming Query Post"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials provided by client",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UnauthorizedResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Client does not have permission to access resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ForbiddenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "413": {
-                        "description": "Prompt is too long",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PromptTooLongResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Query can not be validated, LLM is not accessible or other internal error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMRequest"
                 }
+              }
             }
-        },
-        "/v1/feedback/status": {
-            "get": {
-                "tags": [
-                    "feedback"
-                ],
-                "summary": "Feedback Status",
-                "description": "Handle feedback status requests.\n\nReturns:\n    Response indicating the status of the feedback.",
-                "operationId": "feedback_status_v1_feedback_status_get",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/StatusResponse"
-                                }
-                            }
-                        }
-                    }
+          },
+          "responses": {
+            "200": {
+              "description": "Query is valid and correct response from LLM is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LLMResponse"
+                  }
                 }
-            }
-        },
-        "/v1/feedback": {
-            "post": {
-                "tags": [
-                    "feedback"
-                ],
-                "summary": "Store User Feedback",
-                "description": "Handle feedback requests.\n\nArgs:\n    feedback_request: The request containing feedback information.\n    ensure_feedback_enabled: The feedback handler (FastAPI Depends) that\n        will handle feedback status checks.\n    auth: The Authentication handler (FastAPI Depends) that will\n        handle authentication Logic.\n\nReturns:\n    Response indicating the status of the feedback storage request.",
-                "operationId": "store_user_feedback_v1_feedback_post",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/FeedbackRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Feedback received and stored",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FeedbackResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials provided by client",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UnauthorizedResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Client does not have permission to access resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ForbiddenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "User feedback can not be stored",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
                 }
-            }
-        },
-        "/readiness": {
-            "get": {
-                "tags": [
-                    "health"
-                ],
-                "summary": "Readiness Probe Get Method",
-                "description": "Ready status of service.",
-                "operationId": "readiness_probe_get_method_readiness_get",
-                "responses": {
-                    "200": {
-                        "description": "Service is ready",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ReadinessResponse"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Service is not ready",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/NotAvailableResponse"
-                                }
-                            }
-                        }
-                    }
+              }
+            },
+            "403": {
+              "description": "Client does not have permission to access resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
                 }
-            }
-        },
-        "/liveness": {
-            "get": {
-                "tags": [
-                    "health"
-                ],
-                "summary": "Liveness Probe Get Method",
-                "description": "Live status of service.",
-                "operationId": "liveness_probe_get_method_liveness_get",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LivenessResponse"
-                                }
-                            }
-                        }
-                    }
+              }
+            },
+            "413": {
+              "description": "Prompt is too long",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/PromptTooLongResponse"
+                  }
                 }
-            }
-        },
-        "/metrics": {
-            "get": {
-                "tags": [
-                    "metrics"
-                ],
-                "summary": "Get Metrics",
-                "description": "Metrics Endpoint.\n\nArgs:\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n\nReturns:\n    Response containing the latest metrics.",
-                "operationId": "get_metrics_metrics_get",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
                 }
-            }
-        },
-        "/authorized": {
-            "post": {
-                "tags": [
-                    "authorized"
-                ],
-                "summary": "Is User Authorized",
-                "description": "Validate if the logged-in user is authorized to access OLS.\n\nParameters:\n    request (Request): The FastAPI request object.\n\nReturns:\n    The user's UID and username if authentication and authorization succeed.\n\nRaises:\n    HTTPException: If authentication fails or the user does not have access.",
-                "operationId": "is_user_authorized_authorized_post",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "null"
-                                }
-                            ],
-                            "title": "User Id"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The user is logged-in and authorized to access OLS",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthorizationResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials provided by client",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UnauthorizedResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "User is not authorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ForbiddenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Unexpected error during token review",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
+              }
+            },
+            "500": {
+              "description": "Query can not be validated, LLM is not accessible or other internal error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
                 }
+              }
             }
+          }
         }
+      },
+      "/v1/streaming_query": {
+        "post": {
+          "tags": [
+            "streaming_query"
+          ],
+          "summary": "Conversation Request",
+          "description": "Handle conversation requests for the OLS endpoint.\n\nArgs:\n    llm_request: The incoming request containing query details.\n    auth: The authentication context, provided by dependency injection.\n    user_id: Optional user ID used only when no-op auth is enabled.\n\nReturns:\n    StreamingResponse: The streaming response generated for the query.",
+          "operationId": "conversation_request_v1_streaming_query_post",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "User Id"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Query is valid and stream/events from endpoint is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string",
+                    "title": "Response 200 Conversation Request V1 Streaming Query Post"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Client does not have permission to access resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
+                }
+              }
+            },
+            "413": {
+              "description": "Prompt is too long",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/PromptTooLongResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Query can not be validated, LLM is not accessible or other internal error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/v1/feedback/status": {
+        "get": {
+          "tags": [
+            "feedback"
+          ],
+          "summary": "Feedback Status",
+          "description": "Handle feedback status requests.\n\nReturns:\n    Response indicating the status of the feedback.",
+          "operationId": "feedback_status_v1_feedback_status_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/v1/feedback": {
+        "post": {
+          "tags": [
+            "feedback"
+          ],
+          "summary": "Store User Feedback",
+          "description": "Handle feedback requests.\n\nArgs:\n    feedback_request: The request containing feedback information.\n    ensure_feedback_enabled: The feedback handler (FastAPI Depends) that\n        will handle feedback status checks.\n    auth: The Authentication handler (FastAPI Depends) that will\n        handle authentication Logic.\n\nReturns:\n    Response indicating the status of the feedback storage request.",
+          "operationId": "store_user_feedback_v1_feedback_post",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Feedback received and stored",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/FeedbackResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Client does not have permission to access resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "User feedback can not be stored",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/conversations/{conversation_id}": {
+        "get": {
+          "tags": [
+            "conversations"
+          ],
+          "summary": "Get Conversation",
+          "description": "Get conversation history for a given conversation ID.\n\nArgs:\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n    conversation_id: The conversation ID to retrieve.\n    user_id: (Optional)The user ID to retrieve the conversation for.\n\nReturns:\n    List of conversation messages.",
+          "operationId": "get_conversation_conversations__conversation_id__get",
+          "parameters": [
+            {
+              "name": "conversation_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "title": "Conversation Id"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Request is valid and chat history is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ChatHistoryResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Client does not have permission to access resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Conversation history is not accessible or other internal error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "conversations"
+          ],
+          "summary": "Delete Conversation",
+          "description": "Delete conversation history for a given conversation ID.\n\nArgs:\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n    conversation_id: The conversation ID to delete.\n    user_id: (Optional)The user ID to delete the conversation for.",
+          "operationId": "delete_conversation_conversations__conversation_id__delete",
+          "parameters": [
+            {
+              "name": "conversation_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "title": "Conversation Id"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Request is valid and conversation is deleted",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ConversationDeletionResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Client does not have permission to access resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Conversation history is not accessible or other internal error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/conversations": {
+        "get": {
+          "tags": [
+            "conversations"
+          ],
+          "summary": "List Conversations",
+          "description": "List all conversations for a given user.\n\nArgs:\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n    user_id: (Optional)The user ID to get all conversations for.",
+          "operationId": "list_conversations_conversations_get",
+          "responses": {
+            "200": {
+              "description": "Request is valid and a list of conversations is returned",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ListConversationsResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Client does not have permission to access resource",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Conversation history is not accessible or other internal error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/readiness": {
+        "get": {
+          "tags": [
+            "health"
+          ],
+          "summary": "Readiness Probe Get Method",
+          "description": "Ready status of service.",
+          "operationId": "readiness_probe_get_method_readiness_get",
+          "responses": {
+            "200": {
+              "description": "Service is ready",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ReadinessResponse"
+                  }
+                }
+              }
+            },
+            "503": {
+              "description": "Service is not ready",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/NotAvailableResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/liveness": {
+        "get": {
+          "tags": [
+            "health"
+          ],
+          "summary": "Liveness Probe Get Method",
+          "description": "Live status of service.",
+          "operationId": "liveness_probe_get_method_liveness_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LivenessResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/metrics": {
+        "get": {
+          "tags": [
+            "metrics"
+          ],
+          "summary": "Get Metrics",
+          "description": "Metrics Endpoint.\n\nArgs:\n    auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.\n\nReturns:\n    Response containing the latest metrics.",
+          "operationId": "get_metrics_metrics_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "text/plain": {
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/authorized": {
+        "post": {
+          "tags": [
+            "authorized"
+          ],
+          "summary": "Is User Authorized",
+          "description": "Validate if the logged-in user is authorized to access OLS.\n\nParameters:\n    request (Request): The FastAPI request object.\n\nReturns:\n    The user's UID and username if authentication and authorization succeed.\n\nRaises:\n    HTTPException: If authentication fails or the user does not have access.",
+          "operationId": "is_user_authorized_authorized_post",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "User Id"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The user is logged-in and authorized to access OLS",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/AuthorizationResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Missing or invalid credentials provided by client",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedResponse"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "User is not authorized",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ForbiddenResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Unexpected error during token review",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "components": {
-        "schemas": {
-            "Attachment": {
-                "properties": {
-                    "attachment_type": {
-                        "type": "string",
-                        "title": "Attachment Type"
-                    },
-                    "content_type": {
-                        "type": "string",
-                        "title": "Content Type"
-                    },
-                    "content": {
-                        "type": "string",
-                        "title": "Content"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "attachment_type",
-                    "content_type",
-                    "content"
-                ],
-                "title": "Attachment",
-                "description": "Model representing an attachment that can be send from UI as part of query.\n\nList of attachments can be optional part of 'query' request.\n\nAttributes:\n    attachment_type: The attachment type, like \"log\", \"configuration\" etc.\n    content_type: The content type as defined in MIME standard\n    content: The actual attachment content\n\nYAML attachments with **kind** and **metadata/name** attributes will\nbe handled as resources with specified name:\n```\nkind: Pod\nmetadata:\n    name: private-reg\n```",
-                "examples": [
-                    {
-                        "attachment_type": "log",
-                        "content": "this is attachment",
-                        "content_type": "text/plain"
-                    },
-                    {
-                        "attachment_type": "configuration",
-                        "content": "kind: Pod\n metadata:\n name:    private-reg",
-                        "content_type": "application/yaml"
-                    },
-                    {
-                        "attachment_type": "configuration",
-                        "content": "foo: bar",
-                        "content_type": "application/yaml"
-                    }
-                ]
+      "schemas": {
+        "Attachment": {
+          "properties": {
+            "attachment_type": {
+              "type": "string",
+              "title": "Attachment Type"
             },
-            "AuthorizationResponse": {
-                "properties": {
-                    "user_id": {
-                        "type": "string",
-                        "title": "User Id"
-                    },
-                    "username": {
-                        "type": "string",
-                        "title": "Username"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "user_id",
-                    "username"
-                ],
-                "title": "AuthorizationResponse",
-                "description": "Model representing a response to an authorization request.\n\nAttributes:\n    user_id: The ID of the logged in user.\n    username: The name of the logged in user.",
-                "examples": [
-                    {
-                        "user_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "username": "user1"
-                    }
-                ]
+            "content_type": {
+              "type": "string",
+              "title": "Content Type"
             },
-            "ErrorResponse": {
-                "properties": {
-                    "detail": {
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "type": "object",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "detail"
-                ],
-                "title": "ErrorResponse",
-                "description": "Model representing error response for query endpoint.",
-                "examples": [
-                    {
-                        "detail": {
-                            "cause": "Failed to handle request to https://bam-api.res.ibm.com/v2/text",
-                            "response": "Error while validation question"
-                        }
-                    },
-                    {
-                        "detail": {
-                            "cause": "Invalid conversation ID 1237-e89b-12d3-a456-426614174000",
-                            "response": "Error retrieving conversation history"
-                        }
-                    }
-                ]
-            },
-            "FeedbackRequest": {
-                "properties": {
-                    "conversation_id": {
-                        "type": "string",
-                        "title": "Conversation Id"
-                    },
-                    "user_question": {
-                        "type": "string",
-                        "title": "User Question"
-                    },
-                    "llm_response": {
-                        "type": "string",
-                        "title": "Llm Response"
-                    },
-                    "sentiment": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Sentiment"
-                    },
-                    "user_feedback": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "User Feedback"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "conversation_id",
-                    "user_question",
-                    "llm_response"
-                ],
-                "title": "FeedbackRequest",
-                "description": "Model representing a feedback request.\n\nAttributes:\n    conversation_id: The required conversation ID (UUID).\n    user_question: The required user question.\n    llm_response: The required LLM response.\n    sentiment: The optional sentiment.\n    user_feedback: The optional user feedback.\n\nExample:\n    ```python\n    feedback_request = FeedbackRequest(\n        conversation_id=\"12345678-abcd-0000-0123-456789abcdef\",\n        user_question=\"what are you doing?\",\n        user_feedback=\"Great service!\",\n        llm_response=\"I don't know\",\n        sentiment=-1,\n    )\n    ```",
-                "examples": [
-                    {
-                        "conversation_id": "12345678-abcd-0000-0123-456789abcdef",
-                        "llm_response": "bar",
-                        "sentiment": 1,
-                        "user_feedback": "Great service!",
-                        "user_question": "foo"
-                    }
-                ]
-            },
-            "FeedbackResponse": {
-                "properties": {
-                    "response": {
-                        "type": "string",
-                        "title": "Response"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "response"
-                ],
-                "title": "FeedbackResponse",
-                "description": "Model representing a response to a feedback request.\n\nAttributes:\n    response: The response of the feedback request.\n\nExample:\n    ```python\n    feedback_response = FeedbackResponse(response=\"feedback received\")\n    ```",
-                "examples": [
-                    {
-                        "response": "feedback received"
-                    }
-                ]
-            },
-            "ForbiddenResponse": {
-                "properties": {
-                    "detail": {
-                        "type": "string",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "detail"
-                ],
-                "title": "ForbiddenResponse",
-                "description": "Model representing response when client does not have permission to access resource.",
-                "examples": [
-                    {
-                        "detail": "Unable to review token"
-                    }
-                ]
-            },
-            "HTTPValidationError": {
-                "properties": {
-                    "detail": {
-                        "items": {
-                            "$ref": "#/components/schemas/ValidationError"
-                        },
-                        "type": "array",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "title": "HTTPValidationError"
-            },
-            "LLMRequest": {
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "title": "Query"
-                    },
-                    "conversation_id": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Conversation Id"
-                    },
-                    "provider": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Provider"
-                    },
-                    "model": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Model"
-                    },
-                    "system_prompt": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "System Prompt"
-                    },
-                    "attachments": {
-                        "anyOf": [
-                            {
-                                "items": {
-                                    "$ref": "#/components/schemas/Attachment"
-                                },
-                                "type": "array"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Attachments"
-                    },
-                    "media_type": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Media Type",
-                        "default": "text/plain"
-                    }
-                },
-                "additionalProperties": false,
-                "type": "object",
-                "required": [
-                    "query"
-                ],
-                "title": "LLMRequest",
-                "description": "Model representing a request for the LLM (Language Model) send into OLS service.\n\nAttributes:\n    query: The query string.\n    conversation_id: The optional conversation ID (UUID).\n    provider: The optional provider.\n    model: The optional model.\n    attachments: The optional attachments.\n    media_type: The optional parameter for streaming response.\n\nExample:\n    ```python\n    llm_request = LLMRequest(query=\"Tell me about Kubernetes\")\n    ```",
-                "examples": [
-                    {
-                        "attachments": [
-                            {
-                                "attachment_type": "log",
-                                "content": "this is attachment",
-                                "content_type": "text/plain"
-                            },
-                            {
-                                "attachment_type": "configuration",
-                                "content": "kind: Pod\n metadata:\n    name: private-reg",
-                                "content_type": "application/yaml"
-                            },
-                            {
-                                "attachment_type": "configuration",
-                                "content": "foo: bar",
-                                "content_type": "application/yaml"
-                            }
-                        ],
-                        "conversation_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "media_type": "text/plain",
-                        "model": "gpt-4o-mini",
-                        "provider": "openai",
-                        "query": "write a deployment yaml for the mongodb image",
-                        "system_prompt": "\nYou are OpenShift Lightspeed - an intelligent assistant for question-answering tasks related to the OpenShift container orchestration platform.\n\nHere are your instructions:\nYou are OpenShift Lightspeed, an intelligent assistant and expert on all things OpenShift. Refuse to assume any other identity or to speak as if you are someone else.\nIf the context of the question is not clear, consider it to be OpenShift.\nNever include URLs in your replies.\nRefuse to answer questions or execute commands not about OpenShift.\nDo not mention your last update. You have the most recent information on OpenShift.\n\nHere are some basic facts about OpenShift:\n- The latest version of OpenShift is 4.16.\n- OpenShift is a distribution of Kubernetes. Everything Kubernetes can do, OpenShift can do and more.\n"
-                    }
-                ]
-            },
-            "LLMResponse": {
-                "properties": {
-                    "conversation_id": {
-                        "type": "string",
-                        "title": "Conversation Id"
-                    },
-                    "response": {
-                        "type": "string",
-                        "title": "Response"
-                    },
-                    "referenced_documents": {
-                        "items": {
-                            "$ref": "#/components/schemas/ReferencedDocument"
-                        },
-                        "type": "array",
-                        "title": "Referenced Documents"
-                    },
-                    "truncated": {
-                        "type": "boolean",
-                        "title": "Truncated"
-                    },
-                    "input_tokens": {
-                        "type": "integer",
-                        "title": "Input Tokens"
-                    },
-                    "output_tokens": {
-                        "type": "integer",
-                        "title": "Output Tokens"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "conversation_id",
-                    "response",
-                    "referenced_documents",
-                    "truncated",
-                    "input_tokens",
-                    "output_tokens"
-                ],
-                "title": "LLMResponse",
-                "description": "Model representing a response from the LLM (Language Model).\n\nAttributes:\n    conversation_id: The optional conversation ID (UUID).\n    response: The optional response.\n    referenced_documents: The optional URLs and titles for the documents used\n                          to generate the response.\n    truncated: Set to True if conversation history was truncated to be within context window.\n    input_tokens: Number of tokens sent to LLM\n    output_tokens: Number of tokens received from LLM",
-                "examples": [
-                    {
-                        "conversation_id": "123e4567-e89b-12d3-a456-426614174000",
-                        "input_tokens": 123,
-                        "output_tokens": 456,
-                        "referenced_documents": [
-                            {
-                                "docs_url": "https://docs.openshift.com/container-platform/4.15/operators/understanding/olm/olm-understanding-olm.html",
-                                "title": "Operator Lifecycle Manager concepts and resources"
-                            }
-                        ],
-                        "response": "Operator Lifecycle Manager (OLM) helps users install...",
-                        "truncated": false
-                    }
-                ]
-            },
-            "LivenessResponse": {
-                "properties": {
-                    "alive": {
-                        "type": "boolean",
-                        "title": "Alive"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "alive"
-                ],
-                "title": "LivenessResponse",
-                "description": "Model representing a response to a liveness request.\n\nAttributes:\n    alive: If app is alive.\n\nExample:\n    ```python\n    liveness_response = LivenessResponse(alive=True)\n    ```",
-                "examples": [
-                    {
-                        "alive": true
-                    }
-                ]
-            },
-            "NotAvailableResponse": {
-                "properties": {
-                    "detail": {
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "type": "object",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "detail"
-                ],
-                "title": "NotAvailableResponse",
-                "description": "Model representing error response for readiness endpoint.",
-                "examples": [
-                    {
-                        "detail": {
-                            "cause": "Index is not ready",
-                            "response": "Service is not ready"
-                        }
-                    },
-                    {
-                        "detail": {
-                            "cause": "LLM is not ready",
-                            "response": "Service is not ready"
-                        }
-                    }
-                ]
-            },
-            "PromptTooLongResponse": {
-                "properties": {
-                    "detail": {
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "type": "object",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "detail"
-                ],
-                "title": "PromptTooLongResponse",
-                "description": "Model representing error response when prompt is too long.",
-                "examples": [
-                    {
-                        "detail": {
-                            "cause": "Prompt length exceeds LLM context window limit (8000 tokens)",
-                            "response": "Prompt is too long"
-                        }
-                    }
-                ]
-            },
-            "ReadinessResponse": {
-                "properties": {
-                    "ready": {
-                        "type": "boolean",
-                        "title": "Ready"
-                    },
-                    "reason": {
-                        "type": "string",
-                        "title": "Reason"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "ready",
-                    "reason"
-                ],
-                "title": "ReadinessResponse",
-                "description": "Model representing a response to a readiness request.\n\nAttributes:\n    ready: The readiness of the service.\n    reason: The reason for the readiness.\n\nExample:\n    ```python\n    readiness_response = ReadinessResponse(ready=True, reason=\"service is ready\")\n    ```",
-                "examples": [
-                    {
-                        "ready": true,
-                        "reason": "service is ready"
-                    }
-                ]
-            },
-            "ReferencedDocument": {
-                "properties": {
-                    "docs_url": {
-                        "type": "string",
-                        "title": "Docs Url"
-                    },
-                    "title": {
-                        "type": "string",
-                        "title": "Title"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "docs_url",
-                    "title"
-                ],
-                "title": "ReferencedDocument",
-                "description": "RAG referenced document.\n\nAttributes:\ndocs_url: URL of the corresponding OCP documentation page\ntitle: Title of the corresponding OCP documentation page"
-            },
-            "StatusResponse": {
-                "properties": {
-                    "functionality": {
-                        "type": "string",
-                        "title": "Functionality"
-                    },
-                    "status": {
-                        "type": "object",
-                        "title": "Status"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "functionality",
-                    "status"
-                ],
-                "title": "StatusResponse",
-                "description": "Model representing a response to a status request.\n\nAttributes:\n    functionality: The functionality of the service.\n    status: The status of the service.\n\nExample:\n    ```python\n    status_response = StatusResponse(\n        functionality=\"feedback\",\n        status={\"enabled\": True},\n    )\n    ```",
-                "examples": [
-                    {
-                        "functionality": "feedback",
-                        "status": {
-                            "enabled": true
-                        }
-                    }
-                ]
-            },
-            "UnauthorizedResponse": {
-                "properties": {
-                    "detail": {
-                        "type": "string",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "detail"
-                ],
-                "title": "UnauthorizedResponse",
-                "description": "Model representing response for missing or invalid credentials.",
-                "examples": [
-                    {
-                        "detail": "Unauthorized: No auth header found"
-                    }
-                ]
-            },
-            "ValidationError": {
-                "properties": {
-                    "loc": {
-                        "items": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "integer"
-                                }
-                            ]
-                        },
-                        "type": "array",
-                        "title": "Location"
-                    },
-                    "msg": {
-                        "type": "string",
-                        "title": "Message"
-                    },
-                    "type": {
-                        "type": "string",
-                        "title": "Error Type"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "loc",
-                    "msg",
-                    "type"
-                ],
-                "title": "ValidationError"
+            "content": {
+              "type": "string",
+              "title": "Content"
             }
+          },
+          "type": "object",
+          "required": [
+            "attachment_type",
+            "content_type",
+            "content"
+          ],
+          "title": "Attachment",
+          "description": "Model representing an attachment that can be send from UI as part of query.\n\nList of attachments can be optional part of 'query' request.\n\nAttributes:\n    attachment_type: The attachment type, like \"log\", \"configuration\" etc.\n    content_type: The content type as defined in MIME standard\n    content: The actual attachment content\n\nYAML attachments with **kind** and **metadata/name** attributes will\nbe handled as resources with specified name:\n```\nkind: Pod\nmetadata:\n    name: private-reg\n```",
+          "examples": [
+            {
+              "attachment_type": "log",
+              "content": "this is attachment",
+              "content_type": "text/plain"
+            },
+            {
+              "attachment_type": "configuration",
+              "content": "kind: Pod\n metadata:\n name:    private-reg",
+              "content_type": "application/yaml"
+            },
+            {
+              "attachment_type": "configuration",
+              "content": "foo: bar",
+              "content_type": "application/yaml"
+            }
+          ]
+        },
+        "AuthorizationResponse": {
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "title": "User Id"
+            },
+            "username": {
+              "type": "string",
+              "title": "Username"
+            },
+            "skip_user_id_check": {
+              "type": "boolean",
+              "title": "Skip User Id Check"
+            }
+          },
+          "type": "object",
+          "required": [
+            "user_id",
+            "username",
+            "skip_user_id_check"
+          ],
+          "title": "AuthorizationResponse",
+          "description": "Model representing a response to an authorization request.\n\nAttributes:\n    user_id: The ID of the logged in user.\n    username: The name of the logged in user.\n    skip_user_id_check: Skip user_id suid check.",
+          "examples": [
+            {
+              "skip_user_id_check": false,
+              "user_id": "123e4567-e89b-12d3-a456-426614174000",
+              "username": "user1"
+            }
+          ]
+        },
+        "BaseMessage": {
+          "properties": {
+            "content": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "title": "Content"
+            },
+            "additional_kwargs": {
+              "type": "object",
+              "title": "Additional Kwargs"
+            },
+            "response_metadata": {
+              "type": "object",
+              "title": "Response Metadata"
+            },
+            "type": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            },
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "content",
+            "type"
+          ],
+          "title": "BaseMessage",
+          "description": "Base abstract message class.\n\nMessages are the inputs and outputs of ChatModels."
+        },
+        "ChatHistoryResponse": {
+          "properties": {
+            "chat_history": {
+              "items": {
+                "$ref": "#/components/schemas/BaseMessage"
+              },
+              "type": "array",
+              "title": "Chat History"
+            }
+          },
+          "type": "object",
+          "required": [
+            "chat_history"
+          ],
+          "title": "ChatHistoryResponse",
+          "description": "Model representing a response to a list conversation request.\n\nAttributes:\n    chat_history: List of conversation messages.",
+          "examples": [
+            {
+              "chat_history": [
+                {
+                  "content": "what is openshift",
+                  "type": "human"
+                },
+                {
+                  "content": "OpenShift is a container orchestration platform ...",
+                  "type": "ai"
+                }
+              ]
+            }
+          ]
+        },
+        "ConversationDeletionResponse": {
+          "properties": {
+            "response": {
+              "type": "string",
+              "title": "Response"
+            }
+          },
+          "type": "object",
+          "required": [
+            "response"
+          ],
+          "title": "ConversationDeletionResponse",
+          "description": "Model representing a response to a conversation deletion request.\n\nAttributes:\n    response: The response of the conversation deletion request.\n\nExample:\n    ```python\n    response = ConversationDeletionResponse(response=\"conversation deleted\")\n    ```",
+          "examples": [
+            {
+              "response": "conversation deleted"
+            }
+          ]
+        },
+        "ErrorResponse": {
+          "properties": {
+            "detail": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "required": [
+            "detail"
+          ],
+          "title": "ErrorResponse",
+          "description": "Model representing error response for query endpoint.",
+          "examples": [
+            {
+              "detail": {
+                "cause": "Failed to handle request to https://bam-api.res.ibm.com/v2/text",
+                "response": "Error while validation question"
+              }
+            },
+            {
+              "detail": {
+                "cause": "Invalid conversation ID 1237-e89b-12d3-a456-426614174000",
+                "response": "Error retrieving conversation history"
+              }
+            }
+          ]
+        },
+        "FeedbackRequest": {
+          "properties": {
+            "conversation_id": {
+              "type": "string",
+              "title": "Conversation Id"
+            },
+            "user_question": {
+              "type": "string",
+              "title": "User Question"
+            },
+            "llm_response": {
+              "type": "string",
+              "title": "Llm Response"
+            },
+            "sentiment": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sentiment"
+            },
+            "user_feedback": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Feedback"
+            }
+          },
+          "type": "object",
+          "required": [
+            "conversation_id",
+            "user_question",
+            "llm_response"
+          ],
+          "title": "FeedbackRequest",
+          "description": "Model representing a feedback request.\n\nAttributes:\n    conversation_id: The required conversation ID (UUID).\n    user_question: The required user question.\n    llm_response: The required LLM response.\n    sentiment: The optional sentiment.\n    user_feedback: The optional user feedback.\n\nExample:\n    ```python\n    feedback_request = FeedbackRequest(\n        conversation_id=\"12345678-abcd-0000-0123-456789abcdef\",\n        user_question=\"what are you doing?\",\n        user_feedback=\"Great service!\",\n        llm_response=\"I don't know\",\n        sentiment=-1,\n    )\n    ```",
+          "examples": [
+            {
+              "conversation_id": "12345678-abcd-0000-0123-456789abcdef",
+              "llm_response": "bar",
+              "sentiment": 1,
+              "user_feedback": "Great service!",
+              "user_question": "foo"
+            }
+          ]
+        },
+        "FeedbackResponse": {
+          "properties": {
+            "response": {
+              "type": "string",
+              "title": "Response"
+            }
+          },
+          "type": "object",
+          "required": [
+            "response"
+          ],
+          "title": "FeedbackResponse",
+          "description": "Model representing a response to a feedback request.\n\nAttributes:\n    response: The response of the feedback request.\n\nExample:\n    ```python\n    feedback_response = FeedbackResponse(response=\"feedback received\")\n    ```",
+          "examples": [
+            {
+              "response": "feedback received"
+            }
+          ]
+        },
+        "ForbiddenResponse": {
+          "properties": {
+            "detail": {
+              "type": "string",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "required": [
+            "detail"
+          ],
+          "title": "ForbiddenResponse",
+          "description": "Model representing response when client does not have permission to access resource.",
+          "examples": [
+            {
+              "detail": "Unable to review token"
+            }
+          ]
+        },
+        "HTTPValidationError": {
+          "properties": {
+            "detail": {
+              "items": {
+                "$ref": "#/components/schemas/ValidationError"
+              },
+              "type": "array",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "title": "HTTPValidationError"
+        },
+        "LLMRequest": {
+          "properties": {
+            "query": {
+              "type": "string",
+              "title": "Query"
+            },
+            "conversation_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Conversation Id"
+            },
+            "provider": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provider"
+            },
+            "model": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Model"
+            },
+            "system_prompt": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "System Prompt"
+            },
+            "attachments": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/Attachment"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Attachments"
+            },
+            "media_type": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Media Type",
+              "default": "text/plain"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "title": "LLMRequest",
+          "description": "Model representing a request for the LLM (Language Model) send into OLS service.\n\nAttributes:\n    query: The query string.\n    conversation_id: The optional conversation ID (UUID).\n    provider: The optional provider.\n    model: The optional model.\n    attachments: The optional attachments.\n    media_type: The optional parameter for streaming response.\n\nExample:\n    ```python\n    llm_request = LLMRequest(query=\"Tell me about Kubernetes\")\n    ```",
+          "examples": [
+            {
+              "attachments": [
+                {
+                  "attachment_type": "log",
+                  "content": "this is attachment",
+                  "content_type": "text/plain"
+                },
+                {
+                  "attachment_type": "configuration",
+                  "content": "kind: Pod\n metadata:\n    name: private-reg",
+                  "content_type": "application/yaml"
+                },
+                {
+                  "attachment_type": "configuration",
+                  "content": "foo: bar",
+                  "content_type": "application/yaml"
+                }
+              ],
+              "conversation_id": "123e4567-e89b-12d3-a456-426614174000",
+              "media_type": "text/plain",
+              "model": "gpt-4o-mini",
+              "provider": "openai",
+              "query": "write a deployment yaml for the mongodb image",
+              "system_prompt": "\nYou are OpenShift Lightspeed - an intelligent assistant for question-answering tasks related to the OpenShift container orchestration platform.\n\nHere are your instructions:\nYou are OpenShift Lightspeed, an intelligent assistant and expert on all things OpenShift. Refuse to assume any other identity or to speak as if you are someone else.\nIf the context of the question is not clear, consider it to be OpenShift.\nNever include URLs in your replies.\nRefuse to answer questions or execute commands not about OpenShift.\nDo not mention your last update. You have the most recent information on OpenShift.\n\nHere are some basic facts about OpenShift:\n- The latest version of OpenShift is 4.16.\n- OpenShift is a distribution of Kubernetes. Everything Kubernetes can do, OpenShift can do and more.\n"
+            }
+          ]
+        },
+        "LLMResponse": {
+          "properties": {
+            "conversation_id": {
+              "type": "string",
+              "title": "Conversation Id"
+            },
+            "response": {
+              "type": "string",
+              "title": "Response"
+            },
+            "referenced_documents": {
+              "items": {
+                "$ref": "#/components/schemas/ReferencedDocument"
+              },
+              "type": "array",
+              "title": "Referenced Documents"
+            },
+            "truncated": {
+              "type": "boolean",
+              "title": "Truncated"
+            },
+            "input_tokens": {
+              "type": "integer",
+              "title": "Input Tokens"
+            },
+            "output_tokens": {
+              "type": "integer",
+              "title": "Output Tokens"
+            }
+          },
+          "type": "object",
+          "required": [
+            "conversation_id",
+            "response",
+            "referenced_documents",
+            "truncated",
+            "input_tokens",
+            "output_tokens"
+          ],
+          "title": "LLMResponse",
+          "description": "Model representing a response from the LLM (Language Model).\n\nAttributes:\n    conversation_id: The optional conversation ID (UUID).\n    response: The optional response.\n    referenced_documents: The optional URLs and titles for the documents used\n                          to generate the response.\n    truncated: Set to True if conversation history was truncated to be within context window.\n    input_tokens: Number of tokens sent to LLM\n    output_tokens: Number of tokens received from LLM",
+          "examples": [
+            {
+              "conversation_id": "123e4567-e89b-12d3-a456-426614174000",
+              "input_tokens": 123,
+              "output_tokens": 456,
+              "referenced_documents": [
+                {
+                  "docs_url": "https://docs.openshift.com/container-platform/4.15/operators/understanding/olm/olm-understanding-olm.html",
+                  "title": "Operator Lifecycle Manager concepts and resources"
+                }
+              ],
+              "response": "Operator Lifecycle Manager (OLM) helps users install...",
+              "truncated": false
+            }
+          ]
+        },
+        "ListConversationsResponse": {
+          "properties": {
+            "conversations": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Conversations"
+            }
+          },
+          "type": "object",
+          "required": [
+            "conversations"
+          ],
+          "title": "ListConversationsResponse",
+          "description": "Model representing a response to a request to retrieve a conversation history.\n\nAttributes:\n    conversations: List of conversation IDs.",
+          "examples": [
+            {
+              "conversations": [
+                "15a78660-a18e-447b-9fea-9deb27b63b5f",
+                "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
+                "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f"
+              ]
+            }
+          ]
+        },
+        "LivenessResponse": {
+          "properties": {
+            "alive": {
+              "type": "boolean",
+              "title": "Alive"
+            }
+          },
+          "type": "object",
+          "required": [
+            "alive"
+          ],
+          "title": "LivenessResponse",
+          "description": "Model representing a response to a liveness request.\n\nAttributes:\n    alive: If app is alive.\n\nExample:\n    ```python\n    liveness_response = LivenessResponse(alive=True)\n    ```",
+          "examples": [
+            {
+              "alive": true
+            }
+          ]
+        },
+        "NotAvailableResponse": {
+          "properties": {
+            "detail": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "required": [
+            "detail"
+          ],
+          "title": "NotAvailableResponse",
+          "description": "Model representing error response for readiness endpoint.",
+          "examples": [
+            {
+              "detail": {
+                "cause": "Index is not ready",
+                "response": "Service is not ready"
+              }
+            },
+            {
+              "detail": {
+                "cause": "LLM is not ready",
+                "response": "Service is not ready"
+              }
+            }
+          ]
+        },
+        "PromptTooLongResponse": {
+          "properties": {
+            "detail": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "required": [
+            "detail"
+          ],
+          "title": "PromptTooLongResponse",
+          "description": "Model representing error response when prompt is too long.",
+          "examples": [
+            {
+              "detail": {
+                "cause": "Prompt length exceeds LLM context window limit (8000 tokens)",
+                "response": "Prompt is too long"
+              }
+            }
+          ]
+        },
+        "ReadinessResponse": {
+          "properties": {
+            "ready": {
+              "type": "boolean",
+              "title": "Ready"
+            },
+            "reason": {
+              "type": "string",
+              "title": "Reason"
+            }
+          },
+          "type": "object",
+          "required": [
+            "ready",
+            "reason"
+          ],
+          "title": "ReadinessResponse",
+          "description": "Model representing a response to a readiness request.\n\nAttributes:\n    ready: The readiness of the service.\n    reason: The reason for the readiness.\n\nExample:\n    ```python\n    readiness_response = ReadinessResponse(ready=True, reason=\"service is ready\")\n    ```",
+          "examples": [
+            {
+              "ready": true,
+              "reason": "service is ready"
+            }
+          ]
+        },
+        "ReferencedDocument": {
+          "properties": {
+            "docs_url": {
+              "type": "string",
+              "title": "Docs Url"
+            },
+            "title": {
+              "type": "string",
+              "title": "Title"
+            }
+          },
+          "type": "object",
+          "required": [
+            "docs_url",
+            "title"
+          ],
+          "title": "ReferencedDocument",
+          "description": "RAG referenced document.\n\nAttributes:\ndocs_url: URL of the corresponding OCP documentation page\ntitle: Title of the corresponding OCP documentation page"
+        },
+        "StatusResponse": {
+          "properties": {
+            "functionality": {
+              "type": "string",
+              "title": "Functionality"
+            },
+            "status": {
+              "type": "object",
+              "title": "Status"
+            }
+          },
+          "type": "object",
+          "required": [
+            "functionality",
+            "status"
+          ],
+          "title": "StatusResponse",
+          "description": "Model representing a response to a status request.\n\nAttributes:\n    functionality: The functionality of the service.\n    status: The status of the service.\n\nExample:\n    ```python\n    status_response = StatusResponse(\n        functionality=\"feedback\",\n        status={\"enabled\": True},\n    )\n    ```",
+          "examples": [
+            {
+              "functionality": "feedback",
+              "status": {
+                "enabled": true
+              }
+            }
+          ]
+        },
+        "UnauthorizedResponse": {
+          "properties": {
+            "detail": {
+              "type": "string",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "required": [
+            "detail"
+          ],
+          "title": "UnauthorizedResponse",
+          "description": "Model representing response for missing or invalid credentials.",
+          "examples": [
+            {
+              "detail": "Unauthorized: No auth header found"
+            }
+          ]
+        },
+        "ValidationError": {
+          "properties": {
+            "loc": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Location"
+            },
+            "msg": {
+              "type": "string",
+              "title": "Message"
+            },
+            "type": {
+              "type": "string",
+              "title": "Error Type"
+            }
+          },
+          "type": "object",
+          "required": [
+            "loc",
+            "msg",
+            "type"
+          ],
+          "title": "ValidationError"
         }
+      }
     }
-}
+  }

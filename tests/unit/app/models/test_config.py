@@ -3502,7 +3502,8 @@ def test_user_data_collection_config__logging_level():
 def test_user_data_collection_config__token_expectation():
     """Test the UserDataCollection model with token expectation."""
     udc_config = UserDataCollectorConfig(
-        ingress_env="stage", cp_offline_token="123"  # noqa: S106
+        ingress_env="stage",
+        cp_offline_token="123",  # noqa: S106
     )
     assert udc_config.ingress_env == "stage"
     assert udc_config.cp_offline_token == "123"  # noqa: S105

@@ -3,6 +3,7 @@
 # pylint: disable=W0621
 
 import pytest
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols.constants import (
     GPT35_TURBO,
@@ -38,8 +39,8 @@ def empty_history():
 def conversation_history():
     """Non-empty conversation history."""
     return [
-        "First human message",
-        "First AI response",
+        HumanMessage("First human message"),
+        AIMessage("First AI response"),
     ] * 50
 
 
@@ -47,8 +48,8 @@ def conversation_history():
 def long_history():
     """Long conversation history."""
     return [
-        "First human message",
-        "First AI response",
+        HumanMessage("First human message"),
+        AIMessage("First AI response"),
     ] * 10000
 
 

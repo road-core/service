@@ -28,7 +28,10 @@ def mock_llm_chain(retval):
             return retval
 
         def invoke(
-            self, input, config=None, **kwargs  # noqa: A002 pylint: disable=W0622
+            self,
+            input,
+            config=None,
+            **kwargs,  # noqa: A002 pylint: disable=W0622
         ):
             """Perform invocation of the LLM chain."""
             if retval is not None:

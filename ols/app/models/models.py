@@ -1,9 +1,11 @@
 """Data models representing payloads for REST API calls."""
 
+import json
 from collections import OrderedDict
-from typing import Optional, Self
+from typing import Any, Dict, Optional, Self, Union
 
 from langchain.llms.base import LLM
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from pydantic import BaseModel, field_validator, model_validator
 from pydantic.dataclasses import dataclass
 
@@ -203,6 +205,87 @@ class LLMResponse(BaseModel):
                     "truncated": False,
                     "input_tokens": 123,
                     "output_tokens": 456,
+                }
+            ]
+        }
+    }
+
+
+class ChatHistoryResponse(BaseModel):
+    """Model representing a response to a list conversation request.
+
+    Attributes:
+        chat_history: List of conversation messages.
+    """
+
+    chat_history: list[BaseMessage]
+
+    # provides examples for /docs endpoint
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "chat_history": [
+                        {
+                            "content": "what is openshift",
+                            "type": "human",
+                        },
+                        {
+                            "content": "OpenShift is a container orchestration platform ...",
+                            "type": "ai",
+                        },
+                    ]
+                }
+            ]
+        }
+    }
+
+
+class ListConversationsResponse(BaseModel):
+    """Model representing a response to a request to retrieve a conversation history.
+
+    Attributes:
+        conversations: List of conversation IDs.
+    """
+
+    conversations: list[str]
+
+    # provides examples for /docs endpoint
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "conversations": [
+                        "15a78660-a18e-447b-9fea-9deb27b63b5f",
+                        "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
+                        "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                    ]
+                }
+            ]
+        }
+    }
+
+
+class ConversationDeletionResponse(BaseModel):
+    """Model representing a response to a conversation deletion request.
+
+    Attributes:
+        response: The response of the conversation deletion request.
+
+    Example:
+        ```python
+        response = ConversationDeletionResponse(response="conversation deleted")
+        ```
+    """
+
+    response: str
+
+    # provides examples for /docs endpoint
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "response": "conversation deleted",
                 }
             ]
         }
@@ -499,10 +582,12 @@ class AuthorizationResponse(BaseModel):
     Attributes:
         user_id: The ID of the logged in user.
         username: The name of the logged in user.
+        skip_user_id_check: Skip user_id suid check.
     """
 
     user_id: str
     username: str
+    skip_user_id_check: bool
 
     # provides examples for /docs endpoint
     model_config = {
@@ -511,6 +596,7 @@ class AuthorizationResponse(BaseModel):
                 {
                     "user_id": "123e4567-e89b-12d3-a456-426614174000",
                     "username": "user1",
+                    "skip_user_id_check": False,
                 }
             ]
         }
@@ -576,16 +662,16 @@ class CacheEntry(BaseModel):
         response: The response string.
     """
 
-    query: str
-    response: Optional[str] = ""
+    query: HumanMessage
+    response: Optional[AIMessage] = AIMessage("")
     attachments: list[Attachment] = []
 
     @field_validator("response")
     @classmethod
-    def set_none_response_to_empty_string(cls, v: Optional[str]) -> str:
+    def set_none_response_to_empty_string(cls, v: Optional[AIMessage]) -> AIMessage:
         """Convert None response to an empty string."""
         if v is None:
-            return ""
+            return AIMessage("")
         return v
 
     def to_dict(self) -> dict:
@@ -608,12 +694,91 @@ class CacheEntry(BaseModel):
         )
 
     @staticmethod
-    def cache_entries_to_history(cache_entries: list["CacheEntry"]) -> list[str]:
+    def cache_entries_to_history(
+        cache_entries: list["CacheEntry"],
+    ) -> list[BaseMessage]:
         """Convert cache entries to a history."""
-        history = []
+        history: list[BaseMessage] = []
         for entry in cache_entries:
-            history.append(f"human: {entry.query.strip()}")
+            entry.query.content = entry.query.content.strip()
+            entry.response.content = entry.response.content.strip()
+            history.append(entry.query)
             # the real response or empty string when response is not recorded
-            history.append(f"ai: {str(entry.response).strip()}")
+            history.append(entry.response)
 
         return history
+
+
+class MessageEncoder(json.JSONEncoder):
+    """Convert Message objects to serializable dictionaries."""
+
+    def default(self, o: Any) -> Union[dict, Any]:
+        """Convert a Message object into a serializable dictionary.
+
+        This method is called when an object cannot be serialized by default
+        methods. If the object is an instance of HumanMessage or AIMessage,
+        it is converted into a dictionary. Otherwise, the default JSONEncoder
+        behavior is used.
+
+
+        Args:
+            o: The object to serialize. Expected to be either a HumanMessage
+            or AIMessage instance.
+
+        Returns:
+            dict: A dictionary containing the message attributes if the input is
+                a Message object.
+            Any: The result of the parent class's default method for other
+                 object types.
+        """
+        if isinstance(o, (HumanMessage, AIMessage)):
+            return {
+                "type": o.type,
+                "content": o.content,
+                "response_metadata": o.response_metadata,
+                "additional_kwargs": o.additional_kwargs,
+            }
+        return super().default(o)
+
+
+class MessageDecoder(json.JSONDecoder):
+    """Custom JSON decoder for deserializing Message objects.
+
+    This decoder extends the default JSONDecoder to handle JSON representations of
+    HumanMessage and AIMessage objects, converting them back into their respective
+    Python objects. It processes JSON objects containing 'type', 'content',
+    'response_metadata', and 'additional_kwargs' fields.
+
+    Example:
+        >>> decoder = MessageDecoder()
+        >>> json.loads('{"type": "human", "content": "Hello", ...}', cls=MessageDecoder)
+        HumanMessage(content="Hello", ...)
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        """Initialize the MessageDecoder with custom object hook."""
+        super().__init__(object_hook=self._decode_message, *args, **kwargs)
+
+    def _decode_message(
+        self, dct: Dict[str, Any]
+    ) -> Union[HumanMessage, AIMessage, Dict[str, Any]]:
+        """Decode JSON dictionary into Message objects if applicable.
+
+        Args:
+            dct (dict): Dictionary to decode, potentially representing a Message.
+
+        Returns:
+            Union[HumanMessage, AIMessage, dict]: A Message object if the input
+            dictionary represents a message, otherwise returns the original dictionary.
+        """
+        if "type" in dct:
+            if dct["type"] == "human":
+                message = HumanMessage(content=dct["content"])
+            elif dct["type"] == "ai":
+                message = AIMessage(content=dct["content"])
+            else:
+                return dct
+            message.additional_kwargs = dct["additional_kwargs"]
+            message.response_metadata = dct["response_metadata"]
+            return message
+        return dct

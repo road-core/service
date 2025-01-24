@@ -10,9 +10,7 @@ from ols import config, constants
 # needs to be setup there before is_user_authorized is imported
 config.ols_config.authentication_config.module = "k8s"
 
-from ols.app.endpoints.authorized import (  # noqa:E402
-    is_user_authorized,
-)
+from ols.app.endpoints.authorized import is_user_authorized  # noqa:E402
 from ols.app.models.models import AuthorizationResponse  # noqa:E402
 from tests.mock_classes.mock_k8s_api import (  # noqa:E402
     mock_subject_access_review_response,
@@ -41,7 +39,9 @@ def test_is_user_authorized_auth_disabled():
     request = Request(scope={"type": "http"})
     response = is_user_authorized(request)
     assert response == AuthorizationResponse(
-        user_id=constants.DEFAULT_USER_UID, username=constants.DEFAULT_USER_NAME
+        user_id=constants.DEFAULT_USER_UID,
+        username=constants.DEFAULT_USER_NAME,
+        skip_user_id_check=False,
     )
 
 
@@ -78,7 +78,9 @@ def test_is_user_authorized_valid_token(mock_authz_api, mock_authn_api):
     )
 
     response = is_user_authorized(request)
-    assert response == AuthorizationResponse(user_id="valid-uid", username="valid-user")
+    assert response == AuthorizationResponse(
+        user_id="valid-uid", username="valid-user", skip_user_id_check=False
+    )
 
 
 @pytest.mark.usefixtures("_enabled_auth")

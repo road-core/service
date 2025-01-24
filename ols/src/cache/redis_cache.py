@@ -6,17 +6,12 @@ from typing import Any, Optional
 
 import redis
 from redis.backoff import ExponentialBackoff
-from redis.exceptions import (
-    BusyLoadingError,
-    RedisError,
-)
-from redis.exceptions import (
-    ConnectionError as RedisConnectionError,
-)
+from redis.exceptions import BusyLoadingError, RedisError
+from redis.exceptions import ConnectionError as RedisConnectionError
 from redis.retry import Retry
 
 from ols.app.models.config import RedisConfig
-from ols.app.models.models import CacheEntry
+from ols.app.models.models import CacheEntry, MessageDecoder, MessageEncoder
 from ols.src.cache.cache import Cache
 
 
@@ -71,29 +66,36 @@ class RedisCache(Cache):
         self.redis_client.config_set("maxmemory", config.max_memory)
         self.redis_client.config_set("maxmemory-policy", config.max_memory_policy)
 
-    def get(self, user_id: str, conversation_id: str) -> list[CacheEntry]:
+    def get(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> list[CacheEntry]:
         """Get the value associated with the given key.
 
         Args:
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
+            skip_user_id_check: Skip user_id suid check.
 
         Returns:
             The value associated with the key, or None if not found.
         """
-        key = super().construct_key(user_id, conversation_id)
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
 
         value = self.redis_client.get(key)
         if value is None:
             return None
 
-        return [CacheEntry.from_dict(cache_entry) for cache_entry in json.loads(value)]
+        return [
+            CacheEntry.from_dict(cache_entry)
+            for cache_entry in json.loads(value, cls=MessageDecoder)
+        ]
 
     def insert_or_append(
         self,
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
 
@@ -101,19 +103,70 @@ class RedisCache(Cache):
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             cache_entry: The `CacheEntry` object to store.
+            skip_user_id_check: Skip user_id suid check.
 
         Raises:
             OutOfMemoryError: If item is evicted when Redis allocated
                 memory is higher than maxmemory.
         """
-        key = super().construct_key(user_id, conversation_id)
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
 
         with self._lock:
-            old_value = self.get(user_id, conversation_id)
+            old_value = self.get(user_id, conversation_id, skip_user_id_check)
             if old_value:
                 old_value.append(cache_entry)
+                # self.redis_client.set(
+                #     key, json.dumps(old_value, default=lambda o: o.to_dict(), cls=MessageEncoder)
+                # )
                 self.redis_client.set(
-                    key, json.dumps(old_value, default=lambda o: o.to_dict())
+                    key,
+                    json.dumps(
+                        [entry.to_dict() for entry in old_value], cls=MessageEncoder
+                    ),
                 )
             else:
-                self.redis_client.set(key, json.dumps([cache_entry.to_dict()]))
+                self.redis_client.set(
+                    key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder)
+                )
+
+    def delete(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> bool:
+        """Delete conversation history for a given user_id and conversation_id.
+
+        Args:
+            user_id: User identification.
+            conversation_id: Conversation ID unique for given user.
+            skip_user_id_check: Skip user_id suid check.
+
+        Returns:
+            bool: True if the conversation was deleted, False if not found.
+        """
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
+        # Redis del() returns the number of keys that were removed
+        return bool(self.redis_client.delete(key))
+
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
+        """List all conversations for a given user_id.
+
+        Args:
+            user_id: User identification.
+            skip_user_id_check: Skip user_id suid check.
+
+        Returns:
+            A list of conversation ids from the cache
+        """
+        # Get all keys matching the user_id prefix
+        super()._check_user_id(user_id, skip_user_id_check)
+        prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
+        pattern = f"{prefix}*"
+        keys = self.redis_client.keys(pattern)
+
+        # Extract conversation_ids from the keys
+        user_conversation_ids = []
+        for key in keys:
+            # Remove the prefix to get just the conversation_id
+            conversation_id = key[len(prefix) :]
+            user_conversation_ids.append(conversation_id)
+
+        return user_conversation_ids

@@ -6,13 +6,10 @@ from unittest.mock import patch
 import pytest
 import requests
 from fastapi.testclient import TestClient
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
-from ols.app.models.config import (
-    LoggingConfig,
-    ProviderConfig,
-    QueryFilter,
-)
+from ols.app.models.config import LoggingConfig, ProviderConfig, QueryFilter
 from ols.customize import prompts
 from ols.utils import suid
 from ols.utils.errors_parsing import DEFAULT_ERROR_MESSAGE, DEFAULT_STATUS_CODE
@@ -227,8 +224,7 @@ def test_unknown_provider_in_post(_setup, endpoint):
     assert response.status_code == requests.codes.unprocessable
     expected_json = {
         "detail": {
-            "cause": "Provider 'some-provider' is not a valid provider. "
-            "Valid providers are: []",
+            "cause": "Provider 'some-provider' is not a valid provider. Valid providers are: []",
             "response": "Unable to process this request",
         }
     }
@@ -277,7 +273,6 @@ def test_post_question_improper_conversation_id(_setup, endpoint) -> None:
     with patch(
         "ols.app.endpoints.ols.QuestionValidator.validate_question", return_value=answer
     ):
-
         conversation_id = "not-correct-uuid"
         response = pytest.client.post(
             endpoint,
@@ -469,7 +464,11 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
         )
         assert response.status_code == requests.codes.ok
         chat_history_expected = [
-            CacheEntry(query="Query1", response="Query1", attachments=[])
+            CacheEntry(
+                query=HumanMessage("Query1"),
+                response=AIMessage("Query1"),
+                attachments=[],
+            )
         ]
         assert actual_returned_history == chat_history_expected
 

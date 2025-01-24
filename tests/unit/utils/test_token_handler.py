@@ -4,6 +4,7 @@ from math import ceil
 from unittest import TestCase, mock
 
 import pytest
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ols.constants import TOKEN_BUFFER_WEIGHT, ModelFamily
 from ols.utils.token_handler import PromptTooLongError, TokenHandler
@@ -198,12 +199,12 @@ class TestTokenHandler(TestCase):
     def test_limit_conversation_history(self):
         """Check the behaviour of limiting long conversation history."""
         history = [
-            "human: first message from human",
-            "ai: first answer from AI",
-            "human: second message from human",
-            "ai: second answer from AI",
-            "human: third message from human",
-            "ai: third answer from AI",
+            HumanMessage("first message from human"),
+            AIMessage("first answer from AI"),
+            HumanMessage("second message from human"),
+            AIMessage("second answer from AI"),
+            HumanMessage("third message from human"),
+            AIMessage("third answer from AI"),
         ]
         # for each of the above actual messages the tokens count is 4.
         # then 2 tokens for the tags. Total tokens are 6.
