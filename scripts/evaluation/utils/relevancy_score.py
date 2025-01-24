@@ -42,7 +42,7 @@ class AnswerRelevancyScore:
                     # raise
             sleep(time_to_breath)
 
-        if out:
+        if out and isinstance(out, dict):
             valid_flag = out["Valid"]
             gen_questions = out["Question"]
             score = 0
