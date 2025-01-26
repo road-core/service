@@ -10,14 +10,14 @@ from langchain.prompts import (
 )
 from langchain_core.messages import AIMessage, HumanMessage
 
-from ols.constants import GPT35_TURBO, GRANITE_13B_CHAT_V2, ModelFamily
+from ols.constants import GPT35_TURBO, GRANITE_3_8B_INSTRUCT, ModelFamily
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
     restructure_history,
     restructure_rag_context,
 )
 
-model = [GRANITE_13B_CHAT_V2, GPT35_TURBO]
+model = [GRANITE_3_8B_INSTRUCT, GPT35_TURBO]
 
 system_instruction = """
 Answer user queries in the context of openshift.
