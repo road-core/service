@@ -239,5 +239,6 @@ def pytest_sessionfinish(session):
         upload_artifact_s3(aws_env=aws_env)
     except KeyError:
         print(
-            "Could not find aws credentials to upload to S3. Skipping reporting to Report portal."
+            "Could not find aws credentials to upload to S3. "
+            "Skipping reporting to Report portal."
         )
