@@ -177,7 +177,7 @@ def test_delete_conversation_with_history(_setup, endpoint):
 
 
 def test_get_conversation_not_found(_setup):
-    """Test conversation not found scenario"""
+    """Test conversation not found scenario."""
     conversation_id = suid.get_suid()
 
     with patch("ols.app.endpoints.ols.retrieve_previous_input", return_value=[]):
@@ -191,7 +191,7 @@ def test_get_conversation_not_found(_setup):
 
 
 def test_delete_conversation_not_found(_setup):
-    """Test deletion of non-existent conversation"""
+    """Test deletion of non-existent conversation."""
     conversation_id = suid.get_suid()
 
     with patch("ols.config.conversation_cache.delete", return_value=False):
@@ -205,7 +205,7 @@ def test_delete_conversation_not_found(_setup):
 
 
 def test_invalid_conversation_id(_setup):
-    """Test handling of invalid conversation ID format"""
+    """Test handling of invalid conversation ID format."""
     invalid_id = "not-a-valid-uuid"
     response = pytest.client.get(f"/conversations/{invalid_id}")
 
