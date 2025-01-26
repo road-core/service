@@ -242,7 +242,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
     credentials_path: watsonx_api_key.txt
     project_id: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
     models:
-      - name: ibm/granite-13b-chat-v2
+      - name: ibm/granite-3-8b-instruct
   ```
 
 ### RHEL AI provider
@@ -312,7 +312,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
          ```yaml
             rcs_config:
               default_provider: my_bam
-              default_model: ibm/granite-13b-chat-v2
+              default_model: ibm/granite-3-8b-instruct
          ```
 
 
