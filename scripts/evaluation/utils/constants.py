@@ -11,6 +11,8 @@ INSCOPE_MODELS = {
     "azure_openai+gpt-4o": ("azure_openai", "gpt-4o"),
     "ollama+llama3.1:latest": ("ollama", "llama3.1:latest"),
     "ollama+mistral": ("ollama", "mistral"),
+    "my_rhoai+granite3-8b": ("my_rhoai", "granite3-8b"),
+    "my_rhoai3+granite3-1-8b": ("my_rhoai3", "granite3-1-8b"),
 }
 
 NON_LLM_EVALS = {
