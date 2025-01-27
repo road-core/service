@@ -60,7 +60,7 @@ class "LoggingConfig" as ols.app.models.config.LoggingConfig {
   uvicorn_log_level : int
 }
 class "ModelConfig" as ols.app.models.config.ModelConfig {
-  context_window_size
+  context_window_size : Annotated
   credentials : Optional[str]
   name : str
   options : Optional[dict[str, Any]]
@@ -71,7 +71,7 @@ class "ModelConfig" as ols.app.models.config.ModelConfig {
   validate_options(options: dict) -> dict[str, Any]
 }
 class "ModelParameters" as ols.app.models.config.ModelParameters {
-  max_tokens_for_response
+  max_tokens_for_response : Annotated
 }
 class "OLSConfig" as ols.app.models.config.OLSConfig {
   authentication_config
@@ -100,10 +100,10 @@ class "PostgresConfig" as ols.app.models.config.PostgresConfig {
   ca_cert_path : Optional[FilePath]
   dbname : str
   host : str
-  max_entries
+  max_entries : Annotated
   password : Optional[str]
   password_path : Optional[FilePath]
-  port
+  port : Annotated
   ssl_mode : str
   user : str
   validate_yaml() -> Self
@@ -135,7 +135,7 @@ class "ProviderConfig" as ols.app.models.config.ProviderConfig {
 class "ProviderSpecificConfig" as ols.app.models.config.ProviderSpecificConfig {
   api_key : Optional[str]
   token : Optional[Any]
-  url
+  url : AnyHttpUrl
 }
 class "QueryFilter" as ols.app.models.config.QueryFilter {
   name : Optional[str]
