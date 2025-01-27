@@ -286,7 +286,13 @@ def store_data(
         skip_user_id_check: Skip user_id usid check.
     """
     store_conversation_history(
-        user_id, conversation_id, llm_request, response, attachments, skip_user_id_check
+        user_id,
+        conversation_id,
+        llm_request,
+        response,
+        attachments,
+        timestamps,
+        skip_user_id_check,
     )
 
     if not config.ols_config.user_data_collection.transcripts_disabled:

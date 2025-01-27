@@ -470,7 +470,22 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
                 attachments=[],
             )
         ]
-        assert actual_returned_history == chat_history_expected
+        # cannot test exact timestamp, test the existence
+        assert (
+            actual_returned_history[0].query.content
+            == chat_history_expected[0].query.content
+        )
+        assert (
+            actual_returned_history[0].response.content
+            == chat_history_expected[0].response.content
+        )
+        assert (
+            actual_returned_history[0].query.response_metadata["created_at"] is not None
+        )
+        assert (
+            actual_returned_history[0].response.response_metadata["created_at"]
+            is not None
+        )
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
