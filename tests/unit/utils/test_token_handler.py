@@ -7,6 +7,7 @@ import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 
 from ols.constants import TOKEN_BUFFER_WEIGHT, ModelFamily
+from ols.src.prompts.prompt_generator import restructure_history
 from ols.utils.token_handler import PromptTooLongError, TokenHandler
 from tests.mock_classes.mock_retrieved_node import MockRetrievedNode
 
@@ -281,4 +282,13 @@ class TestTokenHandler(TestCase):
         )
         # history should truncate to empty list and flag should be True
         assert truncated_history == []
+        assert truncated
+
+        # Test formatted history for granite
+        model = ModelFamily.GRANITE
+        truncated_history, truncated = (
+            self._token_handler_obj.limit_conversation_history(history, model, 22)
+        )
+        assert len(truncated_history) == 1
+        assert truncated_history[-1] == restructure_history(history[-1], model)
         assert truncated
