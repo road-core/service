@@ -123,6 +123,25 @@ class AppConfig:
             print(f"Failed to load config file {config_file}: {e!s}")
             print(traceback.format_exc())
             raise
+    
+    def reload_additional_config_file(
+            self,
+            file_path: str,
+            type: str
+    ) -> None:
+        """Reload an additional configuration file that is separate from the standard RCS config."""
+        try:
+            with open(file_path, encoding="utf-8") as opened_file:
+                data = yaml.safe_load(opened_file)
+                match type:
+                    case "rhdh":
+                        pass
+                    case _:
+                        raise ValueError(f"Configuration file type '{type}' not recognized.")
+        except Exception as e:
+            print(f"Failed to load an additional configuration file {file_path}: {e!s}")
+            print(traceback.format_exc())
+            raise
 
 
 config: AppConfig = AppConfig()
