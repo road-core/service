@@ -1,0 +1,13 @@
+name: Shell check
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell check
+        run: make shellcheck
