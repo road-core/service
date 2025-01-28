@@ -116,6 +116,7 @@ def conversation_request(
         llm_request,
         summarizer_response.response,
         attachments,
+        timestamps,
         skip_user_id_check,
     )
 
@@ -437,6 +438,7 @@ def store_conversation_history(
     llm_request: LLMRequest,
     response: Optional[str],
     attachments: list[Attachment],
+    timestamps: dict[str, float],
     skip_user_id_check: bool = False,
 ) -> None:
     """Store conversation history into selected cache.
@@ -451,9 +453,21 @@ def store_conversation_history(
             response = ""
         if config.conversation_cache is not None:
             logger.info("%s Storing conversation history", conversation_id)
+            query_message = HumanMessage(content=llm_request.query)
+            response_message = AIMessage(content=response)
+            if timestamps:
+                query_message.response_metadata = {"created_at": timestamps["start"]}
+                response_message.response_metadata["created_at"] = timestamps[
+                    "generate response"
+                ]
+            if llm_request.provider:
+                response_message.response_metadata["provider"] = llm_request.provider
+            if llm_request.model:
+                response_message.response_metadata["model"] = llm_request.model
+
             cache_entry = CacheEntry(
-                query=HumanMessage(llm_request.query),
-                response=AIMessage(response),
+                query=query_message,
+                response=response_message,
                 attachments=attachments,
             )
             config.conversation_cache.insert_or_append(

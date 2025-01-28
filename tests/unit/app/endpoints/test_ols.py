@@ -2,6 +2,7 @@
 
 import json
 import re
+import time
 from http import HTTPStatus
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -215,7 +216,7 @@ def test_store_conversation_history(insert_or_append):
     llm_request = LLMRequest(query=query)
 
     ols.store_conversation_history(
-        constants.DEFAULT_USER_UID, conversation_id, llm_request, "", []
+        constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], []
     )
 
     expected_history = CacheEntry(query=HumanMessage(query))
@@ -238,10 +239,50 @@ def test_store_conversation_history_some_response(insert_or_append):
     response = "*response*"
     skip_user_id_check = False
 
-    ols.store_conversation_history(user_id, conversation_id, llm_request, response, [])
+    ols.store_conversation_history(
+        user_id, conversation_id, llm_request, response, [], []
+    )
 
     expected_history = CacheEntry(
         query=HumanMessage(query), response=AIMessage(response)
+    )
+    insert_or_append.assert_called_with(
+        user_id, conversation_id, expected_history, skip_user_id_check
+    )
+
+
+@pytest.mark.usefixtures("_load_config")
+@patch("ols.config.conversation_cache.insert_or_append")
+def test_store_conversation_history_store_metadata(insert_or_append):
+    """Test if operation to store conversation history to cache is called."""
+    user_id = "1234"
+    conversation_id = suid.get_suid()
+    query = "Tell me about Kubernetes"
+    provider = "some-provider"
+    model = "some-model"
+    llm_request = LLMRequest(query=query, provider=provider, model=model)
+    response = "*response*"
+    skip_user_id_check = False
+    start_time = time.time()
+    response_time = time.time()
+    timestamps = {"start": start_time, "generate response": response_time}
+
+    ols.store_conversation_history(
+        user_id, conversation_id, llm_request, response, [], timestamps
+    )
+
+    expected_history = CacheEntry(
+        query=HumanMessage(
+            content=llm_request.query, response_metadata={"created_at": start_time}
+        ),
+        response=AIMessage(
+            content=response,
+            response_metadata={
+                "created_at": response_time,
+                "model": model,
+                "provider": provider,
+            },
+        ),
     )
     insert_or_append.assert_called_with(
         user_id, conversation_id, expected_history, skip_user_id_check
@@ -255,9 +296,13 @@ def test_store_conversation_history_empty_user_id():
     conversation_id = suid.get_suid()
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
-        ols.store_conversation_history(user_id, conversation_id, llm_request, "", [])
+        ols.store_conversation_history(
+            user_id, conversation_id, llm_request, "", [], []
+        )
     with pytest.raises(HTTPException, match="Invalid user ID"):
-        ols.store_conversation_history(user_id, conversation_id, llm_request, None, [])
+        ols.store_conversation_history(
+            user_id, conversation_id, llm_request, None, [], []
+        )
 
 
 @pytest.mark.usefixtures("_load_config")
@@ -267,7 +312,9 @@ def test_store_conversation_history_improper_user_id():
     conversation_id = suid.get_suid()
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
-        ols.store_conversation_history(user_id, conversation_id, llm_request, "", [])
+        ols.store_conversation_history(
+            user_id, conversation_id, llm_request, "", [], []
+        )
 
 
 @pytest.mark.usefixtures("_load_config")
@@ -277,7 +324,7 @@ def test_store_conversation_history_improper_conversation_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid conversation ID"):
         ols.store_conversation_history(
-            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", []
+            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], []
         )
 
 
