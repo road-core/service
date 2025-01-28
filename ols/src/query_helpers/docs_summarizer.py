@@ -12,7 +12,7 @@ from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import RagChunk, SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
-from ols.customize import prompts, reranker
+from ols.customize import reranker
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
     restructure_history,
@@ -31,7 +31,6 @@ class DocsSummarizer(QueryHelper):
         """Initialize the QuestionValidator."""
         super().__init__(*args, **kwargs)
         self._prepare_llm()
-        self._get_system_prompt()
         self.verbose = config.ols_config.logging_config.app_log_level == logging.DEBUG
 
     def _prepare_llm(self) -> None:
@@ -44,16 +43,6 @@ class DocsSummarizer(QueryHelper):
         self.bare_llm = self.llm_loader(
             self.provider, self.model, self.generic_llm_params, self.streaming
         )
-
-    def _get_system_prompt(self) -> None:
-        """Retrieve the system prompt."""
-        # use system prompt from config if available otherwise use
-        # default system prompt fine-tuned for the service
-        if config.ols_config.system_prompt is not None:
-            self.system_prompt = config.ols_config.system_prompt
-        else:
-            self.system_prompt = prompts.QUERY_SYSTEM_INSTRUCTION
-        logger.debug("System prompt: %s", self.system_prompt)
 
     def _prepare_prompt(
         self,
@@ -123,7 +112,7 @@ class DocsSummarizer(QueryHelper):
         )
 
         final_prompt, llm_input_values = GeneratePrompt(
-            query, rag_context, history, self.system_prompt
+            query, rag_context, history, self._system_prompt
         ).generate_prompt(self.model)
 
         # Tokens-check: We trigger the computation of the token count
