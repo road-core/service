@@ -1,4 +1,4 @@
-"""Contains customization packages for individual projects (for prompts/keyvords)."""
+"""Contains customization packages for individual projects (for prompts/keywords)."""
 
 import importlib
 import os
