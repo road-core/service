@@ -422,7 +422,7 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
     from ols.app.endpoints.ols import retrieve_previous_input  # pylint: disable=C0415
     from ols.app.models.models import CacheEntry  # pylint: disable=C0415
 
-    actual_returned_history = None
+    actual_returned_history = []
 
     def capture_return_value(*args, **kwargs):
         nonlocal actual_returned_history

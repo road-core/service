@@ -453,21 +453,21 @@ def store_conversation_history(
             response = ""
         if config.conversation_cache is not None:
             logger.info("%s Storing conversation history", conversation_id)
-            queryMessage = HumanMessage(content=llm_request.query)
-            responseMessage = AIMessage(content=response)
+            query_message = HumanMessage(content=llm_request.query)
+            response_message = AIMessage(content=response)
             if timestamps:
-                queryMessage.response_metadata = {"created_at": timestamps["start"]}
-                responseMessage.response_metadata["created_at"] = timestamps[
+                query_message.response_metadata = {"created_at": timestamps["start"]}
+                response_message.response_metadata["created_at"] = timestamps[
                     "generate response"
                 ]
             if llm_request.provider:
-                responseMessage.response_metadata["provider"] = llm_request.provider
+                response_message.response_metadata["provider"] = llm_request.provider
             if llm_request.model:
-                responseMessage.response_metadata["model"] = llm_request.model
+                response_message.response_metadata["model"] = llm_request.model
 
             cache_entry = CacheEntry(
-                query=queryMessage,
-                response=responseMessage,
+                query=query_message,
+                response=response_message,
                 attachments=attachments,
             )
             config.conversation_cache.insert_or_append(
