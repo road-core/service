@@ -1,0 +1,56 @@
+# olsconfig.yaml sample for local ollama server
+#
+# 1. install local ollama server from https://ollama.com/
+# 2. install llama3.1:latest model with:
+#       ollama pull llama3.1:latest
+# 3. Copy this file to the project root of cloned lightspeed-service repo
+# 4. Install dependencies with:
+#       make install-deps
+# 5. Start lightspeed-service with:
+#       OPENAI_API_KEY=IGNORED make run
+# 6. Open https://localhost:8080/ui in your web browser
+#
+llm_providers:
+  - name: ollama
+    type: openai
+    url: "http://localhost:11434/v1/"
+    models:
+      - name: "mistral"
+      - name: 'llama3.2:latest'
+  - name: my_rhoai
+    type: openai
+    url: "https://granite3-8b-wisdom-model-staging.apps.stage2-west.v2dz.p1.openshiftapps.com/v1"
+    credentials_path: ols_api_key.txt
+    models:
+      - name: granite3-8b
+ols_config:
+  # max_workers: 1
+  reference_content:
+    # product_docs_index_path: "./vector_db/vector_db/aap_product_docs/2.5"
+    # product_docs_index_id: aap-product-docs-2_5
+    # embeddings_model_path: "./vector_db/embeddings_model"
+  conversation_cache:
+    type: memory
+    memory:
+      max_entries: 1000
+  logging_config:
+    app_log_level: info
+    lib_log_level: warning
+    uvicorn_log_level: info
+  default_provider: ollama
+  default_model: 'llama3.2:latest'
+  query_validation_method: llm
+  user_data_collection:
+    feedback_disabled: false
+    feedback_storage: "/tmp/data/feedback"
+    transcripts_disabled: false
+    transcripts_storage: "/tmp/data/transcripts"
+dev_config:
+  # config options specific to dev environment - launching OLS in local
+  enable_dev_ui: true
+  disable_auth: true
+  disable_tls: true
+  pyroscope_url: "https://pyroscope.pyroscope.svc.cluster.local:4040"
+  # llm_params:
+  #   temperature_override: 0
+  # k8s_auth_token: optional_token_when_no_available_kube_config
