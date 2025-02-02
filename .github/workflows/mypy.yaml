@@ -14,7 +14,7 @@ jobs:
           python-version: '3.11'
       - name: Python version
         run: python --version
-      - name: Mypy install
+      - name: Mypy installation
         run: pip install --user mypy pydantic
       - name: Type checks
         run: mypy --explicit-package-bases --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --ignore-missing-imports --disable-error-code attr-defined ols/

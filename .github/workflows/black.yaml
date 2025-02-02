@@ -1,10 +1,24 @@
 name: Black
 
-on: [push, pull_request]
+on:
+  - push
+  - pull_request
 
 jobs:
-  lint:
+  black:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: psf/black@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python version
+        run: python --version
+      - name: PDM installation
+        run: pip install --user pdm
+      - name: Install devel dependencies
+        run: pdm install --dev
+      - name: Black version
+        run: pdm run black --version
+      - name: Black check
+        run: pdm run black . --check
