@@ -5,6 +5,7 @@
 from unittest.mock import patch
 
 import pytest
+from langchain_core.messages import HumanMessage
 
 from ols import config
 from ols.utils import suid
@@ -54,7 +55,7 @@ def test_summarize_empty_history(benchmark, rag_index, summarizer):
     history = []  # empty history
 
     # run the benchmark
-    benchmark(summarizer.summarize, conversation_id, question, rag_index, history)
+    benchmark(summarizer.create_response, question, rag_index, history)
 
 
 @patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4)
@@ -65,7 +66,7 @@ def test_summarize_no_history(benchmark, rag_index, summarizer):
 
     # no history is passed into summarize() method
     # run the benchmark
-    benchmark(summarizer.summarize, conversation_id, question, rag_index)
+    benchmark(summarizer.create_response, question, rag_index)
 
 
 @patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4)
@@ -73,10 +74,10 @@ def test_summarize_no_history(benchmark, rag_index, summarizer):
 def test_summarize_history_provided(benchmark, rag_index, summarizer):
     """Benchmark for DocsSummarizer using mocked index and query engine, history is provided."""
     question = "What's the ultimate question with answer 42?"
-    history = ["What is Kubernetes?"]
+    history = [HumanMessage("What is Kubernetes?")]
 
     # first call with history provided
-    benchmark(summarizer.summarize, conversation_id, question, rag_index, history)
+    benchmark(summarizer.create_response, question, rag_index, history)
 
 
 @patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4)
@@ -86,10 +87,10 @@ def test_summarize_history_truncation(benchmark, rag_index, summarizer):
     question = "What's the ultimate question with answer 42?"
 
     # too long history
-    history = ["What is Kubernetes?"] * 10
+    history = [HumanMessage("What is Kubernetes?")] * 10
 
     # run the benchmark
-    benchmark(summarizer.summarize, conversation_id, question, rag_index, history)
+    benchmark(summarizer.create_response, question, rag_index, history)
 
 
 def try_to_run_summarizer(summarizer, question, rag_index, history):
@@ -130,4 +131,4 @@ def test_summarize_no_reference_content(benchmark, summarizer_no_reference_conte
     question = "What's the ultimate question with answer 42?"
 
     # run the benchmark
-    benchmark(summarizer_no_reference_content.summarize, conversation_id, question)
+    benchmark(summarizer_no_reference_content.create_response, question)
