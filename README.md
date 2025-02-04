@@ -1,5 +1,6 @@
 # About The Project
 
+[![GitHub Pages](https://img.shields.io/badge/%20-GitHub%20Pages-informational)](https://road-core.github.io/service/)
 [![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/road-core/service/blob/main/LICENSE)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
