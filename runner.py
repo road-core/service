@@ -44,7 +44,7 @@ if __name__ == "__main__":
         CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
     )
     config.reload_from_yaml_file(cfg_file)
-
+    
     # Optional environment variable representing RHDH app config file.
     rhdh_cfg_file = os.environ.get(RHDH_CONFIGURATION_FILE_NAME_ENV_VARIABLE)
     if rhdh_cfg_file is not None:
@@ -58,7 +58,8 @@ if __name__ == "__main__":
     logger = logging.getLogger("ols")
     configure_logging(config.ols_config.logging_config)
     logger.info("Config loaded from %s", Path(cfg_file).resolve())
-    logger.info("Extra configuration loaded from %s", Path(rhdh_cfg_file).resolve())
+    if rhdh_cfg_file is not None:
+        logger.info("Extra configuration loaded from %s", Path(rhdh_cfg_file).resolve())
     logger.info("Running on Python version %s", sys.version)
     configure_hugging_face_envs(config.ols_config)
 
