@@ -1441,3 +1441,21 @@ def test_valid_config_with_watsonx_credentials_path_only_in_provider_config():
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")
+
+
+def test_missing_additional_config_file():
+    """Check how missing an additional configuration file is handled."""
+    with pytest.raises(Exception, match="Not a directory"):
+        # /dev/null is special file so it can't be directory
+        # at the same moment
+        config.reload_additional_config_file("/dev/null/non-existent", "")
+
+
+def test_additional_config_file_incorrect_type():
+    """Check how an additional configuration file is handled with an incorrect type."""
+    with pytest.raises(
+        ValueError, match="Configuration file type 'wrongtype' not recognized."
+    ):
+        config.reload_additional_config_file(
+            "tests/config/valid_rhdh_config.yaml", "wrongtype"
+        )
