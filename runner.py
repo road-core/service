@@ -44,12 +44,12 @@ if __name__ == "__main__":
         CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
     )
     config.reload_from_yaml_file(cfg_file)
-    
+
     # Optional environment variable representing RHDH app config file.
     rhdh_cfg_file = os.environ.get(RHDH_CONFIGURATION_FILE_NAME_ENV_VARIABLE)
     if rhdh_cfg_file is not None:
         config.reload_additional_config_file(rhdh_cfg_file, "rhdh")
-    
+
     if "--dump-config" in sys.argv:
         with open("olsconfig.json", "w", encoding="utf-8") as fout:
             fout.write(config.config.json())

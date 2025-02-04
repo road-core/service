@@ -18,6 +18,7 @@ from pydantic import (
 from ols import constants
 from ols.utils import checks, tls
 
+
 class ModelParameters(BaseModel):
     """Model parameters."""
 
@@ -502,20 +503,22 @@ class LLMProviders(BaseModel):
         all_servers = lightspeed.get("servers")
         if all_servers is None:
             raise KeyError("No lightspeed servers defined.")
-        checks.expand_lightspeed_environment_variables(all_servers)
+        checks.expands_lightspeed_environment_variables(all_servers)
         new_providers = self._parse_rhdh_lightspeed_config(all_servers)
         for provider in new_providers:
             if provider.name not in self.providers:
                 self.providers[provider.name] = provider
 
     def _parse_rhdh_lightspeed_config(self, data: list[dict]) -> list[ProviderConfig]:
-        """Private helper for converting Red Hat Developer Hub configuration file declared model data to Road-Core Service readable data."""
+        """Private helper for converting RHDH config file model data to RCS readable data."""
         all_converted_providers = []
         for server in data:
             formatted_data = {}
             name = server.get("id")
             url = server.get("url")
-            models = server.get("models")  # Current lightspeed docs don't require model_name but is a requirement of road-core config.
+            models = server.get(
+                "models"
+            )  # OLS doesn't require model_name but is a requirement of road-core config.
             model_type = server.get("type")
             token = server.get("token")
             if name is None:

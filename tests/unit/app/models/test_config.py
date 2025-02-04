@@ -3723,12 +3723,11 @@ def test_lightspeed_config_parsing():
 
     assert config.providers == expected_providers
 
+
 def test_lightspeed_config_parsing_empty():
     """Test that is errors properly if there is no Lightspeed servers provided."""
     with pytest.raises(KeyError):
         config = LLMProviders()
-        with open(
-            "tests/config/invalid_rhdh_config.yaml", encoding="utf-8"
-        ) as f:
+        with open("tests/config/invalid_rhdh_config.yaml", encoding="utf-8") as f:
             data = yaml.safe_load(f)
             config.add_lightspeed_providers(data)
