@@ -34,6 +34,7 @@ from ols.src.llms.llm_loader import LLMConfigurationError, resolve_provider_conf
 from ols.src.query_helpers.attachment_appender import append_attachments_to_query
 from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
+from ols.src.query_helpers.topic_summarizer import TopicSummarizer
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
 
@@ -109,7 +110,12 @@ def conversation_request(
         )
 
     timestamps["generate response"] = time.time()
-
+    
+    topic_summary = ""
+    # only generate topic summary for new conversations
+    if not previous_input:
+        topic_summary = _get_topic_summary(conversation_id, llm_request)
+    
     store_conversation_history(
         user_id,
         conversation_id,
@@ -117,6 +123,7 @@ def conversation_request(
         summarizer_response.response,
         attachments,
         timestamps,
+        topic_summary,
         skip_user_id_check,
     )
 
@@ -412,7 +419,6 @@ def generate_response(
             },
         )
 
-
 def validate_requested_provider_model(llm_request: LLMRequest) -> None:
     """Validate provider/model; if provided in request payload."""
     provider = llm_request.provider
@@ -439,6 +445,7 @@ def store_conversation_history(
     response: Optional[str],
     attachments: list[Attachment],
     timestamps: dict[str, float],
+    topic_summary: str,
     skip_user_id_check: bool = False,
 ) -> None:
     """Store conversation history into selected cache.
@@ -474,6 +481,7 @@ def store_conversation_history(
                 user_id,
                 conversation_id,
                 cache_entry,
+                topic_summary,
                 skip_user_id_check,
             )
     except Exception as e:
@@ -693,3 +701,13 @@ def store_transcript(
         json.dump(data_to_store, transcript_file)
 
     logger.debug("transcript stored in '%s'", transcript_file_path)
+
+
+def _get_topic_summary(conversation_id: str, llm_request: LLMRequest) -> str:
+    """Summarize user question using llm, returns a topic"""
+    topic_summarizer = TopicSummarizer(
+        provider=llm_request.provider,
+        model=llm_request.model,
+        system_prompt=llm_request.system_prompt,
+    )
+    return topic_summarizer.summarize_topic(conversation_id, llm_request.query)

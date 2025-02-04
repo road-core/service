@@ -33,7 +33,7 @@ class InMemoryCache(Cache):
         # pylint: disable=W0201
         self.capacity = config.max_entries
         self.deque: deque[str] = deque()
-        self.cache: dict[str, list[dict[str, Any]]] = {}
+        self.cache: dict[str, dict[str, Any]] = {}
 
     def get(
         self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
@@ -55,7 +55,7 @@ class InMemoryCache(Cache):
 
         self.deque.remove(key)
         self.deque.appendleft(key)
-        value = self.cache[key].copy()
+        value = self.cache[key]['history'].copy()
         return [CacheEntry.from_dict(cache_entry) for cache_entry in value]
 
     def insert_or_append(
@@ -63,6 +63,7 @@ class InMemoryCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        topic_summary: str,
         skip_user_id_check: bool = False,
     ) -> None:
         """Set the value if a key is not present or else simply appends.
@@ -71,6 +72,7 @@ class InMemoryCache(Cache):
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             cache_entry: The `CacheEntry` object to store.
+            topic_summary: Summary of the conversation's initial topic.
             skip_user_id_check: Skip user_id suid check.
         """
         key = super().construct_key(user_id, conversation_id, skip_user_id_check)
@@ -81,11 +83,14 @@ class InMemoryCache(Cache):
                 if len(self.deque) == self.capacity:
                     oldest = self.deque.pop()
                     del self.cache[oldest]
-                self.cache[key] = [value]
+                self.cache[key] = {
+                    'topic_summary': topic_summary,
+                    'history': [value]
+                }
             else:
                 self.deque.remove(key)
                 old_value = self.cache[key]
-                old_value.append(value)
+                old_value['history'].append(value)
                 self.cache[key] = old_value
             self.deque.appendleft(key)
 
@@ -113,7 +118,7 @@ class InMemoryCache(Cache):
             self.deque.remove(key)
             return True
 
-    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -121,9 +126,9 @@ class InMemoryCache(Cache):
             skip_user_id_check: Skip user_id suid check.
 
         Returns:
-            A list of conversation ids from the cache
+            A list of dictionaries with conversation_id and topic summary
         """
-        conversation_ids = []
+        conversations = []
         super()._check_user_id(user_id, skip_user_id_check)
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
 
@@ -131,7 +136,11 @@ class InMemoryCache(Cache):
             for key in self.cache:
                 if key.startswith(prefix):
                     # Extract conversation_id from the key
-                    conversation_id = key[len(prefix) :]
-                    conversation_ids.append(conversation_id)
+                    conversation_id = key[len(prefix):]
+                    topic_summary = self.cache[key].get('topic_summary', '')
+                    conversations.append({
+                        "conversation_id": conversation_id,
+                        "topic_summary": topic_summary
+                    })
 
-        return conversation_ids
+        return conversations

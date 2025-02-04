@@ -24,6 +24,7 @@ class PostgresCache(Cache):
     -----------------+-----------------------------+----------+---------+----------+
      user_id         | text                        | not null |         | extended |
      conversation_id | text                        | not null |         | extended |
+     topic_summary   | text                        | not null |         | extended |
      value           | bytea                       |          |         | extended |
      updated_at      | timestamp without time zone |          |         | plain    |
     Indexes:
@@ -39,6 +40,7 @@ class PostgresCache(Cache):
             user_id         text NOT NULL,
             conversation_id text NOT NULL,
             value           bytea,
+            topic_summary   text,
             updated_at      timestamp,
             PRIMARY KEY(user_id, conversation_id)
         );
@@ -62,8 +64,8 @@ class PostgresCache(Cache):
         """
 
     INSERT_CONVERSATION_HISTORY_STATEMENT = """
-        INSERT INTO cache(user_id, conversation_id, value, updated_at)
-        VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+        INSERT INTO cache(user_id, conversation_id, value, topic_summary, updated_at)
+        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
         """
 
     DELETE_CONVERSATION_HISTORY_STATEMENT = """
@@ -82,7 +84,7 @@ class PostgresCache(Cache):
         """
 
     LIST_CONVERSATIONS_STATEMENT = """
-        SELECT conversation_id
+        SELECT conversation_id, topic_summary
         FROM cache
         WHERE user_id=%s
         ORDER BY updated_at DESC
@@ -145,6 +147,7 @@ class PostgresCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        topic_summary: str,
         skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
@@ -153,8 +156,8 @@ class PostgresCache(Cache):
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             cache_entry: The `CacheEntry` object to store.
+            topic_summary: Summary of the conversation's initial topic.
             skip_user_id_check: Skip user_id suid check.
-
         """
         value = cache_entry.to_dict()
         # the whole operation is run in one transaction
@@ -175,6 +178,7 @@ class PostgresCache(Cache):
                         user_id,
                         conversation_id,
                         json.dumps([value], cls=MessageEncoder).encode("utf-8"),
+                        topic_summary,
                     )
                     PostgresCache._cleanup(cursor, self.capacity)
                 # commit is implicit at this point
@@ -203,7 +207,7 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.delete: %s", e)
                 raise CacheError("PostgresCache.delete", e) from e
 
-    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -218,7 +222,7 @@ class PostgresCache(Cache):
             try:
                 cursor.execute(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,))
                 rows = cursor.fetchall()
-                return [row[0] for row in rows]
+                return [{"conversation_id": row[0], "topic_summary": row[1]} for row in rows]
             except psycopg2.DatabaseError as e:
                 logger.error("PostgresCache.list: %s", e)
                 raise CacheError("PostgresCache.list", e) from e
@@ -267,11 +271,12 @@ class PostgresCache(Cache):
         user_id: str,
         conversation_id: str,
         value: bytes,
+        topic_summary: str,
     ) -> None:
         """Insert new conversation history for given user_id and conversation_id."""
         cursor.execute(
             PostgresCache.INSERT_CONVERSATION_HISTORY_STATEMENT,
-            (user_id, conversation_id, value),
+            (user_id, conversation_id, value, topic_summary),
         )
 
     @staticmethod

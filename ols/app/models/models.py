@@ -248,7 +248,7 @@ class ListConversationsResponse(BaseModel):
         conversations: List of conversation IDs.
     """
 
-    conversations: list[str]
+    conversations: list[dict[str, str]]
 
     # provides examples for /docs endpoint
     model_config = {
@@ -256,9 +256,9 @@ class ListConversationsResponse(BaseModel):
             "examples": [
                 {
                     "conversations": [
-                        "15a78660-a18e-447b-9fea-9deb27b63b5f",
-                        "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
-                        "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                        {"conversation_id": "15a78660-a18e-447b-9fea-9deb27b63b5f", "topic_summary": "topic1"},
+                        {"conversation_id": "c0a3bc27-77cc-46da-822f-93a9c0e0de4b", "topic_summary": "topic2"},
+                        {"conversation_id": "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f", "topic_summary": "topic3"},
                     ]
                 }
             ]

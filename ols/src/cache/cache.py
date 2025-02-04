@@ -63,6 +63,7 @@ class Cache(ABC):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        topic_summary: str,
         skip_user_id_check: bool,
     ) -> None:
         """Abstract method to store a value in the cache.

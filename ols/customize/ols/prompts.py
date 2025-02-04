@@ -65,3 +65,51 @@ Question:
 {{query}}
 Response:
 """
+
+# {{query}} is escaped because it will be replaced as a parameter at time of use
+TOPIC_SUMMARY_PROMPT_TEMPLATE = f"""
+Instructions:
+- You are a topic summarizer
+- Your job is to extract precise topic summary from user input
+
+For Input Analysis:
+- Scan entire user message
+- Identify core subject matter
+- Distill essence into concise descriptor
+- Prioritize key concepts
+- Eliminate extraneous details
+
+For Output Constraints:
+- Maximum 5 words
+- Uppercase first letter of significant words
+- Avoid articles prepositions
+- Exclude punctuation
+- Neutral objective language
+
+Processing Steps
+1. Analyze semantic structure
+2. Identify primary topic
+3. Remove contextual noise
+4. Condense to essential meaning
+5. Generate topic label
+
+
+Example Input:
+How to implement horizontal pod autoscaling in Kubernetes clusters
+Example Output:
+Kubernetes Horizontal Pod Autoscaling
+
+Example Input:
+Comparing OpenShift deployment strategies for microservices architecture
+Example Output:
+OpenShift Microservices Deployment Strategies
+
+Example Input:
+Troubleshooting persistent volume claims in Kubernetes environments
+Example Output:
+Kubernetes Persistent Volume Troubleshooting
+
+Input:
+{{query}}
+Output:
+"""

@@ -77,24 +77,24 @@ class RedisCache(Cache):
             skip_user_id_check: Skip user_id suid check.
 
         Returns:
-            The value associated with the key, or None if not found.
+             A list of CacheEntry objects, or None if not found.
         """
         key = super().construct_key(user_id, conversation_id, skip_user_id_check)
 
         value = self.redis_client.get(key)
         if value is None:
             return None
-
-        return [
-            CacheEntry.from_dict(cache_entry)
-            for cache_entry in json.loads(value, cls=MessageDecoder)
-        ]
+        
+        decoded_value = json.loads(value, cls=MessageDecoder)
+        cache_entries = decoded_value["history"]  # New format
+        return [CacheEntry.from_dict(entry) for entry in cache_entries]
 
     def insert_or_append(
         self,
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        topic_summary: str,
         skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
@@ -103,6 +103,7 @@ class RedisCache(Cache):
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             cache_entry: The `CacheEntry` object to store.
+            topic_summary: Summary of the conversation's initial topic.
             skip_user_id_check: Skip user_id suid check.
 
         Raises:
@@ -114,20 +115,23 @@ class RedisCache(Cache):
         with self._lock:
             old_value = self.get(user_id, conversation_id, skip_user_id_check)
             if old_value:
-                old_value.append(cache_entry)
+                old_value["history"].append(cache_entry)
+                # do not update summary, it should always be the initial purpose of the conversation
                 # self.redis_client.set(
-                #     key, json.dumps(old_value, default=lambda o: o.to_dict(), cls=MessageEncoder)
+                #     key,
+                #     json.dumps(
+                #         [entry.to_dict() for entry in old_value], cls=MessageEncoder
+                #     ),
                 # )
-                self.redis_client.set(
-                    key,
-                    json.dumps(
-                        [entry.to_dict() for entry in old_value], cls=MessageEncoder
-                    ),
-                )
             else:
-                self.redis_client.set(
-                    key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder)
-                )
+                old_value = {
+                    "history": [cache_entry],
+                    "topic_summary": topic_summary
+                }
+                # self.redis_client.set(
+                #     key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder)
+                # )
+            self.redis_client.set(key, json.dumps(old_value, cls=MessageEncoder))
 
     def delete(
         self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
