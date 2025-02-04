@@ -24,7 +24,12 @@ def perform_question_validation_benchmark(benchmark, question):
     # be performed
     llm_loader = mock_llm_loader(
         None,
-        expected_params=("p1", "m1", {GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: 4}),
+        expected_params=(
+            "p1",
+            "m1",
+            {GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: 4},
+            False,
+        ),
     )
 
     # check that LLM loader was called with expected parameters
