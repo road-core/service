@@ -1,0 +1,24 @@
+title: Insights Data Schemas
+description: Insights Data Schemas
+baseurl: "/insights-data-schemas"
+url: "https://redhatinsights.github.io"
+
+heading_anchors: true
+search_enabled: true
+
+aux_links:
+  "Github repository":
+    - "https://github.com/RedHatInsights/insights-data-schemas"
+
+footer_content: "Copyright &copy; 2020 Pavel Tisnovsky, Red Hat"
+
+# Build settings
+markdown: kramdown
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - sources.tmpl.md
+
+theme: jekyll-theme-leap-day
