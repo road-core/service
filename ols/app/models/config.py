@@ -506,7 +506,7 @@ class LLMProviders(BaseModel):
         checks.expands_lightspeed_environment_variables(all_servers)
         new_providers = self._parse_rhdh_lightspeed_config(all_servers)
         for provider in new_providers:
-            if provider.name not in self.providers:
+            if provider.name not in self.providers and provider.name is not None:
                 self.providers[provider.name] = provider
 
     def _parse_rhdh_lightspeed_config(self, data: list[dict]) -> list[ProviderConfig]:
