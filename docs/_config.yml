@@ -1,16 +1,16 @@
 title: Insights Data Schemas
 description: Insights Data Schemas
-baseurl: "/insights-data-schemas"
-url: "https://redhatinsights.github.io"
+baseurl: "/service"
+url: "https://road-core.github.io"
 
 heading_anchors: true
 search_enabled: true
 
 aux_links:
   "Github repository":
-    - "https://github.com/RedHatInsights/insights-data-schemas"
+    - "https://github.com/road-core/service/"
 
-footer_content: "Copyright &copy; 2020 Pavel Tisnovsky, Red Hat"
+footer_content: "Copyright &copy; 2024, 2025 Red Hat and external authors"
 
 # Build settings
 markdown: kramdown
