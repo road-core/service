@@ -114,7 +114,8 @@ def conversation_request(
     topic_summary = ""
     # only generate topic summary for new conversations
     if not previous_input:
-        topic_summary = _get_topic_summary(conversation_id, llm_request)
+        topic_summary = get_topic_summary(conversation_id, llm_request)
+        timestamps["generate topic summary"] = time.time()
     
     store_conversation_history(
         user_id,
@@ -703,7 +704,7 @@ def store_transcript(
     logger.debug("transcript stored in '%s'", transcript_file_path)
 
 
-def _get_topic_summary(conversation_id: str, llm_request: LLMRequest) -> str:
+def get_topic_summary(conversation_id: str, llm_request: LLMRequest) -> str:
     """Summarize user question using llm, returns a topic"""
     topic_summarizer = TopicSummarizer(
         provider=llm_request.provider,
