@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -97,3 +98,22 @@ def get_log_level(value: str) -> int:
             f"{[k.lower() for k in logging.getLevelNamesMapping()]}"
         )
     return log_level
+
+
+def expands_lightspeed_environment_variables(data: list[dict]) -> None:
+    """Expand environment variables declared in RHDH config files for lightspeed."""
+    env_var_pattern = r"\$\{([\w]+)\}"
+    for server in data:
+        for k, v in server.items():
+            if k == "models":  # skip over looking through the model names list
+                continue
+            matched_value = re.match(env_var_pattern, v)
+            if matched_value is None:
+                continue
+            expanded = os.getenv(matched_value.group(1))
+            if expanded is None:
+                raise Exception(
+                    f"Environment variable referenced but not set. {matched_value.group()}"
+                )
+            clean_expanded = expanded.strip()
+            server[k] = clean_expanded

@@ -1,5 +1,6 @@
 # About The Project
 
+[![GitHub Pages](https://img.shields.io/badge/%20-GitHub%20Pages-informational)](https://road-core.github.io/service/)
 [![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/road-core/service/blob/main/LICENSE)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
@@ -54,7 +55,7 @@ configure model, and connect to it.
     * [8. (Optional) Configure the number of workers](#8-optional-configure-the-number-of-workers)
     * [9. Registering a new LLM provider](#9-registering-a-new-llm-provider)
     * [10. TLS security profiles](#10-tls-security-profiles)
-    * [11. Fine tuning](#11-fine-tuning)
+    * [11. System prompt](#11-system-prompt)
     * [12. Configuration dump](#12-configuration-dump)
 * [Usage](#usage)
     * [Deployments](#deployments)
@@ -526,8 +527,8 @@ The `tlsSecurityProfile` is fully optional. When it is not specified, the LLM ca
 
 
 
-## 11. Fine tuning
-   The service uses the, so called, system prompt to put the question into context before the question is sent to the selected LLM. The default system prompt is fine tuned for questions about OpenShift and Kubernetes. It is possible to use a different system prompt via the configuration option `system_prompt_path` in the `rcs_config` section. That option must contain the path to the text file with the actual system prompt (can contain multiple lines). An example of such configuration:
+## 11. System prompt
+   The service uses the, so called, system prompt to put the question into context before the question is sent to the selected LLM. The default system prompt is designed for questions about OpenShift and Kubernetes. It is possible to use a different system prompt via the configuration option `system_prompt_path` in the `rcs_config` section. That option must contain the path to the text file with the actual system prompt (can contain multiple lines). An example of such configuration:
 
 ```yaml
 rcs_config:

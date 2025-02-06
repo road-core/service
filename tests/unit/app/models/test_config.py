@@ -4,6 +4,7 @@ import copy
 import logging
 
 import pytest
+import yaml
 from pydantic import ValidationError
 
 import ols.utils.tls as tls
@@ -3589,3 +3590,144 @@ def test_ols_config_with_non_readable_system_prompt(tmpdir):
                 "system_prompt_path": "tests/config/",
             }
         )
+
+
+def test_missing_lightspeed_id_attribute():
+    """Test if missing id attribute is handled correctly."""
+    config = LLMProviders()
+    data = [
+        {
+            "url": "lightspeed-url",
+            "models": [{"name": "lightspeed-model-name"}],
+            "type": "lightspeed-type",
+            "token": "lightspeed-token",
+        }
+    ]
+
+    with pytest.raises(KeyError, match="lightspeed id is missing."):
+        config._parse_rhdh_lightspeed_config(data)
+
+
+def test_missing_lightspeed_url_attribute():
+    """Test if missing url attribute is handled correctly."""
+    config = LLMProviders()
+    data = [
+        {
+            "id": "lightspeed-id",
+            "models": [{"name": "lightspeed-model-name"}],
+            "type": "lightspeed-type",
+            "token": "lightspeed-token",
+        }
+    ]
+    with pytest.raises(KeyError, match="lightspeed url is missing."):
+        config._parse_rhdh_lightspeed_config(data)
+
+
+def test_missing_lightspeed_models_attribute():
+    """Test if missing model name attribute is handled correctly."""
+    config = LLMProviders()
+    data = [
+        {
+            "id": "lightspeed-id",
+            "url": "lightspeed-url",
+            "type": "lightspeed-type",
+            "token": "lightspeed-token",
+        }
+    ]
+    with pytest.raises(KeyError, match="lightspeed models missing."):
+        config._parse_rhdh_lightspeed_config(data)
+
+
+def test_missing_lightspeed_token_attribute():
+    """Test if missing token attribute is handled correctly."""
+    config = LLMProviders()
+    data = [
+        {
+            "id": "lightspeed-id",
+            "url": "lightspeed-url",
+            "models": [{"name": "lightspeed-model-name"}],
+            "type": "lightspeed-type",
+        }
+    ]
+    with pytest.raises(KeyError, match="lightspeed token is missing."):
+        config._parse_rhdh_lightspeed_config(data)
+
+
+def test_missing_lightspeed_type_attribute():
+    """Test if the missing type attribute is correctly handled."""
+    config = LLMProviders()
+    data = [
+        {
+            "id": "lightspeed-id",
+            "url": "lightspeed-url",
+            "models": [{"name": "lightspeed-model-name"}],
+            "token": "lightspeed-token",
+        }
+    ]
+    parsed_providers = config._parse_rhdh_lightspeed_config(data)
+    fetched_type = parsed_providers[0].type
+    assert fetched_type is not None and fetched_type == "openai"
+
+
+def test_lightspeed_token_setting():
+    """Test if the token is properly set for a lightspeed provider."""
+    config = LLMProviders()
+    data = [
+        {
+            "id": "lightspeed-id",
+            "url": "lightspeed-url",
+            "models": [{"name": "lightspeed-model-name"}],
+            "token": "lightspeed-token",
+            "type": "openai",
+        }
+    ]
+
+    parsed_providers = config._parse_rhdh_lightspeed_config(data)
+    assert (
+        parsed_providers[0].credentials is not None
+        and parsed_providers[0].credentials == "lightspeed-token"
+    )
+
+
+def test_lightspeed_config_parsing():
+    """Test if the parsing of lightspeed providers from an RHDH config file is handled properly."""
+    provider_one = ProviderConfig(
+        {
+            "name": "ollama",
+            "url": "http://localhost:11434/v1",
+            "models": [{"name": "model-one"}],
+            "type": "openai",
+        },
+        True,
+    )
+    provider_two = ProviderConfig(
+        {
+            "name": "new-cluster",
+            "url": "http://localhost:8080",
+            "models": [{"name": "model-one"}],
+            "type": "openai",
+        },
+        True,
+    )
+    provider_one.credentials = "dummy-token"
+    provider_two.credentials = "my-token"
+
+    expected_providers = {"ollama": provider_one, "new-cluster": provider_two}
+
+    config = LLMProviders()
+    with open(
+        "tests/config/valid_rhdh_config_multiple_providers.yaml", encoding="utf-8"
+    ) as f:
+        data = yaml.safe_load(f)
+        config.add_lightspeed_providers(data)
+
+    assert config.providers == expected_providers
+
+
+def test_lightspeed_config_parsing_empty():
+    """Test that is errors properly if there is no Lightspeed servers provided."""
+    with pytest.raises(KeyError):
+        config = LLMProviders()
+        with open("tests/config/invalid_rhdh_config.yaml", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+            config.add_lightspeed_providers(data)
