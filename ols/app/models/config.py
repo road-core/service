@@ -493,6 +493,53 @@ class LLMProviders(BaseModel):
         for v in self.providers.values():
             v.validate_yaml()
 
+    def add_lightspeed_providers(self, data: dict) -> None:
+        """Load additional providers declared in a Red Hat Developer Hub configuration file."""
+        if data is None:
+            return
+        lightspeed = data.get("lightspeed")
+        if lightspeed is None:
+            raise KeyError("No lightspeed configuration defined.")
+        all_servers = lightspeed.get("servers")
+        if all_servers is None:
+            raise KeyError("No lightspeed servers defined.")
+        checks.expands_lightspeed_environment_variables(all_servers)
+        new_providers = self._parse_rhdh_lightspeed_config(all_servers)
+        for provider in new_providers:
+            if provider.name not in self.providers and provider.name is not None:
+                self.providers[provider.name] = provider
+
+    def _parse_rhdh_lightspeed_config(self, data: list[dict]) -> list[ProviderConfig]:
+        """Private helper for converting RHDH config file model data to RCS readable data."""
+        all_converted_providers = []
+        for server in data:
+            formatted_data = {}
+            name = server.get("id")
+            url = server.get("url")
+            models = server.get(
+                "models"
+            )  # OLS doesn't require model_name but is a requirement of road-core config.
+            model_type = server.get("type")
+            token = server.get("token")
+            if name is None:
+                raise KeyError("lightspeed id is missing.")
+            if url is None:
+                raise KeyError("lightspeed url is missing.")
+            if models is None:
+                raise KeyError("lightspeed models missing.")
+            if token is None:
+                raise KeyError("lightspeed token is missing.")
+            if model_type is None:
+                model_type = "openai"  # Default to openai if type is unset.
+            formatted_data["name"] = name
+            formatted_data["url"] = url
+            formatted_data["models"] = models
+            formatted_data["type"] = model_type
+            provider = ProviderConfig(formatted_data, True)
+            provider.credentials = token
+            all_converted_providers.append(provider)
+        return all_converted_providers
+
 
 class PostgresConfig(BaseModel):
     """Postgres configuration."""
