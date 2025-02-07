@@ -1,7 +1,5 @@
 """Unit tests for QuestionValidator class."""
 
-from unittest.mock import patch
-
 import pytest
 
 from ols import config
@@ -14,7 +12,6 @@ from ols.src.query_helpers.question_validator import (  # noqa: E402
     QueryHelper,
     QuestionValidator,
 )
-from tests.mock_classes.mock_llm_chain import mock_llm_chain  # noqa: E402
 from tests.mock_classes.mock_llm_loader import mock_llm_loader  # noqa: E402
 
 
@@ -63,7 +60,6 @@ def test_passing_parameters():
     )
 
 
-@patch("ols.src.query_helpers.question_validator.LLMChain", new=mock_llm_chain(None))
 def test_validate_question_llm_loader():
     """Test that LLM is loaded within validate_question method with proper parameters."""
     # it is needed to initialize configuration in order to be able
