@@ -63,7 +63,7 @@ class InMemoryCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
-        topic_summary: str,
+        topic_summary: str = "",
         skip_user_id_check: bool = False,
     ) -> None:
         """Set the value if a key is not present or else simply appends.
@@ -126,7 +126,7 @@ class InMemoryCache(Cache):
             skip_user_id_check: Skip user_id suid check.
 
         Returns:
-            A list of dictionaries with conversation_id and topic summary
+            A list of dictionaries containing conversation_id and topic_summary
         """
         conversations = []
         super()._check_user_id(user_id, skip_user_id_check)

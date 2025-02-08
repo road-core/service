@@ -147,7 +147,7 @@ class PostgresCache(Cache):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
-        topic_summary: str,
+        topic_summary: str = "",
         skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
@@ -215,7 +215,7 @@ class PostgresCache(Cache):
             skip_user_id_check: Skip user_id suid check.
 
         Returns:
-            A list of conversation ids from the cache
+             A list of dictionaries containing conversation_id and topic_summary
 
         """
         with self.conn.cursor() as cursor:

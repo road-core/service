@@ -2,7 +2,7 @@
 
 import json
 import threading
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 import redis
 from redis.backoff import ExponentialBackoff
@@ -87,14 +87,35 @@ class RedisCache(Cache):
         
         decoded_value = json.loads(value, cls=MessageDecoder)
         cache_entries = decoded_value["history"]  # New format
-        return [CacheEntry.from_dict(entry) for entry in cache_entries]
+        return cache_entries
+    
+    def get_db_entry(
+        self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """Get the db entry associated with the given key.
+
+        Args:
+            user_id: User identification.
+            conversation_id: Conversation ID unique for given user.
+            skip_user_id_check: Skip user_id suid check.
+
+        Returns:
+            A dictionary containing history and topic_summary, or None if not found.
+        """
+        key = super().construct_key(user_id, conversation_id, skip_user_id_check)
+
+        value = self.redis_client.get(key)
+        if value is None:
+            return None
+        
+        return json.loads(value, cls=MessageDecoder)
 
     def insert_or_append(
         self,
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
-        topic_summary: str,
+        topic_summary: str = "",
         skip_user_id_check: bool = False,
     ) -> None:
         """Set the value associated with the given key.
@@ -113,24 +134,14 @@ class RedisCache(Cache):
         key = super().construct_key(user_id, conversation_id, skip_user_id_check)
 
         with self._lock:
-            old_value = self.get(user_id, conversation_id, skip_user_id_check)
+            old_value = self.get_db_entry(user_id, conversation_id, skip_user_id_check)
             if old_value:
                 old_value["history"].append(cache_entry)
-                # do not update summary, it should always be the initial purpose of the conversation
-                # self.redis_client.set(
-                #     key,
-                #     json.dumps(
-                #         [entry.to_dict() for entry in old_value], cls=MessageEncoder
-                #     ),
-                # )
             else:
                 old_value = {
                     "history": [cache_entry],
                     "topic_summary": topic_summary
                 }
-                # self.redis_client.set(
-                #     key, json.dumps([cache_entry.to_dict()], cls=MessageEncoder)
-                # )
             self.redis_client.set(key, json.dumps(old_value, cls=MessageEncoder))
 
     def delete(
@@ -150,7 +161,7 @@ class RedisCache(Cache):
         # Redis del() returns the number of keys that were removed
         return bool(self.redis_client.delete(key))
 
-    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -158,7 +169,7 @@ class RedisCache(Cache):
             skip_user_id_check: Skip user_id suid check.
 
         Returns:
-            A list of conversation ids from the cache
+             A list of dictionaries containing conversation_id and topic_summary
         """
         # Get all keys matching the user_id prefix
         super()._check_user_id(user_id, skip_user_id_check)
@@ -166,11 +177,20 @@ class RedisCache(Cache):
         pattern = f"{prefix}*"
         keys = self.redis_client.keys(pattern)
 
-        # Extract conversation_ids from the keys
-        user_conversation_ids = []
-        for key in keys:
-            # Remove the prefix to get just the conversation_id
-            conversation_id = key[len(prefix) :]
-            user_conversation_ids.append(conversation_id)
+        # Initialize result list
+        conversations = []
 
-        return user_conversation_ids
+        # Fetch data for each conversation
+        for key in keys:
+            # Extract conversation_id from the key
+            conversation_id = key[len(prefix):]
+            
+            # Get the conversation data
+            conversation_data = self.get_db_entry(user_id, conversation_id, skip_user_id_check)
+            if conversation_data is not None:
+                conversations.append({
+                    "conversation_id": conversation_id,
+                    "topic_summary": conversation_data.get("topic_summary", "")
+                })
+
+        return conversations

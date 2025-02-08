@@ -24,7 +24,7 @@ class MockRedisClient:
 
     def config_set(self, parameter, value):
         """Allow passing any parameter."""
-
+    
     def get(self, key):
         """Return item from cache (implementation of GET command)."""
         # real Redis accepts keys as strings only

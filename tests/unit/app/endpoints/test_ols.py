@@ -239,17 +239,18 @@ def test_store_conversation_history_some_response(insert_or_append):
     query = "Tell me about Kubernetes"
     llm_request = LLMRequest(query=query)
     response = "*response*"
+    topic_summary = "some summary"
     skip_user_id_check = False
 
     ols.store_conversation_history(
-        user_id, conversation_id, llm_request, response, [], []
+        user_id, conversation_id, llm_request, response, [], [], topic_summary
     )
 
     expected_history = CacheEntry(
         query=HumanMessage(query), response=AIMessage(response)
     )
     insert_or_append.assert_called_with(
-        user_id, conversation_id, expected_history, skip_user_id_check
+        user_id, conversation_id, expected_history, topic_summary, skip_user_id_check
     )
 
 
@@ -268,9 +269,10 @@ def test_store_conversation_history_store_metadata(insert_or_append):
     start_time = time.time()
     response_time = time.time()
     timestamps = {"start": start_time, "generate response": response_time}
+    topic_summary = "some summary"
 
     ols.store_conversation_history(
-        user_id, conversation_id, llm_request, response, [], timestamps
+        user_id, conversation_id, llm_request, response, [], timestamps, topic_summary
     )
 
     expected_history = CacheEntry(
@@ -287,7 +289,7 @@ def test_store_conversation_history_store_metadata(insert_or_append):
         ),
     )
     insert_or_append.assert_called_with(
-        user_id, conversation_id, expected_history, skip_user_id_check
+        user_id, conversation_id, expected_history, topic_summary,skip_user_id_check
     )
 
 
@@ -299,11 +301,11 @@ def test_store_conversation_history_empty_user_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, "", [], []
+            user_id, conversation_id, llm_request, "", [], [], ""
         )
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, None, [], []
+            user_id, conversation_id, llm_request, None, [], [], ""
         )
 
 
@@ -315,7 +317,7 @@ def test_store_conversation_history_improper_user_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, "", [], []
+            user_id, conversation_id, llm_request, "", [], [], ""
         )
 
 
@@ -326,7 +328,7 @@ def test_store_conversation_history_improper_conversation_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid conversation ID"):
         ols.store_conversation_history(
-            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], []
+            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], [], ""
         )
 
 
@@ -678,7 +680,9 @@ def test_attachments_redact_on_redact_error():
 @patch("ols.src.query_helpers.question_validator.QuestionValidator.validate_question")
 @patch("ols.src.query_helpers.docs_summarizer.DocsSummarizer.create_response")
 @patch("ols.config.conversation_cache.get")
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
 def test_conversation_request(
+    mock_summarize_topic,
     mock_conversation_cache_get,
     mock_summarize,
     mock_validate_question,
@@ -728,7 +732,9 @@ def test_conversation_request(
 @patch("ols.src.query_helpers.question_validator.QuestionValidator.validate_question")
 @patch("ols.src.query_helpers.docs_summarizer.DocsSummarizer.create_response")
 @patch("ols.config.conversation_cache.get")
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
 def test_conversation_request_dedup_ref_docs(
+    mock_summarize_topic,
     mock_conversation_cache_get,
     mock_summarize,
     mock_validate_question,
@@ -788,7 +794,8 @@ def test_conversation_request_on_wrong_configuration(
     "ols.app.endpoints.ols.validate_question",
     new=Mock(return_value=False),
 )
-def test_question_validation_in_conversation_start(auth):
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
+def test_question_validation_in_conversation_start(mock_summarize_topic, auth):
     """Test if question validation is skipped in follow-up conversation."""
     # note the `validate_question` is patched to always return as `SUBJECT_REJECTED`
     # this should resolve in rejection in summarization
@@ -811,7 +818,8 @@ def test_question_validation_in_conversation_start(auth):
     new=Mock(return_value=constants.SUBJECT_REJECTED),
 )
 @patch("ols.src.query_helpers.docs_summarizer.DocsSummarizer.create_response")
-def test_no_question_validation_in_follow_up_conversation(mock_summarize, auth):
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
+def test_no_question_validation_in_follow_up_conversation(mock_summarize_topic, mock_summarize, auth):
     """Test if question validation is skipped in follow-up conversation."""
     # note the `validate_question` is patched to always return as `SUBJECT_REJECTED`
     # but as it is not the first question, it should proceed to summarization
@@ -832,7 +840,8 @@ def test_no_question_validation_in_follow_up_conversation(mock_summarize, auth):
 
 @pytest.mark.usefixtures("_load_config")
 @patch("ols.app.endpoints.ols.validate_question")
-def test_conversation_request_invalid_subject(mock_validate, auth):
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
+def test_conversation_request_invalid_subject(mock_summarize_topic, mock_validate, auth):
     """Test how generate_response function checks validation results."""
     # prepare arguments for DocsSummarizer
     llm_request = LLMRequest(query="Tell me about Kubernetes")
@@ -916,7 +925,6 @@ def transcripts_location(tmpdir):
     )
     return tmpdir.strpath
 
-
 def test_transcripts_are_not_stored_when_disabled(transcripts_location, auth):
     """Test nothing is stored when the transcript collection is disabled."""
     with (
@@ -935,6 +943,8 @@ def test_transcripts_are_not_stored_when_disabled(transcripts_location, auth):
         patch(
             "ols.app.endpoints.ols.store_conversation_history",
             return_value=None,
+        ),
+        patch("ols.app.endpoints.ols.get_topic_summary",  return_value="some summary",
         ),
     ):
         llm_request = LLMRequest(query="Tell me about Kubernetes")
