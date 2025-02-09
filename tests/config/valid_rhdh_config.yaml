@@ -83,3 +83,5 @@ lightspeed:
     - id: ollama
       url: http://localhost:11434/v1
       token: dummy-token
+      models:
+        - name: model-one
