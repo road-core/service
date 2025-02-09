@@ -37,6 +37,9 @@ from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
 
+KEYWORDS = keywords.KEYWORDS
+INVALID_QUERY_RESP = prompts.INVALID_QUERY_RESP
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["query"])
@@ -98,7 +101,7 @@ def conversation_request(
     if not valid:
         # response containing info about query that can not be validated
         summarizer_response = SummarizerResponse(
-            prompts.INVALID_QUERY_RESP,
+            INVALID_QUERY_RESP,
             [],
             False,
             None,
@@ -599,7 +602,7 @@ def _validate_question_keyword(query: str) -> bool:
     # Current implementation is without any tokenizer method, lemmatization/n-grams.
     # Add valid keywords to keywords.py file.
     query_temp = query.lower()
-    for kw in keywords.KEYWORDS:
+    for kw in KEYWORDS:
         if kw in query_temp:
             return True
     # query_temp = {q_word.lower().strip(".?,") for q_word in query.split()}
