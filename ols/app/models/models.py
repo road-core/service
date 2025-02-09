@@ -2,7 +2,7 @@
 
 import json
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Self, Union
+from typing import Any, Optional, Self, Union
 
 from langchain.llms.base import LLM
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
@@ -760,8 +760,8 @@ class MessageDecoder(json.JSONDecoder):
         super().__init__(object_hook=self._decode_message, *args, **kwargs)
 
     def _decode_message(
-        self, dct: Dict[str, Any]
-    ) -> Union[HumanMessage, AIMessage, Dict[str, Any]]:
+        self, dct: dict[str, Any]
+    ) -> Union[HumanMessage, AIMessage, dict[str, Any]]:
         """Decode JSON dictionary into Message objects if applicable.
 
         Args:
@@ -771,6 +771,8 @@ class MessageDecoder(json.JSONDecoder):
             Union[HumanMessage, AIMessage, dict]: A Message object if the input
             dictionary represents a message, otherwise returns the original dictionary.
         """
+        message: BaseMessage
+
         if "type" in dct:
             if dct["type"] == "human":
                 message = HumanMessage(content=dct["content"])
