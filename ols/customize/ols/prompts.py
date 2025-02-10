@@ -67,9 +67,7 @@ Response:
 """
 
 # {{query}} is escaped because it will be replaced as a parameter at time of use
-# pylint: disable=W1309
-# noqa: F541
-TOPIC_SUMMARY_PROMPT_TEMPLATE = f"""
+TOPIC_SUMMARY_PROMPT_TEMPLATE = """
 Instructions:
 - You are a topic summarizer
 - Your job is to extract precise topic summary from user input
@@ -112,6 +110,6 @@ Example Output:
 Kubernetes Persistent Volume Troubleshooting
 
 Input:
-{{query}}
+{query}
 Output:
 """
