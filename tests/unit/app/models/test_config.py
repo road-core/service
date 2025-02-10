@@ -3709,7 +3709,7 @@ def test_lightspeed_config_parsing():
         },
         True,
     )
-    provider_one.credentials = "dummy-token"
+    provider_one.credentials = "placeholder-token"
     provider_two.credentials = "my-token"
 
     expected_providers = {"ollama": provider_one, "new-cluster": provider_two}
