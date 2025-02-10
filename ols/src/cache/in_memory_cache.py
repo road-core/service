@@ -55,7 +55,7 @@ class InMemoryCache(Cache):
 
         self.deque.remove(key)
         self.deque.appendleft(key)
-        value = self.cache[key]['history'].copy()
+        value = self.cache[key]["history"].copy()
         return [CacheEntry.from_dict(cache_entry) for cache_entry in value]
 
     def insert_or_append(
@@ -83,14 +83,11 @@ class InMemoryCache(Cache):
                 if len(self.deque) == self.capacity:
                     oldest = self.deque.pop()
                     del self.cache[oldest]
-                self.cache[key] = {
-                    'topic_summary': topic_summary,
-                    'history': [value]
-                }
+                self.cache[key] = {"topic_summary": topic_summary, "history": [value]}
             else:
                 self.deque.remove(key)
                 old_value = self.cache[key]
-                old_value['history'].append(value)
+                old_value["history"].append(value)
                 self.cache[key] = old_value
             self.deque.appendleft(key)
 
@@ -118,7 +115,9 @@ class InMemoryCache(Cache):
             self.deque.remove(key)
             return True
 
-    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[dict[str, str]]:
+    def list(
+        self, user_id: str, skip_user_id_check: bool = False
+    ) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -136,11 +135,13 @@ class InMemoryCache(Cache):
             for key in self.cache:
                 if key.startswith(prefix):
                     # Extract conversation_id from the key
-                    conversation_id = key[len(prefix):]
-                    topic_summary = self.cache[key].get('topic_summary', '')
-                    conversations.append({
-                        "conversation_id": conversation_id,
-                        "topic_summary": topic_summary
-                    })
+                    conversation_id = key[len(prefix) :]
+                    topic_summary = self.cache[key].get("topic_summary", "")
+                    conversations.append(
+                        {
+                            "conversation_id": conversation_id,
+                            "topic_summary": topic_summary,
+                        }
+                    )
 
         return conversations

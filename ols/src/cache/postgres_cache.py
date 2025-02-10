@@ -207,7 +207,9 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.delete: %s", e)
                 raise CacheError("PostgresCache.delete", e) from e
 
-    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[dict[str, str]]:
+    def list(
+        self, user_id: str, skip_user_id_check: bool = False
+    ) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -222,7 +224,9 @@ class PostgresCache(Cache):
             try:
                 cursor.execute(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,))
                 rows = cursor.fetchall()
-                return [{"conversation_id": row[0], "topic_summary": row[1]} for row in rows]
+                return [
+                    {"conversation_id": row[0], "topic_summary": row[1]} for row in rows
+                ]
             except psycopg2.DatabaseError as e:
                 logger.error("PostgresCache.list: %s", e)
                 raise CacheError("PostgresCache.list", e) from e

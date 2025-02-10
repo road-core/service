@@ -76,7 +76,13 @@ def test_post_question_without_payload(_setup, endpoint):
 def test_post_question_on_invalid_question(_setup, endpoint):
     """Check the REST API /v1/query for invalid question."""
     # let's pretend the question is invalid without even asking LLM
-    with patch("ols.app.endpoints.ols.validate_question", return_value=False):
+    with (
+        patch("ols.app.endpoints.ols.validate_question", return_value=False),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
+    ):
         conversation_id = suid.get_suid()
         response = pytest.client.post(
             endpoint,
@@ -307,6 +313,10 @@ def test_post_question_on_noyaml_response_type(_setup, endpoint) -> None:
             "ols.src.query_helpers.query_helper.load_llm",
             new=mock_llm_loader(ml()),
         ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
     ):
         conversation_id = suid.get_suid()
         response = pytest.client.post(
@@ -339,6 +349,10 @@ def test_post_question_with_keyword(mock_llm_validation, _setup, endpoint) -> No
         patch(
             "ols.src.query_helpers.query_helper.load_llm",
             new=mock_llm_loader(ml()),
+        ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
         ),
     ):
         conversation_id = suid.get_suid()
@@ -389,6 +403,10 @@ def test_post_query_with_query_filters_response_type(_setup, endpoint) -> None:
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -444,6 +462,10 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
         patch(
             "ols.app.endpoints.ols.retrieve_previous_input",
             side_effect=capture_return_value,
+        ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
         ),
     ):
         conversation_id = suid.get_suid()
@@ -520,6 +542,10 @@ def test_post_question_without_attachments(_setup, endpoint) -> None:
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
             ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
+            ),
         ):
             conversation_id = suid.get_suid()
             response = pytest.client.post(
@@ -563,6 +589,10 @@ def test_post_question_with_empty_list_of_attachments(_setup, endpoint) -> None:
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -608,6 +638,10 @@ def test_post_question_with_one_plaintext_attachment(_setup, endpoint) -> None:
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -666,6 +700,10 @@ def test_post_question_with_one_yaml_attachment(_setup, endpoint) -> None:
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -733,6 +771,10 @@ def test_post_question_with_two_yaml_attachments(_setup, endpoint) -> None:
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -821,6 +863,10 @@ def test_post_question_with_one_yaml_without_kind_attachment(_setup, endpoint) -
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
             ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
+            ),
         ):
             conversation_id = suid.get_suid()
             yaml = """
@@ -885,6 +931,10 @@ def test_post_question_with_one_yaml_without_name_attachment(_setup, endpoint) -
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -952,6 +1002,10 @@ def test_post_question_with_one_invalid_yaml_attachment(_setup, endpoint) -> Non
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -1022,6 +1076,10 @@ logs:
             patch(
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
+            ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
             ),
         ):
             conversation_id = suid.get_suid()
@@ -1095,6 +1153,10 @@ def _post_with_system_prompt_override(_setup, caplog, query, system_prompt):
                 "ols.src.query_helpers.query_helper.load_llm",
                 new=mock_llm_loader(ml()),
             ),
+            patch(
+                "ols.src.query_helpers.topic_summarizer.LLMChain",
+                new=mock_llm_chain(None),
+            ),
         ):
             conversation_id = suid.get_suid()
             response = pytest.client.post(
@@ -1127,9 +1189,9 @@ def test_post_with_system_prompt_override(_setup, caplog):
 
     _post_with_system_prompt_override(_setup, caplog, query, system_prompt)
 
-    # Specified system prompt should appear twice in query_helper debug log outputs.
-    # One is from question_validator and another is from docs_summarizer.
-    assert caplog.text.count("System prompt: " + system_prompt) == 2
+    # Specified system prompt should appear three times in query_helper debug log outputs.
+    # One is from question_validator, one is from docs_summarizer, another is from topic_summarizer.
+    assert caplog.text.count("System prompt: " + system_prompt) == 3
 
 
 @patch(

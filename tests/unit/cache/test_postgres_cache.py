@@ -233,7 +233,7 @@ def test_list_operation(mock_connect):
     mock_conversations = [
         ("conversation_1", "First topic"),
         ("conversation_2", "Second topic"),
-        ("conversation_3", "Third topic")
+        ("conversation_3", "Third topic"),
     ]
 
     # Mock the database cursor behavior
@@ -252,7 +252,7 @@ def test_list_operation(mock_connect):
     expected_result = [
         {"conversation_id": "conversation_1", "topic_summary": "First topic"},
         {"conversation_id": "conversation_2", "topic_summary": "Second topic"},
-        {"conversation_id": "conversation_3", "topic_summary": "Third topic"}
+        {"conversation_id": "conversation_3", "topic_summary": "Third topic"},
     ]
     assert result == expected_result
 

@@ -84,11 +84,11 @@ class RedisCache(Cache):
         value = self.redis_client.get(key)
         if value is None:
             return None
-        
+
         decoded_value = json.loads(value, cls=MessageDecoder)
         cache_entries = decoded_value["history"]  # New format
         return cache_entries
-    
+
     def get_db_entry(
         self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
     ) -> Optional[Dict[str, Any]]:
@@ -107,7 +107,7 @@ class RedisCache(Cache):
         value = self.redis_client.get(key)
         if value is None:
             return None
-        
+
         return json.loads(value, cls=MessageDecoder)
 
     def insert_or_append(
@@ -138,10 +138,7 @@ class RedisCache(Cache):
             if old_value:
                 old_value["history"].append(cache_entry)
             else:
-                old_value = {
-                    "history": [cache_entry],
-                    "topic_summary": topic_summary
-                }
+                old_value = {"history": [cache_entry], "topic_summary": topic_summary}
             self.redis_client.set(key, json.dumps(old_value, cls=MessageEncoder))
 
     def delete(
@@ -161,7 +158,9 @@ class RedisCache(Cache):
         # Redis del() returns the number of keys that were removed
         return bool(self.redis_client.delete(key))
 
-    def list(self, user_id: str, skip_user_id_check: bool = False) -> list[dict[str, str]]:
+    def list(
+        self, user_id: str, skip_user_id_check: bool = False
+    ) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -183,14 +182,18 @@ class RedisCache(Cache):
         # Fetch data for each conversation
         for key in keys:
             # Extract conversation_id from the key
-            conversation_id = key[len(prefix):]
-            
+            conversation_id = key[len(prefix) :]
+
             # Get the conversation data
-            conversation_data = self.get_db_entry(user_id, conversation_id, skip_user_id_check)
+            conversation_data = self.get_db_entry(
+                user_id, conversation_id, skip_user_id_check
+            )
             if conversation_data is not None:
-                conversations.append({
-                    "conversation_id": conversation_id,
-                    "topic_summary": conversation_data.get("topic_summary", "")
-                })
+                conversations.append(
+                    {
+                        "conversation_id": conversation_id,
+                        "topic_summary": conversation_data.get("topic_summary", ""),
+                    }
+                )
 
         return conversations

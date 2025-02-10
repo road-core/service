@@ -113,13 +113,13 @@ def conversation_request(
         )
 
     timestamps["generate response"] = time.time()
-    
+
     topic_summary = ""
     # only generate topic summary for new conversations
     if not previous_input:
         topic_summary = get_topic_summary(conversation_id, llm_request)
         timestamps["generate topic summary"] = time.time()
-    
+
     store_conversation_history(
         user_id,
         conversation_id,
@@ -426,6 +426,7 @@ def generate_response(
             },
         )
 
+
 def validate_requested_provider_model(llm_request: LLMRequest) -> None:
     """Validate provider/model; if provided in request payload."""
     provider = llm_request.provider
@@ -712,9 +713,32 @@ def store_transcript(
 
 def get_topic_summary(conversation_id: str, llm_request: LLMRequest) -> str:
     """Summarize user question using llm, returns a topic"""
-    topic_summarizer = TopicSummarizer(
-        provider=llm_request.provider,
-        model=llm_request.model,
-        system_prompt=llm_request.system_prompt,
-    )
-    return topic_summarizer.summarize_topic(conversation_id, llm_request.query)
+    try:
+        topic_summarizer = TopicSummarizer(
+            provider=llm_request.provider,
+            model=llm_request.model,
+            system_prompt=llm_request.system_prompt,
+        )
+        return topic_summarizer.summarize_topic(conversation_id, llm_request.query)
+    except PromptTooLongError as topic_summarizer_error:
+        logger.error("Prompt is too long: %s", topic_summarizer_error)
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail={
+                "response": "Prompt is too long",
+                "cause": str(topic_summarizer_error),
+            },
+        )
+    except Exception as topic_summarizer_error:
+        logger.error("Error while obtaining a topic summary for user question")
+        logger.exception(topic_summarizer_error)
+        status_code, response_text, cause = errors_parsing.parse_generic_llm_error(
+            topic_summarizer_error
+        )
+        raise HTTPException(
+            status_code=status_code,
+            detail={
+                "response": response_text,
+                "cause": cause,
+            },
+        )

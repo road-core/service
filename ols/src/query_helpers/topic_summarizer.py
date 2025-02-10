@@ -38,9 +38,7 @@ class TopicSummarizer(QueryHelper):
             self.provider, self.model, self.generic_llm_params, self.streaming
         )
 
-    def summarize_topic(
-        self, conversation_id: str, query: str
-    ) -> str:
+    def summarize_topic(self, conversation_id: str, query: str) -> str:
         """Summarize the user initial purpose and return a topic in responses.
 
         Args:
@@ -94,8 +92,6 @@ class TopicSummarizer(QueryHelper):
             )
         clean_response = str(response["text"]).strip()
 
-        logger.debug(
-            "%s summarizer response: %s", conversation_id, clean_response
-        )
+        logger.debug("%s summarizer response: %s", conversation_id, clean_response)
 
         return clean_response

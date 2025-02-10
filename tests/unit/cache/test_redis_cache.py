@@ -124,8 +124,12 @@ def test_list_conversations(cache):
     topic_1 = "topic1"
     topic_2 = "topic2"
 
-    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_1, cache_entry_1, topic_1)
-    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_2, cache_entry_2, topic_2)
+    cache.insert_or_append(
+        constants.DEFAULT_USER_UID, conversation_id_1, cache_entry_1, topic_1
+    )
+    cache.insert_or_append(
+        constants.DEFAULT_USER_UID, conversation_id_2, cache_entry_2, topic_2
+    )
 
     conversations = cache.list(constants.DEFAULT_USER_UID)
 
@@ -148,10 +152,18 @@ def test_list_conversations_skip_user_id_check(cache):
     skip_user_id_check = True
 
     cache.insert_or_append(
-        user_provided_user_id, conversation_id_1, cache_entry_1, topic_1, skip_user_id_check
+        user_provided_user_id,
+        conversation_id_1,
+        cache_entry_1,
+        topic_1,
+        skip_user_id_check,
     )
     cache.insert_or_append(
-        user_provided_user_id, conversation_id_2, cache_entry_2, topic_2, skip_user_id_check
+        user_provided_user_id,
+        conversation_id_2,
+        cache_entry_2,
+        topic_2,
+        skip_user_id_check,
     )
 
     conversations = cache.list(user_provided_user_id, skip_user_id_check)
@@ -174,7 +186,7 @@ def test_list_after_delete(cache):
     """Test listing conversations after deleting some."""
     conversation_id_1 = suid.get_suid()
     conversation_id_2 = suid.get_suid()
-    topic_1= "topic1"
+    topic_1 = "topic1"
     topic_2 = "topic2"
     user_id = suid.get_suid()
 
@@ -187,7 +199,6 @@ def test_list_after_delete(cache):
     assert len(conversations) == 1
     assert conversations[0]["conversation_id"] == conversation_id_2
     assert conversations[0]["topic_summary"] == topic_2
-
 
 
 improper_user_uuids = [

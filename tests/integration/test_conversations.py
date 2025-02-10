@@ -37,6 +37,10 @@ def test_get_conversation_with_history(_setup, endpoint):
             "ols.src.query_helpers.query_helper.load_llm",
             new=mock_llm_loader(ml()),
         ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
     ):
         # First create some conversation history
         conversation_id = suid.get_suid()
@@ -94,6 +98,10 @@ def test_list_conversations_with_history(_setup, endpoint):
             "ols.src.query_helpers.query_helper.load_llm",
             new=mock_llm_loader(ml()),
         ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
     ):
         # Create first conversation
         conv_id_1 = suid.get_suid()
@@ -123,8 +131,13 @@ def test_list_conversations_with_history(_setup, endpoint):
 
         conversations = response.json()["conversations"]
         assert len(conversations) >= 2  # May have more from other tests
-        assert conv_id_1 in conversations
-        assert conv_id_2 in conversations
+        found_conv_ids = set(conv["conversation_id"] for conv in conversations)
+        assert conv_id_1 in found_conv_ids
+        assert conv_id_2 in found_conv_ids
+        for conv in conversations:
+            assert (
+                "topic_summary" in conv
+            ), f"Conversation {conv['conversation_id']} is missing topic_summary"
 
 
 @pytest.mark.parametrize("endpoint", ("/conversations/{conversation_id}",))
@@ -139,6 +152,10 @@ def test_delete_conversation_with_history(_setup, endpoint):
         patch(
             "ols.src.query_helpers.query_helper.load_llm",
             new=mock_llm_loader(ml()),
+        ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
         ),
     ):
         # First create a conversation

@@ -217,7 +217,13 @@ def test_store_conversation_history(insert_or_append):
     topic_summary = "test summary"
 
     ols.store_conversation_history(
-        constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], [], topic_summary
+        constants.DEFAULT_USER_UID,
+        conversation_id,
+        llm_request,
+        "",
+        [],
+        [],
+        topic_summary,
     )
 
     expected_history = CacheEntry(query=HumanMessage(query))
@@ -289,7 +295,7 @@ def test_store_conversation_history_store_metadata(insert_or_append):
         ),
     )
     insert_or_append.assert_called_with(
-        user_id, conversation_id, expected_history, topic_summary,skip_user_id_check
+        user_id, conversation_id, expected_history, topic_summary, skip_user_id_check
     )
 
 
@@ -819,7 +825,9 @@ def test_question_validation_in_conversation_start(mock_summarize_topic, auth):
 )
 @patch("ols.src.query_helpers.docs_summarizer.DocsSummarizer.create_response")
 @patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
-def test_no_question_validation_in_follow_up_conversation(mock_summarize_topic, mock_summarize, auth):
+def test_no_question_validation_in_follow_up_conversation(
+    mock_summarize_topic, mock_summarize, auth
+):
     """Test if question validation is skipped in follow-up conversation."""
     # note the `validate_question` is patched to always return as `SUBJECT_REJECTED`
     # but as it is not the first question, it should proceed to summarization
@@ -841,7 +849,9 @@ def test_no_question_validation_in_follow_up_conversation(mock_summarize_topic, 
 @pytest.mark.usefixtures("_load_config")
 @patch("ols.app.endpoints.ols.validate_question")
 @patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
-def test_conversation_request_invalid_subject(mock_summarize_topic, mock_validate, auth):
+def test_conversation_request_invalid_subject(
+    mock_summarize_topic, mock_validate, auth
+):
     """Test how generate_response function checks validation results."""
     # prepare arguments for DocsSummarizer
     llm_request = LLMRequest(query="Tell me about Kubernetes")
@@ -925,6 +935,7 @@ def transcripts_location(tmpdir):
     )
     return tmpdir.strpath
 
+
 def test_transcripts_are_not_stored_when_disabled(transcripts_location, auth):
     """Test nothing is stored when the transcript collection is disabled."""
     with (
@@ -944,7 +955,9 @@ def test_transcripts_are_not_stored_when_disabled(transcripts_location, auth):
             "ols.app.endpoints.ols.store_conversation_history",
             return_value=None,
         ),
-        patch("ols.app.endpoints.ols.get_topic_summary",  return_value="some summary",
+        patch(
+            "ols.app.endpoints.ols.get_topic_summary",
+            return_value="some summary",
         ),
     ):
         llm_request = LLMRequest(query="Tell me about Kubernetes")
@@ -1035,3 +1048,41 @@ def test_store_transcript(transcripts_location):
             }
         ],
     }
+
+
+@pytest.mark.usefixtures("_load_config")
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
+def test_get_topic_summary_valid_subject(mock_summarize_topic):
+    """Test how generate_response function checks validation results."""
+    # mock the TopicSummarizer
+    mock_response = "OpenShift vs Kubernetes Comparison"
+    mock_summarize_topic.return_value = mock_response
+
+    # prepare arguments for TopicSummarizer
+    conversation_id = suid.get_suid()
+    llm_request = LLMRequest(
+        query="Tell me about differences between Kubernetes and Openshift"
+    )
+
+    # try to get response
+    summarizer_response = ols.get_topic_summary(conversation_id, llm_request)
+
+    # check the response
+    assert summarizer_response == mock_response
+
+
+@pytest.mark.usefixtures("_load_config")
+@patch("ols.src.query_helpers.topic_summarizer.TopicSummarizer.summarize_topic")
+def test_get_topic_summary_on_summarizer_error(mock_summarize_topic):
+    """Test how generate_response function checks validation results."""
+    # mock the TopicSummarizer
+    mock_summarize_topic.side_effect = Exception  # any exception might occur
+
+    # prepare arguments for TopicSummarizer
+    conversation_id = suid.get_suid()
+    llm_request = LLMRequest(query="Tell me about Kubernetes")
+    previous_input = None
+
+    # try to get response
+    with pytest.raises(HTTPException, match=DEFAULT_ERROR_MESSAGE):
+        ols.generate_response(conversation_id, llm_request, previous_input)

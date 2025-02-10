@@ -256,9 +256,18 @@ class ListConversationsResponse(BaseModel):
             "examples": [
                 {
                     "conversations": [
-                        {"conversation_id": "15a78660-a18e-447b-9fea-9deb27b63b5f", "topic_summary": "topic1"},
-                        {"conversation_id": "c0a3bc27-77cc-46da-822f-93a9c0e0de4b", "topic_summary": "topic2"},
-                        {"conversation_id": "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f", "topic_summary": "topic3"},
+                        {
+                            "conversation_id": "15a78660-a18e-447b-9fea-9deb27b63b5f",
+                            "topic_summary": "topic1",
+                        },
+                        {
+                            "conversation_id": "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
+                            "topic_summary": "topic2",
+                        },
+                        {
+                            "conversation_id": "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                            "topic_summary": "topic3",
+                        },
                     ]
                 }
             ]
@@ -743,10 +752,9 @@ class MessageEncoder(json.JSONEncoder):
                 "__type__": "CacheEntry",
                 "query": self.default(o.query),  # Handle nested Message object
                 "response": self.default(o.response) if o.response else None,
-                "attachments": o.attachments
+                "attachments": o.attachments,
             }
         return super().default(o)
-
 
 
 class MessageDecoder(json.JSONDecoder):
@@ -783,8 +791,10 @@ class MessageDecoder(json.JSONDecoder):
             # Handle CacheEntry reconstruction
             return CacheEntry(
                 query=self._decode_message(dct["query"]),
-                response=self._decode_message(dct["response"]) if dct["response"] else None,
-                attachments=dct["attachments"]
+                response=(
+                    self._decode_message(dct["response"]) if dct["response"] else None
+                ),
+                attachments=dct["attachments"],
             )
         elif "type" in dct:
             if dct["type"] == "human":
