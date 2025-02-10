@@ -1,6 +1,7 @@
 """Unit tests for TopicSummarizer class."""
 
 from unittest.mock import patch
+
 import pytest
 
 from ols import config

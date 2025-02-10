@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class TopicSummarizer(QueryHelper):
-    """This class is responsible for summarizing the user initial purpose and return a topic in responses."""
+    """This class is responsible for summarizing a topic of user's initial purpose"""
 
     max_tokens_for_response = 4
 

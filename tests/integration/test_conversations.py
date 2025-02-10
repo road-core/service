@@ -131,7 +131,7 @@ def test_list_conversations_with_history(_setup, endpoint):
 
         conversations = response.json()["conversations"]
         assert len(conversations) >= 2  # May have more from other tests
-        found_conv_ids = set(conv["conversation_id"] for conv in conversations)
+        found_conv_ids = {conv["conversation_id"] for conv in conversations}
         assert conv_id_1 in found_conv_ids
         assert conv_id_2 in found_conv_ids
         for conv in conversations:

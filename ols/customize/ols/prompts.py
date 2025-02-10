@@ -67,6 +67,8 @@ Response:
 """
 
 # {{query}} is escaped because it will be replaced as a parameter at time of use
+# pylint: disable=W1309
+# noqa: F541
 TOPIC_SUMMARY_PROMPT_TEMPLATE = f"""
 Instructions:
 - You are a topic summarizer

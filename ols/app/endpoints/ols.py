@@ -712,7 +712,7 @@ def store_transcript(
 
 
 def get_topic_summary(conversation_id: str, llm_request: LLMRequest) -> str:
-    """Summarize user question using llm, returns a topic"""
+    """Summarize user question using llm, returns a topic."""
     try:
         topic_summarizer = TopicSummarizer(
             provider=llm_request.provider,

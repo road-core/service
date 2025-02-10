@@ -747,7 +747,7 @@ class MessageEncoder(json.JSONEncoder):
                 "response_metadata": o.response_metadata,
                 "additional_kwargs": o.additional_kwargs,
             }
-        elif isinstance(o, CacheEntry):
+        if isinstance(o, CacheEntry):
             return {
                 "__type__": "CacheEntry",
                 "query": self.default(o.query),  # Handle nested Message object
@@ -796,7 +796,7 @@ class MessageDecoder(json.JSONDecoder):
                 ),
                 attachments=dct["attachments"],
             )
-        elif "type" in dct:
+        if "type" in dct:
             if dct["type"] == "human":
                 message = HumanMessage(content=dct["content"])
             elif dct["type"] == "ai":

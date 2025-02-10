@@ -15,11 +15,11 @@ from fastapi.responses import StreamingResponse
 from ols import config, constants
 from ols.app.endpoints.ols import (
     generate_response,
+    get_topic_summary,
     log_processing_durations,
     process_request,
     store_conversation_history,
     store_transcript,
-    get_topic_summary,
 )
 from ols.app.models.models import (
     Attachment,

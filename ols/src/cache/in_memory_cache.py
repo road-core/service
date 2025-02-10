@@ -132,11 +132,11 @@ class InMemoryCache(Cache):
         prefix = f"{user_id}{Cache.COMPOUND_KEY_SEPARATOR}"
 
         with self._lock:
-            for key in self.cache:
+            for key, value in self.cache.items():
                 if key.startswith(prefix):
                     # Extract conversation_id from the key
                     conversation_id = key[len(prefix) :]
-                    topic_summary = self.cache[key].get("topic_summary", "")
+                    topic_summary = value.get("topic_summary", "")
                     conversations.append(
                         {
                             "conversation_id": conversation_id,
