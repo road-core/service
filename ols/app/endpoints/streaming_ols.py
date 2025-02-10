@@ -39,6 +39,8 @@ from ols.src.auth.auth import get_auth_dependency
 from ols.utils import errors_parsing
 from ols.utils.token_handler import PromptTooLongError
 
+INVALID_QUERY_RESP = prompts.INVALID_QUERY_RESP
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["streaming_query"])
@@ -134,7 +136,7 @@ async def invalid_response_generator() -> AsyncGenerator[str, None]:
     Yields:
         str: The response indicating invalid query.
     """
-    yield prompts.INVALID_QUERY_RESP
+    yield INVALID_QUERY_RESP
 
 
 def format_stream_data(d: dict) -> str:

@@ -1451,6 +1451,19 @@ def test_missing_additional_config_file():
         config.reload_additional_config_file("/dev/null/non-existent", "")
 
 
+def test_loading_additional_config_file_rhdh_type():
+    """Check how an additional configuration file is handled."""
+    config.reload_additional_config_file("tests/config/valid_rhdh_config.yaml", "rhdh")
+
+
+def test_loading_incorrect_additional_config_file_rhdh_type():
+    """Check how an incorrect additional configuration file is handled."""
+    with pytest.raises(KeyError, match="No lightspeed configuration defined"):
+        config.reload_additional_config_file(
+            "tests/config/invalid_rhdh_config.yaml", "rhdh"
+        )
+
+
 def test_additional_config_file_incorrect_type():
     """Check how an additional configuration file is handled with an incorrect type."""
     with pytest.raises(

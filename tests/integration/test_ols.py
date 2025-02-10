@@ -18,6 +18,8 @@ from tests.mock_classes.mock_langchain_interface import mock_langchain_interface
 from tests.mock_classes.mock_llm_chain import mock_llm_chain
 from tests.mock_classes.mock_llm_loader import mock_llm_loader
 
+INVALID_QUERY_RESP = prompts.INVALID_QUERY_RESP
+
 
 @pytest.fixture(scope="function")
 def _setup():
@@ -86,7 +88,7 @@ def test_post_question_on_invalid_question(_setup, endpoint):
             # non-streaming responses return JSON
             expected_response = {
                 "conversation_id": conversation_id,
-                "response": prompts.INVALID_QUERY_RESP,
+                "response": INVALID_QUERY_RESP,
                 "referenced_documents": [],
                 "truncated": False,
                 "input_tokens": 0,
@@ -95,7 +97,7 @@ def test_post_question_on_invalid_question(_setup, endpoint):
             actual_response = response.json()
         else:
             # streaming_query returns bytes
-            expected_response = prompts.INVALID_QUERY_RESP
+            expected_response = INVALID_QUERY_RESP
             actual_response = response.text
 
         assert actual_response == expected_response

@@ -38,6 +38,9 @@ from ols.src.query_helpers.topic_summarizer import TopicSummarizer
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
 
+KEYWORDS = keywords.KEYWORDS
+INVALID_QUERY_RESP = prompts.INVALID_QUERY_RESP
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["query"])
@@ -99,7 +102,7 @@ def conversation_request(
     if not valid:
         # response containing info about query that can not be validated
         summarizer_response = SummarizerResponse(
-            prompts.INVALID_QUERY_RESP,
+            INVALID_QUERY_RESP,
             [],
             False,
             None,
@@ -189,7 +192,8 @@ def process_request(
     timestamps = {"start": time.time()}
 
     user_id = retrieve_user_id(auth)
-    logger.info("User ID %s", user_id)
+    logger.info("Auth module: %s", config.ols_config.authentication_config.module)
+    logger.info("User ID: %s", user_id)
     timestamps["retrieve user"] = time.time()
 
     conversation_id = retrieve_conversation_id(llm_request)
@@ -205,7 +209,9 @@ def process_request(
     timestamps["redact query"] = time.time()
 
     # Log incoming request (after redaction)
-    logger.info("%s Incoming request: %s", conversation_id, llm_request.query)
+    logger.info(
+        "Conversation ID: %s Incoming request: %s", conversation_id, llm_request.query
+    )
 
     previous_input = retrieve_previous_input(
         user_id, llm_request.conversation_id, skip_user_id_check
@@ -317,7 +323,7 @@ def retrieve_previous_input(
             if cache_content is not None:
                 previous_input = cache_content
             logger.info(
-                "%s Previous conversation input: %s",
+                "Conversation ID: %s Previous conversation input: %s",
                 conversation_id,
                 previous_input,
             )
@@ -605,7 +611,7 @@ def _validate_question_keyword(query: str) -> bool:
     # Current implementation is without any tokenizer method, lemmatization/n-grams.
     # Add valid keywords to keywords.py file.
     query_temp = query.lower()
-    for kw in keywords.KEYWORDS:
+    for kw in KEYWORDS:
         if kw in query_temp:
             return True
     # query_temp = {q_word.lower().strip(".?,") for q_word in query.split()}
