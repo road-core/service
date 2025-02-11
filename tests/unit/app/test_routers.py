@@ -18,10 +18,14 @@ from ols.app.routers import include_routers  # noqa:E402
 
 
 class MockFastAPI:
+    """Mock class for FastAPI."""
+
     def __init__(self):
+        """Initialize mock class."""
         self.routers = []
 
     def include_router(self, router, prefix=None):
+        """Register new router."""
         self.routers.append(router)
 
 
