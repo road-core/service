@@ -34,9 +34,9 @@ COPY --from=lightspeed-rag-embeddings /rag/embeddings_model ./embeddings_model
 # (avoid accidental inclusion of local directories or env files or credentials)
 COPY runner.py pyproject.toml LICENSE README.md ./
 
-RUN pip3.11 install --no-cache-dir .
-
 COPY ols ./ols
+
+RUN pip3.11 install --no-cache-dir .
 
 # this directory is checked by ecosystem-cert-preflight-checks task in Konflux
 COPY LICENSE /licenses/
