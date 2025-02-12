@@ -34,6 +34,7 @@ from ols.src.llms.llm_loader import LLMConfigurationError, resolve_provider_conf
 from ols.src.query_helpers.attachment_appender import append_attachments_to_query
 from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
+from ols.src.query_helpers.topic_summarizer import TopicSummarizer
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
 
@@ -113,6 +114,12 @@ def conversation_request(
 
     timestamps["generate response"] = time.time()
 
+    topic_summary = ""
+    # only generate topic summary for new conversations
+    if not previous_input:
+        topic_summary = get_topic_summary(conversation_id, llm_request)
+        timestamps["generate topic summary"] = time.time()
+
     store_conversation_history(
         user_id,
         conversation_id,
@@ -120,6 +127,7 @@ def conversation_request(
         summarizer_response.response,
         attachments,
         timestamps,
+        topic_summary,
         skip_user_id_check,
     )
 
@@ -445,6 +453,7 @@ def store_conversation_history(
     response: Optional[str],
     attachments: list[Attachment],
     timestamps: dict[str, float],
+    topic_summary: str,
     skip_user_id_check: bool = False,
 ) -> None:
     """Store conversation history into selected cache.
@@ -480,6 +489,7 @@ def store_conversation_history(
                 user_id,
                 conversation_id,
                 cache_entry,
+                topic_summary,
                 skip_user_id_check,
             )
     except Exception as e:
@@ -699,3 +709,36 @@ def store_transcript(
         json.dump(data_to_store, transcript_file)
 
     logger.debug("transcript stored in '%s'", transcript_file_path)
+
+
+def get_topic_summary(conversation_id: str, llm_request: LLMRequest) -> str:
+    """Summarize user question using llm, returns a topic."""
+    try:
+        topic_summarizer = TopicSummarizer(
+            provider=llm_request.provider,
+            model=llm_request.model,
+            system_prompt=llm_request.system_prompt,
+        )
+        return topic_summarizer.summarize_topic(conversation_id, llm_request.query)
+    except PromptTooLongError as topic_summarizer_error:
+        logger.error("Prompt is too long: %s", topic_summarizer_error)
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail={
+                "response": "Prompt is too long",
+                "cause": str(topic_summarizer_error),
+            },
+        )
+    except Exception as topic_summarizer_error:
+        logger.error("Error while obtaining a topic summary for user question")
+        logger.exception(topic_summarizer_error)
+        status_code, response_text, cause = errors_parsing.parse_generic_llm_error(
+            topic_summarizer_error
+        )
+        raise HTTPException(
+            status_code=status_code,
+            detail={
+                "response": response_text,
+                "cause": cause,
+            },
+        )

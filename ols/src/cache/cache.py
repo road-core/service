@@ -63,6 +63,7 @@ class Cache(ABC):
         user_id: str,
         conversation_id: str,
         cache_entry: CacheEntry,
+        topic_summary: str,
         skip_user_id_check: bool,
     ) -> None:
         """Abstract method to store a value in the cache.
@@ -71,6 +72,7 @@ class Cache(ABC):
             user_id: User identification.
             conversation_id: Conversation ID unique for given user.
             cache_entry: The value to store.
+            topic_summary: Summary of the conversation's initial topic.
             skip_user_id_check: Skip user_id suid check.
         """
 
@@ -90,7 +92,7 @@ class Cache(ABC):
         """
 
     @abstractmethod
-    def list(self, user_id: str, skip_user_id_check: bool) -> list[str]:
+    def list(self, user_id: str, skip_user_id_check: bool) -> list[dict[str, str]]:
         """List all conversations for a given user_id.
 
         Args:
@@ -98,5 +100,5 @@ class Cache(ABC):
             skip_user_id_check: Skip user_id suid check.
 
         Returns:
-            A list of conversation ids from the cache
+             A list of dictionaries containing conversation_id and topic_summary
         """

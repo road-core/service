@@ -63,10 +63,10 @@ def test_insert_or_append_skip_user_id_check(cache):
     assert cache.get(user_provided_user_id, conversation_id, skip_user_id_check) is None
 
     cache.insert_or_append(
-        user_provided_user_id, conversation_id, cache_entry_1, skip_user_id_check
+        user_provided_user_id, conversation_id, cache_entry_1, "", skip_user_id_check
     )
     cache.insert_or_append(
-        user_provided_user_id, conversation_id, cache_entry_2, skip_user_id_check
+        user_provided_user_id, conversation_id, cache_entry_2, "", skip_user_id_check
     )
 
     assert cache.get(user_provided_user_id, conversation_id, skip_user_id_check) == [
@@ -107,7 +107,7 @@ def test_delete_skip_user_id_check(cache):
     """Test deleting an existing conversation."""
     skip_user_id_check = True
     cache.insert_or_append(
-        user_provided_user_id, conversation_id, cache_entry_1, skip_user_id_check
+        user_provided_user_id, conversation_id, cache_entry_1, "", skip_user_id_check
     )
 
     result = cache.delete(user_provided_user_id, conversation_id, skip_user_id_check)
@@ -121,15 +121,25 @@ def test_list_conversations(cache):
     # Create multiple conversations
     conversation_id_1 = suid.get_suid()
     conversation_id_2 = suid.get_suid()
+    topic_1 = "topic1"
+    topic_2 = "topic2"
 
-    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_1, cache_entry_1)
-    cache.insert_or_append(constants.DEFAULT_USER_UID, conversation_id_2, cache_entry_2)
+    cache.insert_or_append(
+        constants.DEFAULT_USER_UID, conversation_id_1, cache_entry_1, topic_1
+    )
+    cache.insert_or_append(
+        constants.DEFAULT_USER_UID, conversation_id_2, cache_entry_2, topic_2
+    )
 
     conversations = cache.list(constants.DEFAULT_USER_UID)
 
     assert len(conversations) == 2
-    assert conversation_id_1 in conversations
-    assert conversation_id_2 in conversations
+    for conv in conversations:
+        assert isinstance(conv, dict), "Each conversation should be a dictionary"
+        assert "conversation_id" in conv, "Should have conversation_id field"
+        assert "topic_summary" in conv, "Should have topic_summary field"
+        assert conv["conversation_id"] in [conversation_id_1, conversation_id_2]
+        assert conv["topic_summary"] in [topic_1, topic_2]
 
 
 def test_list_conversations_skip_user_id_check(cache):
@@ -137,20 +147,32 @@ def test_list_conversations_skip_user_id_check(cache):
     # Create multiple conversations
     conversation_id_1 = suid.get_suid()
     conversation_id_2 = suid.get_suid()
+    topic_1 = "topic1"
+    topic_2 = "topic2"
     skip_user_id_check = True
 
     cache.insert_or_append(
-        user_provided_user_id, conversation_id_1, cache_entry_1, skip_user_id_check
+        user_provided_user_id,
+        conversation_id_1,
+        cache_entry_1,
+        topic_1,
+        skip_user_id_check,
     )
     cache.insert_or_append(
-        user_provided_user_id, conversation_id_2, cache_entry_2, skip_user_id_check
+        user_provided_user_id,
+        conversation_id_2,
+        cache_entry_2,
+        topic_2,
+        skip_user_id_check,
     )
 
     conversations = cache.list(user_provided_user_id, skip_user_id_check)
 
-    assert len(conversations) == 2
-    assert conversation_id_1 in conversations
-    assert conversation_id_2 in conversations
+    for conv in conversations:
+        assert "conversation_id" in conv, "Should have conversation_id field"
+        assert "topic_summary" in conv, "Should have topic_summary field"
+        assert conv["conversation_id"] in [conversation_id_1, conversation_id_2]
+        assert conv["topic_summary"] in [topic_1, topic_2]
 
 
 def test_list_no_conversations(cache):
@@ -164,17 +186,19 @@ def test_list_after_delete(cache):
     """Test listing conversations after deleting some."""
     conversation_id_1 = suid.get_suid()
     conversation_id_2 = suid.get_suid()
+    topic_1 = "topic1"
+    topic_2 = "topic2"
     user_id = suid.get_suid()
 
-    cache.insert_or_append(user_id, conversation_id_1, cache_entry_1)
-    cache.insert_or_append(user_id, conversation_id_2, cache_entry_2)
+    cache.insert_or_append(user_id, conversation_id_1, cache_entry_1, topic_1)
+    cache.insert_or_append(user_id, conversation_id_2, cache_entry_2, topic_2)
 
     cache.delete(user_id, conversation_id_1)
 
     conversations = cache.list(user_id)
     assert len(conversations) == 1
-    assert conversation_id_2 in conversations
-    assert conversation_id_1 not in conversations
+    assert conversations[0]["conversation_id"] == conversation_id_2
+    assert conversations[0]["topic_summary"] == topic_2
 
 
 improper_user_uuids = [

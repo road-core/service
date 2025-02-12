@@ -141,13 +141,15 @@ def test_insert_or_append_operation(mock_connect):
     mock_cursor.fetchone.return_value = None
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
 
+    test_topic = "some topic"
+
     # initialize Postgres cache
     config = PostgresConfig()
     cache = PostgresCache(config)
 
     # call the "insert_or_append" operation
     # to insert new conversation history
-    cache.insert_or_append(user_id, conversation_id, history)
+    cache.insert_or_append(user_id, conversation_id, history, test_topic)
 
     # multiple DB operations must be performed
     calls = [
@@ -157,7 +159,7 @@ def test_insert_or_append_operation(mock_connect):
         ),
         call(
             PostgresCache.INSERT_CONVERSATION_HISTORY_STATEMENT,
-            (user_id, conversation_id, conversation.encode("utf-8")),
+            (user_id, conversation_id, conversation.encode("utf-8"), test_topic),
         ),
         call(PostgresCache.QUERY_CACHE_SIZE),
     ]
@@ -227,12 +229,16 @@ def test_insert_or_append_operation_on_exception(mock_connect):
 @patch("psycopg2.connect")
 def test_list_operation(mock_connect):
     """Test the Cache.list operation."""
-    # Mock conversation IDs to be returned by the database
-    mock_conversation_ids = ["conversation_1", "conversation_2", "conversation_3"]
+    # Mock conversation data to be returned by the database
+    mock_conversations = [
+        ("conversation_1", "First topic"),
+        ("conversation_2", "Second topic"),
+        ("conversation_3", "Third topic"),
+    ]
 
     # Mock the database cursor behavior
     mock_cursor = MagicMock()
-    mock_cursor.fetchall.return_value = [(cid,) for cid in mock_conversation_ids]
+    mock_cursor.fetchall.return_value = mock_conversations
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
 
     # Initialize Postgres cache
@@ -240,10 +246,15 @@ def test_list_operation(mock_connect):
     cache = PostgresCache(config)
 
     # Call the "list" operation
-    conversation_ids = cache.list(user_id)
+    result = cache.list(user_id)
 
-    # Verify the result
-    assert conversation_ids == mock_conversation_ids
+    # Verify the result matches the expected format
+    expected_result = [
+        {"conversation_id": "conversation_1", "topic_summary": "First topic"},
+        {"conversation_id": "conversation_2", "topic_summary": "Second topic"},
+        {"conversation_id": "conversation_3", "topic_summary": "Third topic"},
+    ]
+    assert result == expected_result
 
     # Verify the query execution
     mock_cursor.execute.assert_called_once_with(

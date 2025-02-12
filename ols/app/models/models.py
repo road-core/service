@@ -248,7 +248,7 @@ class ListConversationsResponse(BaseModel):
         conversations: List of conversation IDs.
     """
 
-    conversations: list[str]
+    conversations: list[dict[str, str]]
 
     # provides examples for /docs endpoint
     model_config = {
@@ -256,9 +256,18 @@ class ListConversationsResponse(BaseModel):
             "examples": [
                 {
                     "conversations": [
-                        "15a78660-a18e-447b-9fea-9deb27b63b5f",
-                        "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
-                        "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                        {
+                            "conversation_id": "15a78660-a18e-447b-9fea-9deb27b63b5f",
+                            "topic_summary": "topic1",
+                        },
+                        {
+                            "conversation_id": "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
+                            "topic_summary": "topic2",
+                        },
+                        {
+                            "conversation_id": "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
+                            "topic_summary": "topic3",
+                        },
                     ]
                 }
             ]
@@ -738,6 +747,13 @@ class MessageEncoder(json.JSONEncoder):
                 "response_metadata": o.response_metadata,
                 "additional_kwargs": o.additional_kwargs,
             }
+        if isinstance(o, CacheEntry):
+            return {
+                "__type__": "CacheEntry",
+                "query": self.default(o.query),  # Handle nested Message object
+                "response": self.default(o.response) if o.response else None,
+                "attachments": o.attachments,
+            }
         return super().default(o)
 
 
@@ -761,7 +777,7 @@ class MessageDecoder(json.JSONDecoder):
 
     def _decode_message(
         self, dct: dict[str, Any]
-    ) -> Union[HumanMessage, AIMessage, dict[str, Any]]:
+    ) -> Union[HumanMessage, AIMessage, CacheEntry, dict[str, Any]]:
         """Decode JSON dictionary into Message objects if applicable.
 
         Args:
@@ -771,8 +787,15 @@ class MessageDecoder(json.JSONDecoder):
             Union[HumanMessage, AIMessage, dict]: A Message object if the input
             dictionary represents a message, otherwise returns the original dictionary.
         """
-        message: BaseMessage
-
+        if "__type__" in dct and dct["__type__"] == "CacheEntry":
+            # Handle CacheEntry reconstruction
+            return CacheEntry(
+                query=self._decode_message(dct["query"]),
+                response=(
+                    self._decode_message(dct["response"]) if dct["response"] else None
+                ),
+                attachments=dct["attachments"],
+            )
         if "type" in dct:
             if dct["type"] == "human":
                 message = HumanMessage(content=dct["content"])
