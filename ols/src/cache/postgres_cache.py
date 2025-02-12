@@ -99,6 +99,7 @@ class PostgresCache(Cache):
             dbname=config.dbname,
             sslmode=config.ssl_mode,
             sslrootcert=config.ca_cert_path,
+            gssencmode=config.gssencmode,
         )
         self.conn.autocommit = True
         try:
