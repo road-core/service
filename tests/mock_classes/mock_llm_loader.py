@@ -3,8 +3,12 @@
 from types import SimpleNamespace
 
 
-class MockLLMLoader:
-    """Mock for LLMLoader."""
+class MockLLM:
+    """Mock for LLM.
+
+    Provides limited mock for langchain_core.language_models.llms.LLM objects.
+
+    """
 
     def __init__(self, llm=None):
         """Store the selected LLM into object's attribute."""
@@ -28,6 +32,6 @@ def mock_llm_loader(llm=None, expected_params=None):
         # was called with expected parameters
         if expected_params is not None:
             assert expected_params == args, (expected_params, args)
-        return MockLLMLoader(llm)
+        return MockLLM(llm)
 
     return loader
