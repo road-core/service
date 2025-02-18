@@ -1,5 +1,6 @@
 """Unit tests for UserQuotaLimiter class."""
 
+import datetime
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -26,7 +27,8 @@ def test_init_storage_failure_detection(mock_connect):
 
 
 @patch("psycopg2.connect")
-def test_init_quota(mock_connect):
+@patch("ols.src.quota.user_quota_limiter.datetime")
+def test_init_quota(mock_datetime, mock_connect):
     """Test the init quota operation."""
     quota_limit = 100
     user_id = "1234"
@@ -35,6 +37,12 @@ def test_init_quota(mock_connect):
     mock_cursor = MagicMock()
     mock_cursor.fetchone.return_value = None
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
 
     # initialize Postgres storage
     config = PostgresConfig()
@@ -45,7 +53,8 @@ def test_init_quota(mock_connect):
 
     # new record should be inserted into storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.INIT_QUOTA_FOR_USER, (user_id, quota_limit, quota_limit)
+        UserQuotaLimiter.INIT_QUOTA_FOR_USER,
+        (user_id, quota_limit, quota_limit, timestamp),
     )
 
 
@@ -76,7 +85,8 @@ def test_available_quota_with_data(mock_connect):
 
 
 @patch("psycopg2.connect")
-def test_available_quota_no_data(mock_connect):
+@patch("ols.src.quota.user_quota_limiter.datetime")
+def test_available_quota_no_data(mock_datetime, mock_connect):
     """Test the get available quota operation."""
     quota_limit = 100
     user_id = "1234"
@@ -85,6 +95,12 @@ def test_available_quota_no_data(mock_connect):
     mock_cursor = MagicMock()
     mock_cursor.fetchone.return_value = None
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
 
     # initialize Postgres storage
     config = PostgresConfig()
@@ -99,7 +115,7 @@ def test_available_quota_no_data(mock_connect):
         call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
         call(
             UserQuotaLimiter.INIT_QUOTA_FOR_USER,
-            (user_id, quota_limit, quota_limit),
+            (user_id, quota_limit, quota_limit, timestamp),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -136,7 +152,8 @@ def test_consume_tokens_not_enough(mock_connect):
 
 
 @patch("psycopg2.connect")
-def test_consume_tokens_enough_tokens(mock_connect):
+@patch("ols.src.quota.user_quota_limiter.datetime")
+def test_consume_tokens_enough_tokens(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 50
     available_tokens = 100
@@ -147,6 +164,12 @@ def test_consume_tokens_enough_tokens(mock_connect):
     mock_cursor = MagicMock()
     mock_cursor.fetchone.return_value = (available_tokens,)
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
 
     # initialize Postgres storage
     config = PostgresConfig()
@@ -161,7 +184,7 @@ def test_consume_tokens_enough_tokens(mock_connect):
         # and the quota should be updated accordingly
         call(
             UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-            (available_tokens - to_be_consumed, user_id),
+            (available_tokens - to_be_consumed, timestamp, user_id),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
