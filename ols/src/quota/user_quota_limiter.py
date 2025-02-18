@@ -1,6 +1,7 @@
 """Simple user quota limiter where each user have fixed quota."""
 
 import logging
+from datetime import datetime
 
 import psycopg2
 
@@ -19,13 +20,15 @@ class UserQuotaLimiter(QuotaLimiter):
             user_id         text NOT NULL,
             quota_limit     int NOT NULL,
             available       int,
+            updated_at      timestamp with time zone,
+            revoked_at      timestamp with time zone,
             PRIMARY KEY(user_id)
         );
         """
 
     INIT_QUOTA_FOR_USER = """
-        INSERT INTO user_quota_limiter (user_id, quota_limit, available)
-        VALUES (%s, %s, %s)
+        INSERT INTO user_quota_limiter (user_id, quota_limit, available, revoked_at)
+        VALUES (%s, %s, %s, %s)
         """
 
     SELECT_QUOTA_FOR_USER = """
@@ -36,7 +39,7 @@ class UserQuotaLimiter(QuotaLimiter):
 
     UPDATE_AVAILABLE_QUOTA_FOR_USER = """
         UPDATE user_quota_limiter
-           SET available=%s
+           SET available=%s, updated_at=%s
          WHERE user_id=%s
         """
 
@@ -91,9 +94,14 @@ class UserQuotaLimiter(QuotaLimiter):
 
         # update available tokens for user
         available -= to_be_consumed
+
+        # timestamp to be used
+        updated_at = datetime.now()
+
         with self.connection.cursor() as cursor:
             cursor.execute(
-                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER, (available, user_id)
+                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
+                (available, updated_at, user_id),
             )
             self.connection.commit()
 
@@ -106,9 +114,12 @@ class UserQuotaLimiter(QuotaLimiter):
 
     def _init_quota(self, user_id: str) -> None:
         """Initialize quota for given user."""
+        # timestamp to be used
+        revoked_at = datetime.now()
+
         with self.connection.cursor() as cursor:
             cursor.execute(
                 UserQuotaLimiter.INIT_QUOTA_FOR_USER,
-                (user_id, self.initial_quota, self.initial_quota),
+                (user_id, self.initial_quota, self.initial_quota, revoked_at),
             )
             self.connection.commit()
