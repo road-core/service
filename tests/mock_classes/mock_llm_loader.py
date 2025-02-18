@@ -19,6 +19,10 @@ class MockLLMLoader:
         # yield input prompt/user query
         yield llm_input[1].content
 
+    def invoke(self, input, config=None, **kwargs):  # noqa: A002,W0622,RUF100
+        """Transform a single input into an output."""
+        return input
+
 
 def mock_llm_loader(llm=None, expected_params=None):
     """Construct mock for load_llm."""
