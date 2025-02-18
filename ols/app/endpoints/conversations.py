@@ -5,9 +5,9 @@ streaming queries.
 """
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from ols import config
 from ols.app.endpoints.ols import (
@@ -54,13 +54,18 @@ chat_history_response: dict[int | str, dict[str, Any]] = {
 
 @router.get("/conversations/{conversation_id}", responses=chat_history_response)
 def get_conversation(
-    conversation_id: str, auth: Any = Depends(auth_dependency)
+    conversation_id: str,
+    history_length: Optional[int] = Query(
+        None, description="Number of most recent conversations to return", gt=0
+    ),
+    auth: Any = Depends(auth_dependency),
 ) -> ChatHistoryResponse:
     """Get conversation history for a given conversation ID.
 
     Args:
         auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
         conversation_id: The conversation ID to retrieve.
+        history_length: (Optional)Number of most recent conversations to return.
         user_id: (Optional)The user ID to retrieve the conversation for.
 
     Returns:
@@ -90,6 +95,10 @@ def get_conversation(
                 conversation_id,
             )
             raise Exception(f"Conversation {conversation_id} not found")
+
+        if history_length is not None:
+            chat_history = chat_history[-history_length:]
+
         return ChatHistoryResponse(chat_history=chat_history)
     except Exception as e:
         logger.error("Error retrieving previous chat history: %s", e)
@@ -188,12 +197,16 @@ list_conversations_response: dict[int | str, dict[str, Any]] = {
 
 @router.get("/conversations", responses=list_conversations_response)
 def list_conversations(
+    history_length: Optional[int] = Query(
+        None, description="Number of most recent conversations to return", gt=0
+    ),
     auth: Any = Depends(auth_dependency),
 ) -> ListConversationsResponse:
     """List all conversations for a given user.
 
     Args:
         auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
+        history_length: (Optional)Number of most recent conversations to return.
         user_id: (Optional)The user ID to get all conversations for.
 
     """
@@ -203,7 +216,9 @@ def list_conversations(
 
     # Log incoming request (after redaction)
     logger.info("Listing all conversations for user: %s ", user_id)
+    conversations = config.conversation_cache.list(user_id, skip_user_id_check)
 
-    return ListConversationsResponse(
-        conversations=config.conversation_cache.list(user_id, skip_user_id_check)
-    )
+    if history_length is not None:
+        conversations = conversations[:history_length]
+
+    return ListConversationsResponse(conversations=conversations)
