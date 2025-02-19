@@ -41,3 +41,5 @@ ols_config:
 dev_config:
   disable_auth: true
   disable_tls: true
+user_data_collector_config:
+  user_agent: "lightspeed-operator/user-data-collection cluster/{cluster_id}"
