@@ -11,6 +11,10 @@ class QuotaLimiter(ABC):
         """Retrieve available quota for given user."""
 
     @abstractmethod
+    def revoke_quota(self, user_id: str) -> None:
+        """Revoke quota for given user."""
+
+    @abstractmethod
     def consume_tokens(
         self, user_id: str, input_tokens: int, output_tokens: int
     ) -> None:
