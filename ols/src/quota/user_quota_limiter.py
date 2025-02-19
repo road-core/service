@@ -79,6 +79,18 @@ class UserQuotaLimiter(QuotaLimiter):
                 return self.initial_quota
             return value[0]
 
+    def revoke_quota(self, user_id: str) -> None:
+        """Revoke quota for given user."""
+        # timestamp to be used
+        updated_at = datetime.now()
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
+                (self.initial_quota, updated_at, user_id),
+            )
+            self.connection.commit()
+
     def consume_tokens(
         self, user_id: str, input_tokens: int, output_tokens: int
     ) -> None:
