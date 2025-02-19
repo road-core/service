@@ -85,6 +85,63 @@ def test_get_conversation_with_history(_setup, endpoint):
         assert history[3]["type"] == "ai"
 
 
+@pytest.mark.parametrize("endpoint", ("/conversations/{conversation_id}",))
+def test_get_conversation_with_history_length(_setup, endpoint):
+    """Test getting conversation history with history_length param."""
+    ml = mock_langchain_interface("test response")
+    with (
+        patch(
+            "ols.src.query_helpers.docs_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
+        patch(
+            "ols.src.query_helpers.query_helper.load_llm",
+            new=mock_llm_loader(ml()),
+        ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
+    ):
+        # First create some conversation history
+        conversation_id = suid.get_suid()
+
+        # Make first query to create conversation
+        response = pytest.client.post(
+            "/v1/query",
+            json={
+                "conversation_id": conversation_id,
+                "query": "First question",
+            },
+        )
+        assert response.status_code == requests.codes.ok
+
+        # Make second query to add to conversation
+        response = pytest.client.post(
+            "/v1/query",
+            json={
+                "conversation_id": conversation_id,
+                "query": "Second question",
+            },
+        )
+        assert response.status_code == requests.codes.ok
+
+        # Now test getting the conversation history
+        response = pytest.client.get(
+            f"{endpoint.format(conversation_id=conversation_id)}?history_length=2"
+        )
+        assert response.status_code == requests.codes.ok
+
+        history = response.json()["chat_history"]
+        assert len(history) == 2  # 1 query + 1 response
+
+        # Verify second message
+        assert history[0]["content"] == "Second question"
+        assert history[0]["type"] == "human"
+        # Verify second response
+        assert history[1]["type"] == "ai"
+
+
 @pytest.mark.parametrize("endpoint", ("/conversations",))
 def test_list_conversations_with_history(_setup, endpoint):
     """Test listing conversations after creating multiple conversations."""
@@ -138,6 +195,58 @@ def test_list_conversations_with_history(_setup, endpoint):
             assert (
                 "topic_summary" in conv
             ), f"Conversation {conv['conversation_id']} is missing topic_summary"
+
+
+@pytest.mark.parametrize("endpoint", ("/conversations",))
+def test_list_conversations_with_history_length(_setup, endpoint):
+    """Test listing conversations with history_length after creating multiple conversations."""
+    ml = mock_langchain_interface("test response")
+    with (
+        patch(
+            "ols.src.query_helpers.docs_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
+        patch(
+            "ols.src.query_helpers.query_helper.load_llm",
+            new=mock_llm_loader(ml()),
+        ),
+        patch(
+            "ols.src.query_helpers.topic_summarizer.LLMChain",
+            new=mock_llm_chain(None),
+        ),
+    ):
+        # Create first conversation
+        conv_id_1 = suid.get_suid()
+        response = pytest.client.post(
+            "/v1/query",
+            params={"user_id": "testuser"},
+            json={
+                "conversation_id": conv_id_1,
+                "query": "Question for conversation 1",
+            },
+        )
+        assert response.status_code == requests.codes.ok
+
+        # Create second conversation
+        conv_id_2 = suid.get_suid()
+        response = pytest.client.post(
+            "/v1/query",
+            params={"user_id": "testuser"},
+            json={
+                "conversation_id": conv_id_2,
+                "query": "Question for conversation 2",
+            },
+        )
+        assert response.status_code == requests.codes.ok
+
+        # Test listing conversations
+        response = pytest.client.get(
+            endpoint, params={"history_length": 1, "user_id": "testuser"}
+        )
+        assert response.status_code == requests.codes.ok
+
+        conversations = response.json()["conversations"]
+        assert len(conversations) == 1  # Return exact one conversation
 
 
 @pytest.mark.parametrize("endpoint", ("/conversations/{conversation_id}",))
