@@ -17,7 +17,7 @@ def get_model_response(query, provider, model, mode, api_client=None):
     """Get response depending upon the mode."""
     if mode == "ols":
         response = api_client.post(
-            "/v1/query",
+            "/api/v1/ai/chat/",
             json={
                 "query": query,
                 "provider": provider,

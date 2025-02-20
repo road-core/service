@@ -11,8 +11,8 @@ INSCOPE_MODELS = {
     "azure_openai+gpt-4o": ("azure_openai", "gpt-4o"),
     "ollama+llama3.1:latest": ("ollama", "llama3.1:latest"),
     "ollama+mistral": ("ollama", "mistral"),
-    "my_rhoai+granite3-8b": ("my_rhoai", "granite3-8b"),
-    "my_rhoai3+granite3-1-8b": ("my_rhoai3", "granite3-1-8b"),
+    "my_rhoai_g31+granite3-1-8b": ("my_rhoai_g31", "granite3-1-8b"),
+    "my_rhoai_g3+granite3-8b": ("my_rhoai_g3", "granite3-8b"),
 }
 
 NON_LLM_EVALS = {
@@ -44,7 +44,7 @@ DEFAULT_INPUT_DIR = "eval_data"
 DEFAULT_RESULT_DIR = "eval_result"
 
 # Retry settings for LLM calls used when model does not respond reliably in 100% cases
-MAX_RETRY_ATTEMPTS = 10
+MAX_RETRY_ATTEMPTS = 5
 REST_API_TIMEOUT = 120
 TIME_TO_BREATH = 10
 

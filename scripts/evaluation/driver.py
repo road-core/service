@@ -1,6 +1,7 @@
 """Driver for evaluation."""
 
 import argparse
+from os import path
 import sys
 
 from httpx import Client
@@ -96,8 +97,11 @@ def main():
     client = Client(base_url=args.eval_api_url, verify=False)  # noqa: S501
 
     if "localhost" not in args.eval_api_url:
-        with open(args.eval_api_token_file, mode="r", encoding="utf-8") as t_f:
-            token = t_f.read().rstrip()
+        if path.isfile(args.eval_api_token_file) == True:
+            with open(args.eval_api_token_file, mode="r", encoding="utf-8") as t_f:
+                token = t_f.read().rstrip()
+        else:
+            token = args.eval_api_token_file
         client.headers.update({"Authorization": f"Bearer {token}"})
 
     resp_eval = ResponseEvaluation(args, client)
