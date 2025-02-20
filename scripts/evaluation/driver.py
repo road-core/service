@@ -97,7 +97,7 @@ def main():
     client = Client(base_url=args.eval_api_url, verify=False)  # noqa: S501
 
     if "localhost" not in args.eval_api_url:
-        if path.isfile(args.eval_api_token_file) == True:
+        if path.isfile(args.eval_api_token_file):
             with open(args.eval_api_token_file, mode="r", encoding="utf-8") as t_f:
                 token = t_f.read().rstrip()
         else:
