@@ -3,8 +3,6 @@
 import logging
 from datetime import datetime
 
-import psycopg2
-
 from ols.app.models.config import PostgresConfig
 from ols.src.quota.quota_exceed_error import QuotaExceedError
 from ols.src.quota.quota_limiter import QuotaLimiter
@@ -57,17 +55,8 @@ class UserQuotaLimiter(QuotaLimiter):
         self.increase_by = increase_by
 
         # initialize connection to DB
-        self.connection = psycopg2.connect(
-            host=config.host,
-            port=config.port,
-            user=config.user,
-            password=config.password,
-            dbname=config.dbname,
-            sslmode=config.ssl_mode,
-            sslrootcert=config.ca_cert_path,
-            gssencmode=config.gss_encmode,
-        )
-        self.connection.autocommit = True
+        self.connect(config)
+
         try:
             self._initialize_tables()
         except Exception as e:
