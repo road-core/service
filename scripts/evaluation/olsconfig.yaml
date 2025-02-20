@@ -17,12 +17,18 @@ llm_providers:
     models:
       - name: "mistral"
       - name: 'llama3.2:latest'
-  - name: my_rhoai
+  - name: my_rhoai_g3
     type: openai
-    url: "https://granite3-8b-wisdom-model-staging.apps.stage2-west.v2dz.p1.openshiftapps.com/v1"
+    url: "http://localhost:8000/v1"
     credentials_path: ols_api_key.txt
     models:
       - name: granite3-8b
+  - name: my_rhoai_g31
+    type: openai
+    url: "http://localhost:8000/v1"
+    credentials_path: rhoai_api_key.txt
+    models:
+      - name: granite3-1-8b
 ols_config:
   # max_workers: 1
   reference_content:
@@ -37,8 +43,10 @@ ols_config:
     app_log_level: info
     lib_log_level: warning
     uvicorn_log_level: info
-  default_provider: ollama
-  default_model: 'llama3.2:latest'
+  # default_provider: my_rhoai_g31
+  # default_model: 'granite3-1-8b'
+  default_provider: my_rhoai_g3
+  default_model: 'granite3-8b'
   query_validation_method: llm
   user_data_collection:
     feedback_disabled: false
