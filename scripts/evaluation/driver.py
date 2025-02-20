@@ -1,5 +1,6 @@
-"""Driver for evaluation."""
 # ruff: noqa: I001
+"""Driver for evaluation."""
+
 import argparse
 from os import path
 import sys
