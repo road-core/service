@@ -149,7 +149,7 @@ def test_revoke_quota(mock_datetime, mock_connect):
 
     # quota for given user should be written into the storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
+        UserQuotaLimiter.SET_AVAILABLE_QUOTA_FOR_USER,
         (quota_limit, timestamp, user_id),
     )
 
@@ -175,7 +175,7 @@ def test_consume_tokens_not_enough(mock_connect):
     with pytest.raises(
         Exception, match="User 1234 has 50 tokens, but 100 tokens are needed"
     ):
-        q.consume_tokens(user_id, to_be_consumed, 0)
+        q.consume_tokens(to_be_consumed, 0, user_id)
 
     # quota for given user should be read from storage
     mock_cursor.execute.assert_called_once_with(
@@ -185,7 +185,7 @@ def test_consume_tokens_not_enough(mock_connect):
 
 @patch("psycopg2.connect")
 @patch("ols.src.quota.user_quota_limiter.datetime")
-def test_consume_tokens_enough_tokens(mock_datetime, mock_connect):
+def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 50
     available_tokens = 100
@@ -208,7 +208,7 @@ def test_consume_tokens_enough_tokens(mock_datetime, mock_connect):
     q = UserQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
-    q.consume_tokens(user_id, to_be_consumed, 0)
+    q.consume_tokens(to_be_consumed, 0, user_id)
 
     calls = [
         # quota for given user should be read from storage
@@ -216,7 +216,120 @@ def test_consume_tokens_enough_tokens(mock_datetime, mock_connect):
         # and the quota should be updated accordingly
         call(
             UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-            (available_tokens - to_be_consumed, timestamp, user_id),
+            (-to_be_consumed, timestamp, user_id),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
+
+
+@patch("psycopg2.connect")
+@patch("ols.src.quota.user_quota_limiter.datetime")
+def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
+    """Test the operation to consume tokens."""
+    to_be_consumed = 50
+    available_tokens = 100
+    quota_limit = 100
+    user_id = "1234"
+
+    # mock the query result - no data
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = (available_tokens,)
+    mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
+
+    # initialize Postgres storage
+    config = PostgresConfig()
+    q = UserQuotaLimiter(config, quota_limit)
+
+    # try to consume tokens
+    q.consume_tokens(0, to_be_consumed, user_id)
+
+    calls = [
+        # quota for given user should be read from storage
+        call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
+        # and the quota should be updated accordingly
+        call(
+            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
+            (-to_be_consumed, timestamp, user_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=True)
+
+
+@patch("psycopg2.connect")
+@patch("ols.src.quota.user_quota_limiter.datetime")
+def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_connect):
+    """Test the operation to consume tokens."""
+    input_tokens = 30
+    output_tokens = 20
+    to_be_consumed = input_tokens + output_tokens
+    available_tokens = 100
+    quota_limit = 100
+    user_id = "1234"
+
+    # mock the query result - no data
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = (available_tokens,)
+    mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
+
+    # initialize Postgres storage
+    config = PostgresConfig()
+    q = UserQuotaLimiter(config, quota_limit)
+
+    # try to consume tokens
+    q.consume_tokens(input_tokens, output_tokens, user_id)
+
+    calls = [
+        # quota for given user should be read from storage
+        call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
+        # and the quota should be updated accordingly
+        call(
+            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
+            (-to_be_consumed, timestamp, user_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=True)
+
+
+@patch("psycopg2.connect")
+@patch("ols.src.quota.user_quota_limiter.datetime")
+def test_increase_quota(mock_datetime, mock_connect):
+    """Test the operation to increase quota."""
+    quota_limit = 100
+    additional_quota = 10
+    user_id = "1234"
+
+    # mock the query result - no data
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = None
+    mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
+
+    # initialize Postgres storage
+    config = PostgresConfig()
+    q = UserQuotaLimiter(config, quota_limit, additional_quota)
+
+    # try to increase quota
+    q.increase_quota(user_id)
+
+    # quota for given user should be written into the storage
+    mock_cursor.execute.assert_called_once_with(
+        UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
+        (additional_quota, timestamp, user_id),
+    )
