@@ -303,6 +303,34 @@ def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_conne
 
 
 @patch("psycopg2.connect")
+def test_consume_tokens_on_no_record(mock_connect):
+    """Test the operation to consume tokens."""
+    to_be_consumed = 100
+    quota_limit = 100
+    user_id = "1234"
+
+    # mock the query result - no data
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = None
+    mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # initialize Postgres storage
+    config = PostgresConfig()
+    q = UserQuotaLimiter(config, quota_limit)
+
+    # try to consume tokens
+    with pytest.raises(
+        Exception, match="User 1234 has 0 tokens, but 100 tokens are needed"
+    ):
+        q.consume_tokens(to_be_consumed, 0, user_id)
+
+    # quota for given user should be read from storage
+    mock_cursor.execute.assert_called_once_with(
+        UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)
+    )
+
+
+@patch("psycopg2.connect")
 @patch("ols.src.quota.user_quota_limiter.datetime")
 def test_increase_quota(mock_datetime, mock_connect):
     """Test the operation to increase quota."""
