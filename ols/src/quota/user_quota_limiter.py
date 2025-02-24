@@ -106,18 +106,29 @@ class UserQuotaLimiter(QuotaLimiter):
     ) -> None:
         """Consume tokens by given user."""
         to_be_consumed = input_tokens + output_tokens
-        available = self.available_quota(user_id)
 
-        # check if user still have available tokens to be consumed
-        if available < to_be_consumed:
-            e = QuotaExceedError(user_id, available, to_be_consumed)
-            logger.exception("Quota exceed: %s", e)
-            raise e
-
-        # timestamp to be used
-        updated_at = datetime.now()
-
+        # note that checking available tokens and decreasing quota operations
+        # are performed in a transaction
         with self.connection.cursor() as cursor:
+            cursor.execute(
+                UserQuotaLimiter.SELECT_QUOTA_FOR_USER,
+                (user_id,),
+            )
+            value = cursor.fetchone()
+            if value is None:
+                available = 0
+            else:
+                available = value[0]
+
+            # check if user still have available tokens to be consumed
+            if available < to_be_consumed:
+                e = QuotaExceedError(user_id, available, to_be_consumed)
+                logger.exception("Quota exceed: %s", e)
+                raise e
+
+            # timestamp to be used
+            updated_at = datetime.now()
+
             cursor.execute(
                 UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
                 (-to_be_consumed, updated_at, user_id),
