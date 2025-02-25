@@ -22,6 +22,7 @@ from ols.app.models.models import (
     ForbiddenResponse,
     LLMRequest,
     LLMResponse,
+    ProcessedRequest,
     PromptTooLongResponse,
     RagChunk,
     ReferencedDocument,
@@ -86,22 +87,11 @@ def conversation_request(
     Returns:
         Response containing the processed information.
     """
-    (
-        user_id,
-        conversation_id,
-        query_without_attachments,
-        previous_input,
-        attachments,
-        valid,
-        timestamps,
-        skip_user_id_check,
-        # not needed now - it is prepared here to be used in agent/tools
-        user_token,  # pylint: disable=W0612
-    ) = process_request(auth, llm_request)
+    processed_request = process_request(auth, llm_request)
 
     summarizer_response: SummarizerResponse | Generator
 
-    if not valid:
+    if not processed_request.valid:
         # response containing info about query that can not be validated
         summarizer_response = SummarizerResponse(
             INVALID_QUERY_RESP,
@@ -111,54 +101,58 @@ def conversation_request(
         )
     else:
         summarizer_response = generate_response(
-            conversation_id, llm_request, previous_input
+            processed_request.conversation_id,
+            llm_request,
+            processed_request.previous_input,
         )
 
-    timestamps["generate response"] = time.time()
+    processed_request.timestamps["generate response"] = time.time()
 
     topic_summary = ""
     # only generate topic summary for new conversations
-    if not previous_input:
-        topic_summary = get_topic_summary(conversation_id, llm_request)
-        timestamps["generate topic summary"] = time.time()
+    if not processed_request.previous_input:
+        topic_summary = get_topic_summary(
+            processed_request.conversation_id, llm_request
+        )
+        processed_request.timestamps["generate topic summary"] = time.time()
 
     store_conversation_history(
-        user_id,
-        conversation_id,
+        processed_request.user_id,
+        processed_request.conversation_id,
         llm_request,
         summarizer_response.response,
-        attachments,
-        timestamps,
+        processed_request.attachments,
+        processed_request.timestamps,
         topic_summary,
-        skip_user_id_check,
+        processed_request.skip_user_id_check,
     )
 
     if config.ols_config.user_data_collection.transcripts_disabled:
         logger.debug("transcripts collections is disabled in configuration")
     else:
         store_transcript(
-            user_id,
-            conversation_id,
-            valid,
-            query_without_attachments,
+            processed_request.user_id,
+            processed_request.conversation_id,
+            processed_request.valid,
+            processed_request.query_without_attachments,
             llm_request,
             summarizer_response.response,
             summarizer_response.rag_chunks,
             summarizer_response.history_truncated,
-            attachments,
+            processed_request.attachments,
         )
 
-    timestamps["store transcripts"] = time.time()
+    processed_request.timestamps["store transcripts"] = time.time()
 
     referenced_documents = ReferencedDocument.from_rag_chunks(
         summarizer_response.rag_chunks
     )
 
-    timestamps["add references"] = time.time()
-    log_processing_durations(timestamps)
+    processed_request.timestamps["add references"] = time.time()
+    log_processing_durations(processed_request.timestamps)
 
     return LLMResponse(
-        conversation_id=conversation_id,
+        conversation_id=processed_request.conversation_id,
         response=summarizer_response.response,
         referenced_documents=referenced_documents,
         truncated=summarizer_response.history_truncated,
@@ -175,11 +169,7 @@ def conversation_request(
     )
 
 
-def process_request(
-    auth: Any, llm_request: LLMRequest
-) -> tuple[
-    str, str, str, list[CacheEntry], list[Attachment], bool, dict[str, float], str, str
-]:
+def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
     """Process incoming request.
 
     Args:
@@ -245,16 +235,16 @@ def process_request(
 
     timestamps["validate question"] = time.time()
 
-    return (
-        user_id,
-        conversation_id,
-        query_without_attachments,
-        previous_input,
-        attachments,
-        valid,
-        timestamps,
-        skip_user_id_check,
-        user_token,
+    return ProcessedRequest(
+        user_id=user_id,
+        conversation_id=conversation_id,
+        query_without_attachments=query_without_attachments,
+        previous_input=previous_input,
+        attachments=attachments,
+        valid=valid,
+        timestamps=timestamps,
+        skip_user_id_check=skip_user_id_check,
+        user_token=user_token,
     )
 
 
