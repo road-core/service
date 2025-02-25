@@ -14,43 +14,48 @@ class UserQuotaLimiter(QuotaLimiter):
     """Simple user quota limiter where each user have fixed quota."""
 
     CREATE_QUOTA_TABLE = """
-        CREATE TABLE IF NOT EXISTS user_quota_limiter (
-            user_id         text NOT NULL,
+        CREATE TABLE IF NOT EXISTS quota_limits (
+            id              text NOT NULL,
+            subject         char(1) NOT NULL,
             quota_limit     int NOT NULL,
             available       int,
             updated_at      timestamp with time zone,
             revoked_at      timestamp with time zone,
-            PRIMARY KEY(user_id)
+            PRIMARY KEY(id, subject)
         );
         """
 
-    INIT_QUOTA_FOR_USER = """
-        INSERT INTO user_quota_limiter (user_id, quota_limit, available, revoked_at)
-        VALUES (%s, %s, %s, %s)
+    INIT_QUOTA = """
+        INSERT INTO quota_limits (id, subject, quota_limit, available, revoked_at)
+        VALUES (%s, %s, %s, %s, %s)
         """
 
-    SELECT_QUOTA_FOR_USER = """
+    SELECT_QUOTA = """
         SELECT available
-          FROM user_quota_limiter
-         WHERE user_id=%s LIMIT 1
+          FROM quota_limits
+         WHERE id=%s and subject=%s LIMIT 1
         """
 
-    SET_AVAILABLE_QUOTA_FOR_USER = """
-        UPDATE user_quota_limiter
+    SET_AVAILABLE_QUOTA = """
+        UPDATE quota_limits
            SET available=%s, updated_at=%s
-         WHERE user_id=%s
+         WHERE id=%s and subject=%s
         """
 
-    UPDATE_AVAILABLE_QUOTA_FOR_USER = """
-        UPDATE user_quota_limiter
+    UPDATE_AVAILABLE_QUOTA = """
+        UPDATE quota_limits
            SET available=available+%s, updated_at=%s
-         WHERE user_id=%s
+         WHERE id=%s and subject=%s
         """
 
     def __init__(
-        self, config: PostgresConfig, initial_quota: int = 0, increase_by: int = 0
+        self,
+        config: PostgresConfig,
+        initial_quota: int = 0,
+        increase_by: int = 0,
     ) -> None:
         """Initialize quota limiter storage."""
+        self.subject = "u"  # user
         self.initial_quota = initial_quota
         self.increase_by = increase_by
 
@@ -68,8 +73,8 @@ class UserQuotaLimiter(QuotaLimiter):
         """Retrieve available quota for given user."""
         with self.connection.cursor() as cursor:
             cursor.execute(
-                UserQuotaLimiter.SELECT_QUOTA_FOR_USER,
-                (user_id,),
+                UserQuotaLimiter.SELECT_QUOTA,
+                (user_id, self.subject),
             )
             value = cursor.fetchone()
             if value is None:
@@ -84,8 +89,8 @@ class UserQuotaLimiter(QuotaLimiter):
 
         with self.connection.cursor() as cursor:
             cursor.execute(
-                UserQuotaLimiter.SET_AVAILABLE_QUOTA_FOR_USER,
-                (self.initial_quota, updated_at, user_id),
+                UserQuotaLimiter.SET_AVAILABLE_QUOTA,
+                (self.initial_quota, updated_at, user_id, self.subject),
             )
             self.connection.commit()
 
@@ -96,8 +101,8 @@ class UserQuotaLimiter(QuotaLimiter):
 
         with self.connection.cursor() as cursor:
             cursor.execute(
-                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-                (self.increase_by, updated_at, user_id),
+                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+                (self.increase_by, updated_at, user_id, self.subject),
             )
             self.connection.commit()
 
@@ -111,8 +116,8 @@ class UserQuotaLimiter(QuotaLimiter):
         # are performed in a transaction
         with self.connection.cursor() as cursor:
             cursor.execute(
-                UserQuotaLimiter.SELECT_QUOTA_FOR_USER,
-                (user_id,),
+                UserQuotaLimiter.SELECT_QUOTA,
+                (user_id, self.subject),
             )
             value = cursor.fetchone()
             if value is None:
@@ -130,8 +135,8 @@ class UserQuotaLimiter(QuotaLimiter):
             updated_at = datetime.now()
 
             cursor.execute(
-                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-                (-to_be_consumed, updated_at, user_id),
+                UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+                (-to_be_consumed, updated_at, user_id, self.subject),
             )
             self.connection.commit()
 
@@ -149,7 +154,13 @@ class UserQuotaLimiter(QuotaLimiter):
 
         with self.connection.cursor() as cursor:
             cursor.execute(
-                UserQuotaLimiter.INIT_QUOTA_FOR_USER,
-                (user_id, self.initial_quota, self.initial_quota, revoked_at),
+                UserQuotaLimiter.INIT_QUOTA,
+                (
+                    user_id,
+                    self.subject,
+                    self.initial_quota,
+                    self.initial_quota,
+                    revoked_at,
+                ),
             )
             self.connection.commit()
