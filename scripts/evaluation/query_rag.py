@@ -12,19 +12,19 @@ from llama_index.vector_stores.faiss import FaissVectorStore
 from pandas import DataFrame
 
 QNA_QUERIES = [
-    "what is kubernetes?",
-    "what is openshift virtualization?",
-    "What is the purpose of the imagePullPolicy in Red Hat OpenShift Container Platform?",
-    # "What is the purpose of the APIRequestCount object?",
-    # "What is the purpose of the ClusterVersion object in OpenShift updates?",
-    "How does Red Hat OpenShift Pipelines automate deployments?",
-    "what is a limitrange?",
-    "What is the purpose of the Vertical Pod Autoscaler Operator in Openshift?",
-    "Is there a doc on updating clusters?",
-    # "Can you tell me how to install OpenShift in FIPS mode?",
-    "How do I find my clusterID?",
-    "do you recommend using DeploymentConfig?",
-    "give me sample deployment yaml that uses MongoDB image",
+    "what is ansible??",
+    "what is idempotency?",
+    "What is ansible galaxy?",
+    "What is ansible playbooks?",
+    "How do you use ansible to create encrypted files?",
+    "What are 'facts' in the context of Ansible?",
+    "What are tags?",
+    "what is ansible tower?",
+    "What is Ansible roles?",
+    "What is Ansible Automation mesh?",
+    "What is Ansible development tools?",
+    "What is Ansible automation platform?",
+    "How to install Ansible automation platform?"
 ]
 
 

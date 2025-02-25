@@ -1,371 +1,456 @@
 {
     "evaluation": {
         "eval1": {
-            "question": "what is kubernetes?",
+            "question": "what is ansible?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
-                    "in_use": true,
-                    "cutoff_score": 0.05,
-                    "text": [
-                        "Kubernetes is an open source container orchestration tool developed by Google. It allows you to run and manage container-based workloads, and is commonly used to deploy interconnected microservices in a cloud-native way. Kubernetes clusters can span hosts across on-premise, public, private, or hybrid clouds.",
-                        "Kubernetes is an open-source container orchestration engine for automating deployment, scaling, and management of containerized applications. It uses a declarative model, meaning it defines a desired state and automatically works towards achieving that state. Kubernetes was originally developed by Google and has since become widely adopted in the industry for its ability to manage large-scale container deployments. It provides features such as self-healing, automated rollouts, and service discovery, making it easier to manage and scale complex applications."
-                    ]
-                },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
-                    "text": [
-                        "Kubernetes is an open source container orchestration tool developed by Google that you can use to run and manage container-based workloads. It is commonly used to deploy an array of interconnected microservices, building an application in a cloud native way. Kubernetes can span hosts across on-premise, public, private, or hybrid clouds."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
+                "my_rhoai_g3+granite3-8b+with_rag": {
                     "cutoff_score": 0.35,
                     "text": [
-                        "Kubernetes is an open-source container orchestration platform designed to automate the deployment, scaling, and management of containerized applications. It provides a framework for running distributed systems resiliently, allowing you to manage services that can span multiple hosts. Kubernetes helps ensure that your application is always available by managing the containers lifecycle, providing load balancing, scaling features, and self-healing capabilities."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "text": [
-                        "Kubernetes is an open-source container orchestration engine for automating the deployment, scaling, and management of containerized applications. It provides a platform for running and managing containers at scale, allowing you to easily deploy and manage applications across multiple machines or environments. Kubernetes enables efficient resource utilization, automatic scaling, self-healing capabilities, and seamless integration with various cloud providers. It is widely used in modern application development to build scalable and resilient cloud-native applications."
-                    ]
-                },
-                "bam+ibm/granite-3-8b-instruct+without_rag": {
-                    "text": [
-                        "Kubernetes, also known as K8s, is an open-source platform designed to automate deploying, scaling, and managing containerized applications. It groups containers that make up an application into logical units for easy management and discovery. Kubernetes abstracts the underlying infrastructure, enabling developers to focus on building their applications without worrying about the complexities of the infrastructure.\n\nKubernetes provides several key features:\n\n1. **Automated Deployment**: Kubernetes can automatically deploy new application versions based on predefined policies, ensuring that the correct version is always running.\n2. **Scaling**: Kubernetes allows you to easily scale your applications up or down based on demand, ensuring optimal performance and resource utilization.\n3. **Self-Healing**: If a container crashes, Kubernetes will automatically restart it, ensuring high availability and reliability.\n4. **Load Balancing**: Kubernetes provides built-in load balancing capabilities, distributing traffic across multiple instances of an application to ensure no single instance becomes a bottleneck.\n5. **Storage Orchestration**: Kubernetes manages storage resources for your applications, making it easy to add or remove storage as needed.\n6. **Secret and Configuration Management**: Kubernetes allows you to manage sensitive data, such as passwords and API keys, as well as application configurations, making it easy to maintain consistent settings across your application environment.\n\nThese features make Kubernetes a powerful and flexible platform for managing containerized applications at scale.\n\nTo learn more about Kubernetes, you can visit the official website at https://kubernetes.io/ or explore the many resources available online, including tutorials, documentation, and community forums."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+without_rag": {
-                    "text": [
-                        "Kubernetes is an open-source container orchestration platform that automates the deployment, scaling, and management of containerized applications. It provides a framework for running and coordinating containers across a cluster of machines. Kubernetes helps simplify the management of complex distributed systems by abstracting away many of the underlying infrastructure details. OpenShift, being a distribution of Kubernetes, offers all the capabilities provided by Kubernetes along with additional features and tools specific to OpenShift."
+                        "Ansible is an open source IT automation engine that automates various IT processes such as provisioning, configuration management, application deployment, orchestration, and more. It is free to use and benefits from the contributions of its thousands of contributors. Ansible does not require any paid subscription for its core functionalities."
                     ]
                 },
                 "ground_truth": {
                     "cutoff_score": {
-                        "bam+ibm/granite-3-8b-instruct+with_rag": 0.3,
-                        "watsonx+ibm/granite-3-8b-instruct+without_rag": 0.3,
-                        "openai+gpt-4o-mini+without_rag": 0.2,
-                        "azure_openai+gpt-4o-mini+without_rag": 0.2
+                        "my_rhoai_g3+granite3-8b+with_rag": 0.2
                     },
                     "text": [
-                        "Kubernetes is an open source container orchestration engine for automating deployment, scaling, and management of containerized applications. It serves as the engine for various applications such as telecommunications, streaming video, gaming, banking, and more. Kubernetes allows you to manage container workloads by deploying them on worker nodes and controlling them from control plane nodes. It uses pods to group containers together and provides additional metadata for better management."
+                        "Ansible is an open-source automation tool used for configuration management, application deployment, and IT orchestration. It is agentless, uses YAML-based playbooks, and communicates over SSH or WinRM. Ansible ensures idempotency, meaning tasks produce consistent results. It is widely used for server provisioning, cloud automation, and DevOps workflows."
                     ]
                 },
                 "ground_truth+with_rag": {
                     "cutoff_score": {
-                        "bam+ibm/granite-3-8b-instruct+with_rag": 0.2,
-                        "watsonx+ibm/granite-3-8b-instruct+with_rag": 0.2,
-                        "openai+gpt-4o-mini+with_rag": 0.2,
-                        "azure_openai+gpt-4o-mini+with_rag": 0.2
+                        "my_rhoai_g3+granite3-8b+with_rag": 0.2
                     },
                     "text": [
-                        "Kubernetes is an open source container orchestration tool developed by Google. It allows you to run and manage container-based workloads, and is commonly used to deploy interconnected microservices in a cloud-native way. Kubernetes clusters can span hosts across various environments, including on-premise, public, private, and hybrid clouds. It provides features such as sharing resources, orchestrating containers across multiple hosts, installing new hardware configurations, running health checks and self-healing applications, and scaling containerized applications."
+                        "Ansible is an open source IT automation engine that automates various IT processes such as provisioning, configuration management, application deployment, orchestration, and more. It is free to use and benefits from the contributions of its thousands of contributors. Ansible does not require any paid subscription for its core functionalities."
                     ]
                 },
                 "ground_truth+without_rag": {
                     "cutoff_score": {
-                        "azure_openai+gpt-4o-mini+without_rag": 0.2
+                        "my_rhoai_g3+granite3-8b+with_rag": 0.2
                     },
                     "text": [
-                        "Kubernetes is an open-source container orchestration platform that automates the deployment, scaling, and management of containerized applications. It allows you to easily deploy, scale, and manage containerized applications in a clustered environment."
+                        "Ansible is an open-source automation tool used for configuration management, application deployment, and IT orchestration. It is agentless, uses YAML-based playbooks, and communicates over SSH or WinRM. Ansible ensures idempotency, meaning tasks produce consistent results. It is widely used for server provisioning, cloud automation, and DevOps workflows."
                     ]
                 }
             }
-        },    
+        },
         "eval2": {
-            "question": "what is openshift virtualization?",
+            "question": "what is idempotency?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
-                    "text": [
-                        "OpenShift Virtualization is a feature of Red Hat OpenShift Container Platform that allows traditional virtual machines (VMs) to be brought into the platform and run alongside containers. It represents the icon and can be used with either the OVN-Kubernetes or the OpenShiftSDN default Container Network Interface (CNI) network provider. OpenShift Virtualization is certified in Microsoft's Windows Server Virtualization Validation Program (SVVP) to run Windows Server workloads.",
-                        "OpenShift Virtualization is an add-on to Red Hat OpenShift Container Platform that allows you to run and manage virtual machine workloads alongside container workloads. It adds new objects into your Red Hat OpenShift Container Platform cluster by using Kubernetes custom resources to enable virtualization tasks such as creating and managing Linux and Windows virtual machines, running pod and VM workloads alongside each other in a cluster, connecting to virtual machines through a variety of consoles and CLI tools, importing and cloning existing virtual machines, managing network interface controllers and storage disks attached to virtual machines, live migrating virtual machines between nodes, and providing an enhanced web console for managing these virtualized resources alongside the Red Hat OpenShift Container Platform cluster containers and infrastructure."
-                    ]
-                },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
-                    "cutoff_score": 0.3,
-                    "text": [
-                        "OpenShift Virtualization is an add-on to Red Hat OpenShift Container Platform that allows you to run and manage virtual machine workloads alongside container workloads. It adds new objects into your Red Hat OpenShift Container Platform cluster by using Kubernetes custom resources to enable virtualization tasks such as creating and managing Linux and Windows virtual machines, running pod and VM workloads alongside each other in a cluster, connecting to virtual machines through various consoles and CLI tools, importing and cloning existing virtual machines, managing network interface controllers and storage disks attached to virtual machines, and live migrating virtual machines between nodes. An enhanced web console provides a graphical portal to manage these virtualized resources alongside the Red Hat OpenShift Container Platform cluster containers and infrastructure."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.3,
-                    "text": [
-                        "OpenShift Virtualization allows you to bring traditional virtual machines (VMs) into the Red Hat OpenShift Container Platform and run them alongside containers. In this environment, VMs are treated as native Kubernetes objects that can be managed using the OpenShift web console or command line interface. It provides a way to integrate VM workloads with containerized applications within the OpenShift platform."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
                     "cutoff_score": 0.35,
                     "text": [
-                        "OpenShift Virtualization is an add-on to the Red Hat OpenShift Container Platform that enables you to run and manage virtual machine (VM) workloads alongside container workloads. It integrates virtualization capabilities into the OpenShift environment, allowing users to create and manage both Linux and Windows VMs as native Kubernetes objects.\n\nKey features of OpenShift Virtualization include:\n\n- Creating and managing VMs directly within the OpenShift platform.\n- Running pod (container) and VM workloads together in a single cluster.\n- Connecting to VMs through various consoles and command-line tools.\n- Importing and cloning existing virtual machines.\n- Managing network interfaces and storage disks attached to VMs.\n- Live migrating VMs between nodes for better resource management.\n\nThe enhanced web console provides a graphical interface for managing these virtualized resources alongside containerized applications, making it easier for users to handle diverse workloads within a unified platform.",
-                        "OpenShift Virtualization is a feature of Red Hat OpenShift Container Platform that allows you to bring traditional virtual machines (VMs) into the Kubernetes environment and run them alongside containers. In OpenShift Virtualization, VMs are treated as native Kubernetes objects and can be managed using the OpenShift web console or command line interface. This feature enables organizations to consolidate their containerized and virtualized workloads onto a single platform, providing greater flexibility and efficiency in managing their applications."
+                        "Idempotency in Ansible refers to the property of certain operations that, when executed multiple times, have the same effect as if they were executed once. This means that running an idempotent task or playbook multiple times will not change the system beyond the initial application. It's a crucial concept in Ansible to ensure that the desired state of the system is maintained without causing unintended side effects."
+                    ]
+                },
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Idempotency in Ansible refers to the property of certain operations that, when executed multiple times, have the same effect as if they were executed once. This means that running an idempotent task or playbook multiple times will not change the system beyond the initial application. It's a crucial concept in Ansible to ensure that the desired state of the system is maintained without causing unintended side effects."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "OpenShift Virtualization is an add-on to Red Hat OpenShift Container Platform that allows you to run and manage virtual machine workloads alongside container workloads. It adds new objects into your OpenShift cluster using Kubernetes custom resources to enable virtualization tasks such as creating and managing Linux and Windows virtual machines, running pod and VM workloads together in a cluster, connecting to virtual machines through consoles and CLI tools, importing and cloning existing VMs, managing network interface controllers and storage disks attached to VMs, and live migrating VMs between nodes. It also provides an enhanced web console for managing these virtualized resources alongside the OpenShift cluster containers and infrastructure."
+                        "Idempotency in Ansible refers to the property of certain operations that, when executed multiple times, have the same effect as if they were executed once. This means that running an idempotent task or playbook multiple times will not change the system beyond the initial application. It's a crucial concept in Ansible to ensure that the desired state of the system is maintained without causing unintended side effects."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Idempotency means that repeating an operation multiple times produces the same result without unintended side effects."
                     ]
                 }
             }
-        },    
+        },
         "eval3": {
-            "question": "What is the purpose of the imagePullPolicy in Red Hat OpenShift Container Platform?",
+            "question": "what is ansible galaxy?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
                     "text": [
-                        "The imagePullPolicy in Red Hat OpenShift Container Platform determines whether a container image should be pulled prior to starting the container. It has three possible values: Always, IfNotPresent, and Never."
+                        "Ansible Galaxy is a hub for finding, reusing, and sharing Ansible content. It serves as a directory for the Ansible community to access and share prepackaged roles that can be used to start automation projects. These roles can be easily integrated into Ansible Playbooks and applied to customer environments for tasks such as provisioning infrastructure, deploying applications, and more. Ansible Galaxy is the recommended frontend directory for the Ansible community to access content."
                     ]
                 },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "The imagePullPolicy in Red Hat OpenShift Container Platform determines if the image should be pulled prior to starting the container. It has three possible values: Always, IfNotPresent, and Never. If a container imagePullPolicy parameter is not specified, Red Hat OpenShift Container Platform sets it based on the image tag. If the tag is 'latest', it defaults to 'Always'. Otherwise, it defaults to 'IfNotPresent'."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.25,
-                    "text": [
-                        "The imagePullPolicy in Red Hat OpenShift Container Platform determines whether the container image should be pulled from a registry before starting the container. It helps manage how images are retrieved based on their tags. There are three possible values for imagePullPolicy:1. **Always**: The image is always pulled from the registry, regardless of whether it already exists locally.2. **IfNotPresent**: The image is pulled only if it is not already present on the node.3. **Never**: The image is never pulled; it must exist locally.If an explicit value for imagePullPolicy is not specified, OpenShift sets it based on the tag of the container image:- If the tag is latest, OpenShift defaults to Always.- For any other tag, it defaults to IfNotPresent. This policy helps ensure that applications run with the correct version of their dependencies while optimizing resource usage by avoiding unnecessary pulls when images are already available locally."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.25,
-                    "text": [
-                        "The purpose of the imagePullPolicy in Red Hat OpenShift Container Platform is to determine if the container image should be pulled prior to starting the container. It helps control when and how often the container image is fetched from the registry. The three possible values for imagePullPolicy are:\n\n1. Always: The container image will always be pulled, even if it already exists locally.n2. IfNotPresent: The container image will only be pulled if it does not already exist locally.\n3. Never: The container image will never be pulled, and it is assumed to already exist locally.\n\nIf no value is specified for the imagePullPolicy parameter, OpenShift sets it based on the tag of the image being used. If the tag is \"latest\", then OpenShift defaults to \"Always\" as the policy. Otherwise, it defaults to \"IfNotPresent\"."
+                        "Ansible Galaxy is a hub for finding, reusing, and sharing Ansible content. It serves as a directory for the Ansible community to access and share prepackaged roles that can be used to start automation projects. These roles can be easily integrated into Ansible Playbooks and applied to customer environments for tasks such as provisioning infrastructure, deploying applications, and more. Ansible Galaxy is the recommended frontend directory for the Ansible community to access content."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "The imagePullPolicy in Red Hat OpenShift Container Platform determines whether a container image should be pulled before starting the container. It has three possible values: Always, IfNotPresent, and Never.\n\nIf a container imagePullPolicy parameter is not specified, Red Hat OpenShift Container Platform sets it based on the image tag. If the tag is \"latest\", it defaults imagePullPolicy to \"Always\". Otherwise, it defaults imagePullPolicy to \"IfNotPresent\".\n\nThe \"Always\" value ensures that the container image is always pulled before starting the container. The \"IfNotPresent\" value ensures that the container image is only pulled if it does not already exist in the container registry. The \"Never\" value ensures that the container image is never pulled, and the container will use the cached image if available.\n\nIn summary, the imagePullPolicy is used to control the behavior of container image pulling in Red Hat OpenShift Container Platform, allowing for efficient resource utilization and reduced latency."
+                        "Ansible Galaxy is a hub for finding, reusing, and sharing Ansible content. It serves as a directory for the Ansible community to access and share prepackaged roles that can be used to start automation projects. These roles can be easily integrated into Ansible Playbooks and applied to customer environments for tasks such as provisioning infrastructure, deploying applications, and more. Ansible Galaxy is the recommended frontend directory for the Ansible community to access content."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible Galaxy is a community-driven repository for sharing and downloading Ansible roles and collections. It helps users find pre-built automation content instead of writing everything from scratch."
                     ]
                 }
             }
-        },    
+        },
         "eval4": {
-            "question": "How does Red Hat OpenShift Pipelines automate deployments?",
+            "question": "What is ansible playbooks?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
                     "text": [
-                        "Red Hat OpenShift Pipelines automates deployments using Tekton building blocks, which introduce standard custom resource definitions (CRDs) for defining CI/CD pipelines that are portable across Kubernetes distributions. This allows for the abstraction of underlying implementation details and the creation of serverless, cloud-native, continuous integration and continuous delivery (CI/CD) systems that run in isolated containers. These pipelines are designed for decentralized teams working on microservices-based architecture and can be triggered by various events, such as code changes or vulnerability discoveries, to rebuild and replace images ensuring the immutable containers process."
+                        "Ansible Playbooks are lists of tasks that automatically execute for your specified inventory or groups of hosts. They are composed of one or more plays, which are ordered groupings of tasks mapped to specific hosts. Each play executes part of the overall goal of the playbook, running one or more tasks. Each task calls an Ansible module. Playbooks can be saved, shared, or reused indefinitely, making it easier to codify operational knowledge and ensure consistent actions across IT environments."
                     ]
                 },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "Red Hat OpenShift Pipelines automates deployments by using Tekton building blocks to abstract away the underlying implementation details. It leverages standard custom resource definitions (CRDs) for defining CI/CD pipelines that are portable across Kubernetes distributions. This allows for serverless, cloud-native, continuous integration, and continuous deployment systems that run in isolated containers, enabling decentralized teams working on microservices-based architecture to automate deployments efficiently."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.3,
-                    "text": [
-                        "Red Hat OpenShift Pipelines automates deployments by utilizing Tekton building blocks, which are standard custom resource definitions (CRDs) designed for defining CI/CD pipelines. These pipelines are cloud-native and serverless, running in isolated containers. The automation process involves the following key aspects:1. **CI/CD Pipelines**: OpenShift Pipelines allows you to create continuous integration and continuous deployment systems that automate the entire deployment process across multiple platforms.2. **Decentralized Teams**: The design of these pipelines supports decentralized teams working on microservices-based architectures, enabling them to manage their own deployments effectively.3. **Build Triggers**: You can set up build triggers that automatically rebuild and replace images when changes occur or vulnerabilities are discovered, ensuring that the latest production-quality content is deployed.4. **Tekton Resources**: By leveraging Tekton's standard resources, you can define reusable pipeline components that streamline the deployment process while abstracting away underlying implementation details.Overall, OpenShift Pipelines provides a robust framework for automating application deployments efficiently within Kubernetes environments."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "text": [
-                        "Red Hat OpenShift Pipelines automates deployments by leveraging Tekton building blocks and standard custom resource definitions (CRDs) for defining CI/CD pipelines. It abstracts away the underlying implementation details and provides a cloud-native, continuous integration and continuous delivery (CI/CD) solution based on Kubernetes resources. With OpenShift Pipelines, you can create serverless, cloud-native pipelines that automate deployments across multiple platforms. These pipelines run in isolated containers and use Tekton custom resources to automate deployments, making them portable across Kubernetes distributions."
+                        "Playbooks are YAML files that contain specific sets of human-readable instructions, or “plays,” that you\nsend to run on a single target or groups of targets. Ansible playbooks are repeatable and reusable\nconfiguration management tools designed to deploy complex applications."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "Red Hat OpenShift Pipelines automates deployments by using Tekton building blocks to abstract away the underlying implementation details. It introduces standard custom resource definitions (CRDs) for defining CI/CD pipelines that are portable across Kubernetes distributions. These pipelines are serverless, cloud-native, continuous integration, and continuous deployment systems that run in isolated containers. They use standard Tekton custom resources to automate deployments and are designed for decentralized teams working on microservices-based architecture."
+                        "Ansible Playbooks are lists of tasks that automatically execute for your specified inventory or groups of hosts. They are composed of one or more plays, which are ordered groupings of tasks mapped to specific hosts. Each play executes part of the overall goal of the playbook, running one or more tasks. Each task calls an Ansible module. Playbooks can be saved, shared, or reused indefinitely, making it easier to codify operational knowledge and ensure consistent actions across IT environments."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Playbooks are YAML files that contain specific sets of human-readable instructions, or “plays,” that you\nsend to run on a single target or groups of targets. Ansible playbooks are repeatable and reusable\nconfiguration management tools designed to deploy complex applications."
                     ]
                 }
             }
-        },    
+        },
         "eval5": {
-            "question": "what is a limitrange?",
+            "question": "How do you use ansible to create encrypted files?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
-                    "text": [
-                        "A LimitRange is a feature in OpenShift that sets resource usage limits for each kind of resource in a Namespace. It is used to define the minimum and maximum usage limits for resources that match on kind."
-                    ]
-                },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
-                    "text": [
-                        "A LimitRange in OpenShift sets resource usage limits for each kind of resource in a Namespace. It defines a min/max usage limit for resources that match on kind. This allows you to specify the minimum and maximum CPU and memory limits for all containers across a pod in a given project."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
                     "cutoff_score": 0.35,
                     "text": [
-                        "A LimitRange in OpenShift is an object that sets resource usage limits for each kind of resource within a Namespace. It defines minimum and maximum usage limits for resources such as CPU, memory, and storage that can be requested by containers or persistent volume claims.The LimitRange specification includes:- **Limits**: A list of LimitRangeItem objects that specify the constraints.- **Type**: The type of resource (e.g., Container, PersistentVolumeClaim).- **Min/Max**: The minimum and maximum values for the specified resources.- **Default**: Default values for CPU and memory if not specified in the Pod spec.- **DefaultRequest**: Default request values for CPU and memory if not specified in the Pod spec.- **MaxLimitRequestRatio**: The maximum limit-to-request ratio for a container.By using LimitRanges, administrators can enforce policies on how much resources applications can consume within a project."
+                        "To create an encrypted file using Ansible, you can use the ansible-vault command."
                     ]
                 },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.35,
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "A LimitRange in OpenShift is an object that sets resource usage limits for different kinds of resources within a Namespace. It defines minimum and maximum usage limits for resources such as CPU, memory, and storage that can be requested by containers or persistent volume claims.The key components of a LimitRange include:- **Limits**: A list of LimitRangeItem objects that specify the constraints.- **Type**: The kind of resource (e.g., Container, PersistentVolumeClaim).- **Min/Max**: The minimum and maximum values for the specified resource.- **Default/DefaultRequest**: Default values for CPU and memory if not specified in the Pod spec.- **MaxLimitRequestRatio**: The maximum ratio between limit and request values.LimitRanges help ensure fair resource allocation among applications running in a cluster."
+                        "To create an encrypted file using Ansible, you can use the ansible-vault command."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "A LimitRange is a feature in OpenShift (and Kubernetes) that allows you to set resource usage limits for each kind of resource in a Namespace. It defines a minimum and maximum usage limit for resources that match a specific kind, such as CPU, memory, or storage. By setting these limits, you can ensure that the resources are being used efficiently and prevent any single resource-intensive application from consuming disproportionate amounts of the shared resources.\n\nIn OpenShift, a LimitRange object has several parameters, including:\n\n1. `type`: This parameter specifies the type of resource that the LimitRange applies to. Common types include \"cpu\", \"memory\", and \"storage\".\n2. `limits`: This parameter is an array of `LimitRangeItem` objects that define the minimum and maximum usage limits for the resources.\n3. `defaultRequest`: This parameter specifies the default amount of CPU and memory that a container can request if not specified in the Pod spec.\n4. `defaultLimit`: This parameter specifies the default limit-to-request ratio for a container.\n\nBy using LimitRanges, you can manage and control the resource usage in your OpenShift cluster, ensuring that each application gets the resources it needs while preventing any single application from consuming excessive resources."
+                        "To create an encrypted file using Ansible, you can use the ansible-vault command."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "In Ansible, you can create encrypted files using Ansible Vault, which allows you to securely store sensitive data like passwords, API keys, and configuration files."
                     ]
                 }
             }
-        },    
+        },
         "eval6": {
-            "question": "What is the purpose of the Vertical Pod Autoscaler Operator in Openshift?",
+            "question": "What are 'facts' in the context of Ansible?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
                     "text": [
-                        "The Vertical Pod Autoscaler Operator (VPA) in Openshift is responsible for managing and scaling the vertical dimensions of applications, such as the number of replicas per container, based on resource utilization metrics. It helps to ensure that the resources are efficiently utilized and prevents overprovisioning or underutilization of resources. The VPA Operator can be installed using the Red Hat OpenShift Container Platform web console or the command line interface."
+                        "In Ansible, facts are pieces of information about remote nodes that are automatically discovered when running plays. They are inferred rather than set, and Ansible executes the internal setup module on the remote nodes to gather these facts. Facts can include details like operating system, IP addresses, meminfo, load averages, and more. They are stored in memory for use by future tasks in a playbook instead of being written to the console. Facts can be used in playbooks and templates just like variables, but they are automatically gathered without needing to be explicitly called."
                     ]
                 },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "The Vertical Pod Autoscaler Operator (VPA) in OpenShift is used to automatically adjust the resource requests and limits of pods based on their usage. It helps optimize resource utilization and can improve the performance and stability of applications running on the platform. The VPA can be installed using the Red Hat OpenShift Container Platform web console or CLI."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.3,
-                    "text": [
-                        "The purpose of the Vertical Pod Autoscaler (VPA) Operator in OpenShift is to automatically adjust the resource requests for pods based on their actual usage. By installing the VPA Operator, you enable dynamic resource allocation for pods, ensuring that they have adequate resources to run efficiently without over-provisioning. This helps optimize resource utilization and improve application performance within an OpenShift cluster.",
-                        "The Vertical Pod Autoscaler Operator in OpenShift is used to automatically adjust the resource requests for pods based on their actual usage. It helps optimize resource allocation by dynamically adjusting CPU and memory requests for containers within pods, ensuring that they have adequate resources to run efficiently without being over-provisioned. This optimization can lead to better performance and resource utilization within the cluster."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "text": [
-                        "The purpose of the Vertical Pod Autoscaler (VPA) Operator in OpenShift is to automatically adjust the resource requests and limits of containers running in pods based on their actual resource usage. The VPA Operator analyzes historical metrics and current resource utilization to determine the optimal resource allocation for each container. By dynamically adjusting resources, the VPA Operator helps optimize performance, improve efficiency, and prevent over- or under-provisioning of resources in OpenShift clusters."
+                        "In Ansible, facts are pieces of information about remote nodes that are automatically discovered when running plays. They are inferred rather than set, and Ansible executes the internal setup module on the remote nodes to gather these facts. Facts can include details like operating system, IP addresses, meminfo, load averages, and more. They are stored in memory for use by future tasks in a playbook instead of being written to the console. Facts can be used in playbooks and templates just like variables, but they are automatically gathered without needing to be explicitly called."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "The Vertical Pod Autoscaler Operator (VPA) in OpenShift is responsible for monitoring the resource consumption of pods and determining the optimal CPU and memory resources for them. It consists of three components: a recommender, an updater, and an admission controller. The recommender determines the optimal resources, the updater checks if the pods have the correct resources and recreates them if not, and the admission controller sets the correct resource requests on each new pod. The VPA can be used with a default recommender or with an alternative recommender based on user's requirements."
+                        "In Ansible, facts are pieces of information about remote nodes that are automatically discovered when running plays. They are inferred rather than set, and Ansible executes the internal setup module on the remote nodes to gather these facts. Facts can include details like operating system, IP addresses, meminfo, load averages, and more. They are stored in memory for use by future tasks in a playbook instead of being written to the console. Facts can be used in playbooks and templates just like variables, but they are automatically gathered without needing to be explicitly called."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "In Ansible, facts are system properties and variables that Ansible collects automatically from managed hosts. They provide information about the target system, such as OS, network details, CPU, memory, disk space, environment variables, and more."
                     ]
                 }
             }
-        },    
+        },
         "eval7": {
-            "question": "Is there a doc on updating clusters?",
+            "question": "What are tags?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
-                    "cutoff_score": 0.25,
-                    "text": [
-                        "The provided document is a detailed guide on updating OpenShift clusters, including information on the Cluster Version Operator (CVO), ClusterVersion resource, and various update strategies such as canary rollouts.\n\nAdditionally, the document provides instructions on how to check compatibility and update installed Operators.\n\nFor more information on specific update strategies, refer to the \"Performing a canary rollout update\" section.\n\nFor a general overview of how updates work, see the \"Introduction to OpenShift updates\" section.",
-                        "Yes, the Red Hat OpenShift Container Platform documentation covers updating clusters. You can find the relevant information in the \"Updating Clusters\" section of the documentation."
-                    ]
-                },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
-                    "cutoff_score": 0.25,
-                    "text": [
-                        "Yes, there is documentation on updating clusters in OpenShift. The process involves creating custom machine config pools (MCPs), labeling nodes, pausing those custom MCPs, performing the cluster update, unpausing one custom MCP, testing applications, and optionally removing custom labels from remaining nodes in small batches.\n\nAdditionally, the Cluster Version Operator (CVO) plays a crucial role in the update process. It constantly compares the manifests of managed cluster Operators to in-cluster resources, and reconciles discrepancies to ensure that the actual state of these resources match their desired state. The CVO also monitors the ClusterVersion resource and communicates or interacts with it through the ClusterVersion object.\n\nFor more detailed information, you can refer to the \"How cluster updates work\" section in the OpenShift documentation."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
                     "cutoff_score": 0.35,
                     "text": [
-                        "Yes, there are detailed sections that describe the update process for Red Hat OpenShift Container Platform (OCP). The primary component that orchestrates and facilitates the update process is the Cluster Version Operator (CVO). It monitors the ClusterVersion resource and ensures that the actual state of resources matches their desired state.\n\nFor specific procedures, you can refer to topics such as performing rolling updates, canary rollouts, and managing machine config pools during updates. It's important to carefully plan your update strategy based on your cluster's characteristics and requirements.",
-                        "Yes, the update process for clusters in OpenShift is detailed in various sections. The primary component that orchestrates updates is the Cluster Version Operator (CVO), which monitors the ClusterVersion resource to ensure that the actual state of resources matches their desired state.\nThe update process generally involves selecting a version to update to, monitoring progress through status updates, and confirming that nodes are updated before deploying workloads that rely on new features. It's also important to check for available updates after completing an update.\nIf you have specific questions about any part of the cluster updating process, feel free to ask!"
+                        "In Ansible, tags are a way to selectively run specific tasks within a playbook. Tags are user-defined labels that can be assigned to individual tasks or to entire plays. By using the --tags or -t command-line option when running the ansible-playbook command, you can choose to execute only those tasks that have been tagged with the specified tag(s)."
                     ]
                 },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.3,
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "Yes, there are detailed sections that describe the update process for Red Hat OpenShift Container Platform (OCP). The primary component that orchestrates updates is the Cluster Version Operator (CVO), which monitors the ClusterVersion resource and ensures that the actual state of resources matches their desired state.\n\nThe update process includes considerations for rolling updates, canary rollouts, and managing machine config pools (MCPs). It is recommended to carefully plan the update process, especially for larger clusters, to avoid errors that could affect the entire cluster.\n\nFor specific steps and strategies, you can refer to the sections on \"How cluster updates work\", \"The Cluster Version Operator\", and \"Performing a canary rollout update\".",
-                        "I can't provide documents or URLs, but I can summarize the update process for OpenShift clusters. The update process involves using the Cluster Version Operator (CVO), which orchestrates updates by monitoring the ClusterVersion resource. Key steps include:1. **Check Update Availability**: The CVO queries the OpenShift Update Service for available updates based on your cluster's subscribed channel.2. **Rolling Updates**: You can perform rolling updates by creating custom machine config pools (MCPs) and labeling nodes to control which ones are updated.3. **Testing**: After updating, it's essential to test applications on updated nodes to ensure they function as expected.If you have specific questions about any part of this process, feel free to ask!"
+                        "In Ansible, tags are a way to selectively run specific tasks within a playbook. Tags are user-defined labels that can be assigned to individual tasks or to entire plays. By using the --tags or -t command-line option when running the ansible-playbook command, you can choose to execute only those tasks that have been tagged with the specified tag(s)."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "Yes, there is a document on updating clusters in Red Hat OpenShift Container Platform. The document provides best practices for cluster updates and describes the major aspects of the update process. It also includes information on using the Topology Aware Lifecycle Manager (TALM) to manage software lifecycle, performing canary rollout updates, and ensuring proper configuration of PodDisruptionBudget for minimizing disruptions during maintenance tasks."
+                        "In Ansible, tags are a way to selectively run specific tasks within a playbook. Tags are user-defined labels that can be assigned to individual tasks or to entire plays. By using the --tags or -t command-line option when running the ansible-playbook command, you can choose to execute only those tasks that have been tagged with the specified tag(s)."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Tags, also known as keywords or labels, are small pieces of text that are associated with a piece of content, such as a document, image, video, or webpage. They help to categorize and organize the content in a way that makes it more discoverable and searchable."
                     ]
                 }
             }
-        },    
+        },
         "eval8": {
-            "question": "How do I find my clusterID?",
+            "question": "what is ansible tower?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
                     "text": [
-                        "You can find your clusterID in the Red Hat OpenShift Container Platform web console by navigating to Home -> Overview. The value is available in the Cluster ID field of the Details section."
+                        "Ansible Tower, now known as Red Hat Ansible Automation Platform, is a web-based solution that provides a graphical user interface, REST API, and command line interface for managing and controlling your Ansible infrastructure. It offers features such as role-based access control, job scheduling, and centralized management of Ansible projects, making it easier to manage and scale Ansible deployments in large organizations."
                     ]
                 },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "You can have your cluster ID autofilled by using the Red Hat OpenShift Container Platform web console or manually obtain it using the web console or the OpenShift CLI (oc).\n\nAs a user with the cluster-admin role, follow these steps to view the cluster ID in the web console:\n\n1. Navigate to Home -> Overview.\n2. The value is available in the Cluster ID field of the Details section."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
-                    "text": [
-                        "To find your clusterID, you can follow these steps:\n\n1. **Using the Web Console:**\n   - Navigate to Home -> Overview.\n   - Locate the Cluster ID field in the Details section.\n\n2. **Using the OpenShift CLI (oc):**\n   - Run the following command:\n     ```\n     $ oc get clusterversion -o jsonpath='{.items[].spec.clusterID}{\"\\n\"}'\n     ```\n\nBy following these steps either through the web console or using the OpenShift CLI, you can obtain your clusterID easily.",
-                        "To find your clusterID, you can follow these steps:\n\n1. Access the Red Hat OpenShift Container Platform web console.\n2. Navigate to Home -> Overview.\n3. Look for the Cluster ID field in the Details section. The value displayed there is your clusterID.\n\nAlternatively, you can use the OpenShift CLI (oc) to obtain your clusterID by running the following command:\n\n```sh\n$ oc get clusterversion -o jsonpath='{.items[].spec.clusterID}{\"\\n\"}'\n```\n\nBy executing this command, you will retrieve your clusterID using the OpenShift CLI (oc)."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "text": [
-                        "To find your cluster ID, you can use either the Red Hat OpenShift Container Platform web console or the OpenShift CLI (oc). Here are the steps for both methods:\n\nUsing the web console:\n1. Navigate to Home -> Overview.\n2. In the Details section, you will find your cluster ID in the Cluster ID field.\n\nUsing the OpenShift CLI (oc):\nRun the following command in your terminal:\n```\n$ oc get clusterversion -o jsonpath='{.items[].spec.clusterID}{\"\\n\"}'\n```\n\nThis command will retrieve and display your cluster ID.",
-                        "To find your cluster ID in OpenShift, you can use either the web console or the OpenShift CLI (oc). Here are the steps for both methods:Using the web console:1. Log in to the OpenShift web console.2. Navigate to Home -> Overview.3. In the Details section, you will find your cluster ID displayed in the Cluster ID field.Using the OpenShift CLI (oc):1. Log in to your cluster using the OpenShift CLI (oc) with a user account that has cluster-admin role access.2. Run the following command:   ```   $ oc get clusterversion -o jsonpath='{.items[].spec.clusterID}{}'   ```   This command will retrieve and display your cluster ID.By following these steps, you should be able to find your cluster ID in OpenShift."
+                        "Ansible Tower, now known as Red Hat Ansible Automation Platform, is a web-based solution that provides a graphical user interface, REST API, and command line interface for managing and controlling your Ansible infrastructure. It offers features such as role-based access control, job scheduling, and centralized management of Ansible projects, making it easier to manage and scale Ansible deployments in large organizations."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "To find your clusterID, you can follow these steps:\n\n1. Navigate to Home -> Overview in the Red Hat OpenShift Container Platform web console.\n2. Look for the Cluster ID field in the Details section to find your cluster's unique identifier.\n\nAlternatively, you can use the OpenShift CLI (oc) and run the following command:\n```terminal\n$ oc get clusterversion -o jsonpath='{.items[].spec.clusterID}{\"\n\"}'\n```\n\nThese methods will help you obtain your clusterID for reference or when providing information to Red Hat Support."
+                        "Ansible Tower, now known as Red Hat Ansible Automation Platform, is a web-based solution that provides a graphical user interface, REST API, and command line interface for managing and controlling your Ansible infrastructure. It offers features such as role-based access control, job scheduling, and centralized management of Ansible projects, making it easier to manage and scale Ansible deployments in large organizations."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible Tower is an open-source management platform for Ansible, a popular automation tool for IT environments. It provides a centralized interface for managing Ansible projects, plays, and inventory across multiple nodes, allowing users to efficiently deploy, configure, and manage their infrastructure."
                     ]
                 }
             }
-        },    
+        },
         "eval9": {
-            "question": "do you recommend using DeploymentConfig?",
+            "question": "What is Ansible roles?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
-                    "text": [
-                        "No, I do not recommend using DeploymentConfig as of Red Hat OpenShift Container Platform 4.14. DeploymentConfig objects are deprecated and should not be used for new installations. Instead, use Deployment objects or another alternative to provide declarative updates for pods."
-                    ]
-                },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
-                    "text": [
-                        "No, as of Red Hat OpenShift Container Platform 4.14, DeploymentConfig objects are deprecated and should not be used for new installations. Instead, use Deployment objects or another alternative to provide declarative updates for pods."
-                    ]
-                },
-                "openai+gpt-4o-mini+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
                     "cutoff_score": 0.35,
                     "text": [
-                        "As of Red Hat OpenShift Container Platform 4.14, DeploymentConfig objects are deprecated and not recommended for new installations. It is advised to use Deployment objects or other alternatives for declarative updates for pods instead."
+                        "Ansible roles are a way to create reusable automation content that helps teams work more efficiently and avoid duplicating efforts. With roles, you can group together a broader range of existing automation content, like playbooks, configuration files, templates, tasks, and handlers, to create customized automation content that can be reused and shared with others. Roles are generally included in Ansible content collections. You can also make roles configurable by exposing variables that users can set when calling the role, allowing them to configure their system according to their organization's requirements."
                     ]
                 },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.35,
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "As of Red Hat OpenShift Container Platform 4.14, DeploymentConfig objects are deprecated and are not recommended for new installations. It is advised to use Deployment objects or other alternatives for declarative updates for pods instead. While DeploymentConfig objects are still supported, only security-related and critical issues will be fixed. Therefore, it is recommended to transition to using Deployment objects for better support and features.",
-                        "No, I do not recommend using DeploymentConfig objects. As of OpenShift 4.14, DeploymentConfig objects are deprecated and only security-related and critical issues will be fixed for them. It is advisable to use Deployment objects or other alternatives for declarative updates for pods instead."
+                        "Ansible roles allow you to create reusable automation content that helps teams to work more efficiently\nand avoid duplicating efforts. With roles, you can group together a broader range of existing automation\ncontent, like playbooks, configuration files, templates, tasks, and handlers to create customized\nautomation content that can be reused and shared with others."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "No, I do not recommend using DeploymentConfig as of Red Hat OpenShift Container Platform 4.14. DeploymentConfig objects are deprecated and should not be used for new installations. Instead, use Deployment objects or another alternative to provide declarative updates for pods."
+                        "Ansible roles are a way to create reusable automation content that helps teams work more efficiently and avoid duplicating efforts. With roles, you can group together a broader range of existing automation content, like playbooks, configuration files, templates, tasks, and handlers, to create customized automation content that can be reused and shared with others. Roles are generally included in Ansible content collections. You can also make roles configurable by exposing variables that users can set when calling the role, allowing them to configure their system according to their organization's requirements."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible roles allow you to create reusable automation content that helps teams to work more efficiently\nand avoid duplicating efforts. With roles, you can group together a broader range of existing automation\ncontent, like playbooks, configuration files, templates, tasks, and handlers to create customized\nautomation content that can be reused and shared with others."
                     ]
                 }
             }
-        },    
+        },
         "eval10": {
-            "question": "give me sample deployment yaml that uses MongoDB image",
+            "question": "What is Ansible Automation mesh?",
             "answer": {
-                "bam+ibm/granite-3-8b-instruct+with_rag": {
-                    "cutoff_score": 0.1,
-                    "text": [
-                        "Here is an example of a YAML file that uses the MongoDB image and deploys a simple application:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: mongodb-nationalparks\nspec:\n  selector:\n    matchLabels:\n      app.kubernetes.io/name: mongodb-nationalparks\n  replicas: 3\n  template:\n    metadata:\n      labels:\n        app.kubernetes.io/name: mongodb-nationalparks\n    spec:\n      containers:\n      - name: mongodb\n        image: quay.io/centos7/mongodb-36-centos7:latest\n        ports:\n        - containerPort: 27017\n```\n\nThis YAML file creates a Deployment object that deploys a MongoDB container with a replica count of 3. The container image is pulled from the Quay registry and exposes port 27017 for communication.\n\nTo create this YAML file, follow these steps:\n\n1. Open a terminal and navigate to the directory where you want to create the YAML file.\n2. Run the following command to create the YAML file:\n\n```bash\noc create -f mongodb-nationalparks.yaml\n```\n\nThis command creates the Deployment object for the MongoDB application.\n\n3. After the YAML file is created, you can verify its existence by running the following command:\n\n```bash\noc get deployments\n```\n\nThis command lists all the deployments in the project, including the MongoDB deployment.\n\n4. You can also verify the status of the deployment by running the following command:\n\n```bash\noc rollout status deployment/mongodb-nationalparks\n```\n\nThis command displays the current status of the MongoDB deployment, including the number of replicas and the last observed status."
-                    ]
-                },
-                "watsonx+ibm/granite-3-8b-instruct+with_rag": {
+                "rhoai_vllm+granite3-8b+with_rag": {
                     "cutoff_score": 0.35,
                     "text": [
-                        "Here's an example deployment YAML that uses the MongoDB image:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: mongodb-nationalparks\nspec:\n  selector:\n    matchLabels:\n      app.kubernetes.io/name: mongodb-nationalparks\n  replicas: 3\n  template:\n    metadata:\n      labels:\n        app.kubernetes.io/name: mongodb-nationalparks\n    spec:\n      containers:\n      - name: mongodb\n        image: quay.io/centos7/mongodb-36-centos7:latest\n        ports:\n        - containerPort: 27017\n        env:\n        - name: MONGODB_USER\n          value: mongodb\n        - name: MONGODB_PASSWORD\n          value: mongodb\n        - name: MONGODB_DATABASE\n          value: nationalparks\n        - name: MONGODB_ADMIN_PASSWORD\n          value: mongodb\n```\nThis YAML defines a Deployment that creates a MongoDB pod with the name `mongodb-nationalparks`. The pod uses the official MongoDB image from Quay.io, which is based on CentOS 7. The container exposes port 27017, and there are environment variables set to connect to the MongoDB instance with the specified credentials and database name."
+                        "Ansible Automation mesh is an overlay network designed to simplify the distribution of automation across a collection of execution nodes using existing connectivity. It creates peer-to-peer connections between these execution nodes, increasing the resiliency of automation workloads to network latency and connection disruptions. This also allows for more flexible architectures and rapid, independent scaling of control and execution capacity. Automation mesh is particularly beneficial for enterprises with multiple isolated IT environments, providing a consistent and reliable way to deploy and scale up automation across execution nodes using a peer-to-peer mesh communication network."
                     ]
                 },
-                "openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.35,
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "Here is a sample deployment YAML file that uses the MongoDB image:```yamlapiVersion: apps/v1kind: Deploymentmetadata:  name: mongodb-nationalparks  labels:    app.kubernetes.io/name: mongodb    app.kubernetes.io/part-of: national-parks-appspec:  replicas: 1  selector:    matchLabels:      app.kubernetes.io/name: mongodb      app.kubernetes.io/part-of: national-parks-app  template:    metadata:      labels:        app.kubernetes.io/name: mongodb        app.kubernetes.io/part-of: national-parks-app    spec:      containers:      - name: mongodb-nationalparks        image: quay.io/centos7/mongodb-36-centos7         env:          - name: MONGODB_USER             valueFrom:              secretKeyRef:                name: nationalparks-mongodb-parameters                 key: MONGODB_USER           - name: MONGODB_PASSWORD             valueFrom:              secretKeyRef:                name: nationalparks-mongodb-parameters                 key: MONGODB_PASSWORD           - name: MONGODB_DATABASE             valueFrom:              secretKeyRef:                name: nationalparks-mongodb-parameters                 key:MONGODB_DATABASE            - name :MONGODB_ADMIN_PASSWORD              valueFrom :              secretKeyRef :                 name :nationalparks-mongodb-parameters                   key :MONGODB_ADMIN_PASSWORD   ```This YAML defines a deployment for MongoDB, using the specified image and environment variables sourced from a Kubernetes Secret. Adjust the values as necessary for your specific use case.",
-                        "I can provide you with a sample deployment YAML for deploying a MongoDB application in OpenShift. Here’s an example:```yamlapiVersion: apps/v1kind: Deploymentmetadata:  name: mongodb-nationalparks  labels:    app.kubernetes.io/name: mongodb    app.kubernetes.io/part-of: national-parks-appspec:  replicas: 1  selector:    matchLabels:      app.kubernetes.io/name: mongodb      app.kubernetes.io/part-of: national-parks-app  template:    metadata:      labels:        app.kubernetes.io/name: mongodb        app.kubernetes.io/part-of: national-parks-app    spec:      containers:        - name: mongodb-nationalparks          image: quay.io/centos7/mongodb-36-centos7           env:            - name: MONGODB_USER               valueFrom:                secretKeyRef:                  name: nationalparks-mongodb-parameters                   key: MONGODB_USER             - name: MONGODB_PASSWORD               valueFrom:                secretKeyRef:                  name: nationalparks-mongodb-parameters                   key: MONGODB_PASSWORD             - name: MONGODB_DATABASE               valueFrom:                secretKeyRef:                  name: nationalparks-mongodb-parameters                   key:MONGODB_DATABASE              - name :MONGODB_ADMIN_PASSWORD                valueFrom :                secretKeyRef :                   name :nationalparks-mongodb-parameters                     key :MONGODB_ADMIN_PASSWORD             ports :           - containerPort :27017   ```This YAML defines a deployment for MongoDB using the specified image and environment variables sourced from a Kubernetes Secret named `nationalparks-mongodb-parameters`. Adjust the values as necessary for your specific use case."
-                    ]
-                },
-                "azure_openai+gpt-4o-mini+with_rag": {
-                    "cutoff_score": 0.35,
-                    "text": [
-                        "Here is a sample deployment YAML file that uses the MongoDB image:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: mongodb-nationalparks\n  labels:\n    app.kubernetes.io/name: mongodb\n    app.kubernetes.io/part-of: national-parks-app\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app.kubernetes.io/name: mongodb\n      app.kubernetes.io/part-of: national-parks-app\n  template:\n    metadata:\n      labels:\n        app.kubernetes.io/name: mongodb\n        app.kubernetes.io/part-of: national-parks-app\n    spec:\n      containers:\n        - name: mongodb-nationalparks\n          image: quay.io/centos7/mongodb-36-centos7 \n          env:\n            - name: MONGODB_USER \n              valueFrom:\n                secretKeyRef:\n                  name: nationalparks-mongodb-parameters \n                  key: MONGODB_USER \n            - name: MONGODB_PASSWORD \n              valueFrom:\n                secretKeyRef:\n                  name: nationalparks-mongodb-parameters \n                  key: MONGODB_PASSWORD \n            - name: MONGODB_DATABASE \n              valueFrom:\n                secretKeyRef:\n                  name: nationalparks-mongodb-parameters \n                  key:MONGODB_DATABASE  \n            - name :MONGODB_ADMIN_PASSWORD  \n              valueFrom :\n                secretKeyRef :\n                   name :nationalparks-mongodb-parameters  \n                   key :MONGODB_ADMIN_PASSWORD   \n          ports :\n           - containerPort :27017   \n```\n\nThis YAML defines a deployment for MongoDB, specifying the image to use and environment variables sourced from a Kubernetes Secret. Adjust the values as necessary for your specific use case.",
-                        "Sure! Here's an example of a deployment YAML file that uses the MongoDB image:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: mongodb-deployment\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: mongodb-app\n  template:\n    metadata:\n      labels:\n        app: mongodb-app\n    spec:\n      containers:\n        - name: mongodb-container\n          image: quay.io/centos7/mongodb-36-centos7\n          env:\n            - name: MONGODB_USER\n              valueFrom:\n                secretKeyRef:\n                  name: nationalparks-mongodb-parameters \n                  key: MONGODB_USER \n            - name: MONGODB_PASSWORD \n              valueFrom :\n                secretKeyRef :\n                  name : nationalparks-mongodb-parameters \n                  key : MONGODB_PASSWORD \n            - name : MONGODB_DATABASE \n              valueFrom :\n                secretKeyRef :\n                  name : nationalparks-mongodb-parameters  \n                  key : MONGODB_DATABASE  \n            - name : MONGODB_ADMIN_PASSWORD  \n              valueFrom :\n                secretKeyRef :\n                  name : nationalparks-mongodb-parameters  \n                  key : MONGODB_ADMIN_PASSWORD  \n```\n\nThis YAML file defines a Deployment resource with one replica. It uses the `quay.io/centos7/mongodb-36-centos7` image for the MongoDB container. The environment variables are set using values from the `nationalparks-mongodb-parameters` Secret.\n\nYou can apply this YAML file using the `oc apply` command:\n\n```terminal\n$ oc apply -f <filename>.yaml\n\n```\n\nReplace `<filename>` with the actual filename of your YAML file.",
-                        "Here's a sample deployment YAML for deploying a MongoDB application in OpenShift:```yamlapiVersion: apps/v1kind: Deploymentmetadata:  name: mongodb-nationalparks  labels:    app.kubernetes.io/name: mongodb    app.kubernetes.io/part-of: national-parks-appspec:  replicas: 1  selector:    matchLabels:      app.kubernetes.io/name: mongodb      app.kubernetes.io/part-of: national-parks-app  template:    metadata:      labels:        app.kubernetes.io/name: mongodb        app.kubernetes.io/part-of: national-parks-app    spec:      containers:        - name: mongodb-nationalparks          image: quay.io/centos7/mongodb-36-centos7 # MongoDB image from Quay.io           ports:            - containerPort: 27017 # Default MongoDB port           env:            - name: MONGODB_USER               valueFrom:                secretKeyRef:                  name: nationalparks-mongodb-parameters                   key: MONGODB_USER             - name: MONGODB_PASSWORD               valueFrom:                secretKeyRef:                  name: nationalparks-mongodb-parameters                   key: MONGODB_PASSWORD              - name: MONGODB_DATABASE                valueFrom:                secretKeyRef:                  name:nationalparks-mongodb-parameters                    key:MONGODB_DATABASE   ```This YAML defines a deployment for the MongoDB database, using the specified image and environment variables sourced from a Kubernetes Secret. Adjust the `replicas` and other configurations as needed for your use case."
+                        "Automation mesh is an overlay network intended to ease the distribution of automation across a collection of execution nodes using existing connectivity. Execution nodes are where Ansible Playbooks are actually executed. A node runs an automation execution environment which, in turn, runs the Ansible Playbook. Automation mesh creates peer-to-peer connections between these execution nodes, increasing the resiliency of your automation workloads to network latency and connection disruptions. This also permits more flexible architectures and provides rapid, independent scaling of control and execution capacity."
                     ]
                 },
                 "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
                     "text": [
-                        "Here is a sample deployment YAML that uses the MongoDB image:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: mongodb-nationalparks\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app.kubernetes.io/name: mongodb-nationalparks\n  template:\n    metadata:\n      labels:\n        app.kubernetes.io/name: mongodb-nationalparks\n    spec:\n      containers:\n        - name: mongodb-nationalparks-container\n          image: quay.io/centos7/mongodb-36-centos7\n          env:\n            - name: MONGODB_USER\n              value: \"mongodb\"\n            - name: MONGODB_PASSWORD \n              valueFrom :\n                secretKeyRef :\n                  key : MONGODB_PASSWORD \n                  name : nationalparks-mongodb-parameters \n            - name : MONGODB_DATABASE \n              valueFrom :\n                secretKeyRef :\n                  key : MONGODB_DATABASE \n                  name : nationalparks-mongodb-parameters  \n            - name : MONGODB_ADMIN_PASSWORD  \n              valueFrom :\n                secretKeyRef :\n                  key : MONGODB_ADMIN_PASSWORD  \n                  name : nationalparks-mongodb-parameters   \n```\n\nThis YAML file defines a Deployment resource that deploys a single replica of the MongoDB image \"quay.io/centos7/mongodb-36-centos7\" with environment variables sourced from the \"nationalparks-mongodb-parameters\" secret."
+                        "Ansible Automation mesh is an overlay network designed to simplify the distribution of automation across a collection of execution nodes using existing connectivity. It creates peer-to-peer connections between these execution nodes, increasing the resiliency of automation workloads to network latency and connection disruptions. This also allows for more flexible architectures and rapid, independent scaling of control and execution capacity. Automation mesh is particularly beneficial for enterprises with multiple isolated IT environments, providing a consistent and reliable way to deploy and scale up automation across execution nodes using a peer-to-peer mesh communication network."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Automation mesh is an overlay network intended to ease the distribution of automation across a collection of execution nodes using existing connectivity. Execution nodes are where Ansible Playbooks are actually executed. A node runs an automation execution environment which, in turn, runs the Ansible Playbook. Automation mesh creates peer-to-peer connections between these execution nodes, increasing the resiliency of your automation workloads to network latency and connection disruptions. This also permits more flexible architectures and provides rapid, independent scaling of control and execution capacity."
+                    ]
+                }
+            }
+        },
+        "eval11": {
+            "question": "What is Ansible development tools?",
+            "answer": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
+                    "text": [
+                        "Ansible development tools are a suite of tools provided with the Ansible Automation Platform to help automation creators create, test, and deploy playbook projects, execution environments, and collections on Linux, MacOS, and Windows platforms. These tools simplify the automation content creation experience by consolidating core Ansible tools into a single package, promoting recommended practices."
+                    ]
+                },
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible development tools are an integrated and supported suite of capabilities that help IT\npractitioners at any skill level generate automation content faster than they might with manual coding.\nAnsible development tools can help you create, test, and deploy automation content like playbooks,\nRed Hat Ansible Automation Platform 2.5 Getting started with Ansible Automation Platform\n8\nexecution environments, and collections quickly and accurately using recommended practices."
+                    ]
+                },
+                "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible development tools are a suite of tools provided with the Ansible Automation Platform to help automation creators create, test, and deploy playbook projects, execution environments, and collections on Linux, MacOS, and Windows platforms. These tools simplify the automation content creation experience by consolidating core Ansible tools into a single package, promoting recommended practices."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible development tools are an integrated and supported suite of capabilities that help IT\npractitioners at any skill level generate automation content faster than they might with manual coding.\nAnsible development tools can help you create, test, and deploy automation content like playbooks,\nRed Hat Ansible Automation Platform 2.5 Getting started with Ansible Automation Platform\n8\nexecution environments, and collections quickly and accurately using recommended practices."
+                    ]
+                }
+            }
+        },
+        "eval12": {
+            "question": "What is Ansible automation platform?",
+            "answer": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
+                    "text": [
+                        "The Ansible Automation Platform is a comprehensive solution that simplifies the development and operation of automation workloads for managing enterprise application infrastructure lifecycles. It works across multiple IT domains, including operations, networking, security, and development, as well as across diverse hybrid environments. The platform includes automation controller, which enables users to define, operate, scale, and delegate automation across their enterprise."
+                    ]
+                },
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible Automation Platform (AAP) is Red Hat’s enterprise version of Ansible, designed for large-scale automation. It includes Automation Controller (formerly Tower) for managing workflows, Automation Hub for certified content, and Execution Environments for consistency. AAP offers RBAC, scalability, and event-driven automation, making it ideal for IT, cloud, network, and security automation."
+                    ]
+                },
+                "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "The Ansible Automation Platform is a comprehensive solution that simplifies the development and operation of automation workloads for managing enterprise application infrastructure lifecycles. It works across multiple IT domains, including operations, networking, security, and development, as well as across diverse hybrid environments. The platform includes automation controller, which enables users to define, operate, scale, and delegate automation across their enterprise."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Ansible Automation Platform (AAP) is Red Hat’s enterprise version of Ansible, designed for large-scale automation. It includes Automation Controller (formerly Tower) for managing workflows, Automation Hub for certified content, and Execution Environments for consistency. AAP offers RBAC, scalability, and event-driven automation, making it ideal for IT, cloud, network, and security automation."
+                    ]
+                }
+            }
+        },
+        "eval13": {
+            "question": "How to install Ansible automation platform?",
+            "answer": {
+                "rhoai_vllm+granite3-8b+with_rag": {
+                    "cutoff_score": 0.35,
+                    "text": [
+                        "To install the Ansible Automation Platform, select an installation method based on your environment: RPM installation, OpenShift Container Platform, cloud environments, or containerized installation. For RPM installation, download the Ansible Automation Platform Bundle installer from the Red Hat Ansible Automation Platform download page. For containerized installation, ensure you have Python 3.10 or later, VS Code with the Ansible extension, and a containerization platform like Podman, Podman Desktop, Docker, or Docker Desktop. Update all packages on your RHEL nodes to the recent version before installation. Follow the detailed installation procedures provided in the Ansible Automation Platform documentation for your chosen method. Note that the Ansible Automation Platform is available through a paid subscription, with the latest version being 2.5."
+                    ]
+                },
+                "ground_truth": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Red Hat Ansible Automation Platform offers flexible installation and configuration options. Depending\non your organization’s needs, you can install Red Hat Ansible Automation Platform using one of the\nfollowing methods, based on your environment:\nRPM installation\nInstalling on OpenShift Container Platform\nCloud environments\nContainerized installation."
+                    ]
+                },
+                "ground_truth+with_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "To install the Ansible Automation Platform, select an installation method based on your environment: RPM installation, OpenShift Container Platform, cloud environments, or containerized installation. For RPM installation, download the Ansible Automation Platform Bundle installer from the Red Hat Ansible Automation Platform download page. For containerized installation, ensure you have Python 3.10 or later, VS Code with the Ansible extension, and a containerization platform like Podman, Podman Desktop, Docker, or Docker Desktop. Update all packages on your RHEL nodes to the recent version before installation. Follow the detailed installation procedures provided in the Ansible Automation Platform documentation for your chosen method. Note that the Ansible Automation Platform is available through a paid subscription, with the latest version being 2.5."
+                    ]
+                },
+                "ground_truth+without_rag": {
+                    "cutoff_score": {
+                        "rhoai_vllm+granite3-8b+with_rag": 0.2
+                    },
+                    "text": [
+                        "Red Hat Ansible Automation Platform offers flexible installation and configuration options. Depending\non your organization’s needs, you can install Red Hat Ansible Automation Platform using one of the\nfollowing methods, based on your environment:\nRPM installation\nInstalling on OpenShift Container Platform\nCloud environments\nContainerized installation."
                     ]
                 }
             }
@@ -373,19 +458,18 @@
     },
     "questions_pool": {
         "valid_questions": [
-            "what is openshift?",
-            "what is openshift",
-            "what is openhsift",
-            "What is openshift",
-            "what is openshift ?",
-            "what is open shift?",
-            "how to install openshift on aws",
-            "what is an openshift imagestream used for?",
-            "how are openshift security context constraints used?",
-            "can i control who can use a particular scc?",
-            "Is OpenShift 4 control planes supported directly on ARM?  If so, can you provide a link?",
-            "When did OpenShift allow support for hosted control planes on ARM?",
-            "What is a conditional update?",
+            "what is ansible?",
+            "what is ansible",
+            "what is ansible",
+            "What is ansible",
+            "what is ansible ?",
+            "how to install ansible on aws",
+            "what is ansible roles?",
+            "what is Ansible playbooks?",
+            "what is Ansible development tools?",
+            "how to install Ansible automation platform?",
+            "What is Ansible Automation mesh?",
+            "What is a Ansible Automation platform?",
             "What is a conditional update risk?",
             "What are conditional updates in OpenShift?",
             "How do I manually approve an InstallPlan using the CLI?",
