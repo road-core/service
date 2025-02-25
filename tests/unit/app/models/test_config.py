@@ -2379,6 +2379,10 @@ def test_ols_config_equality(subtests):
         ols_config_1.tls_security_profile = TLSSecurityProfile()
         assert ols_config_1 != ols_config_2
 
+    # compare OLSConfig with other object
+    assert ols_config_1 != "foo"
+    assert ols_config_2 != {}
+
 
 def test_config():
     """Test the Config model of the Global service configuration."""
@@ -2797,6 +2801,20 @@ def test_logging_config_equality():
     assert logging_config_1 != other_value
 
 
+def test_reference_content_constructor():
+    """Test the ReferenceContent constructor."""
+    reference_content = ReferenceContent(
+        {
+            "product_docs_index_id": "id",
+            "product_docs_index_path": "/path/1/",
+            "embeddings_model_path": "/path/2/",
+        }
+    )
+    assert reference_content.product_docs_index_id == "id"
+    assert reference_content.product_docs_index_path == "/path/1/"
+    assert reference_content.embeddings_model_path == "/path/2/"
+
+
 def test_reference_content_equality():
     """Test the ReferenceContent equality check."""
     reference_content_1 = ReferenceContent()
@@ -2819,6 +2837,17 @@ def test_reference_content_yaml_validation():
     reference_content = ReferenceContent()
     # should not raise an exception
     reference_content.validate_yaml()
+
+    # existing docs index path with set up product ID
+    reference_content.product_docs_index_path = "."
+    reference_content.product_docs_index_id = "foo"
+    reference_content.validate_yaml()
+
+    # existing docs index path, but no product ID
+    reference_content.product_docs_index_path = "."
+    reference_content.product_docs_index_id = None
+    with pytest.raises(InvalidConfigurationError):
+        reference_content.validate_yaml()
 
     # non-existing docs index path
     reference_content.product_docs_index_path = "foo"
