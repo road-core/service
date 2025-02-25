@@ -27,7 +27,7 @@ def test_init_storage_failure_detection(mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_init_quota(mock_datetime, mock_connect):
     """Test the init quota operation."""
     quota_limit = 100
@@ -87,7 +87,7 @@ def test_available_quota_with_data(mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_available_quota_no_data(mock_datetime, mock_connect):
     """Test the get available quota operation."""
     quota_limit = 100
@@ -126,7 +126,7 @@ def test_available_quota_no_data(mock_datetime, mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_revoke_quota(mock_datetime, mock_connect):
     """Test the operation to revoke quota."""
     quota_limit = 100
@@ -189,7 +189,7 @@ def test_consume_tokens_not_enough(mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 50
@@ -229,7 +229,7 @@ def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 50
@@ -269,7 +269,7 @@ def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     input_tokens = 30
@@ -340,7 +340,7 @@ def test_consume_tokens_on_no_record(mock_connect):
 
 
 @patch("psycopg2.connect")
-@patch("ols.src.quota.user_quota_limiter.datetime")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
 def test_increase_quota(mock_datetime, mock_connect):
     """Test the operation to increase quota."""
     quota_limit = 100
