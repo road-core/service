@@ -24,7 +24,7 @@ QNA_QUERIES = [
     "What is Ansible Automation mesh?",
     "What is Ansible development tools?",
     "What is Ansible automation platform?",
-    "How to install Ansible automation platform?"
+    "How to install Ansible automation platform?",
 ]
 
 
