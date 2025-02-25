@@ -114,7 +114,9 @@ class RevokableQuotaLimiter(QuotaLimiter):
 
             # check if ID still have available tokens to be consumed
             if available < to_be_consumed:
-                e = QuotaExceedError(subject_id, available, to_be_consumed)
+                e = QuotaExceedError(
+                    subject_id, self.subject_type, available, to_be_consumed
+                )
                 logger.exception("Quota exceed: %s", e)
                 raise e
 
@@ -134,7 +136,7 @@ class RevokableQuotaLimiter(QuotaLimiter):
         cursor.close()
         self.connection.commit()
 
-    def _init_quota(self, subject_id: str) -> None:
+    def _init_quota(self, subject_id: str = "") -> None:
         """Initialize quota for given ID."""
         # timestamp to be used
         revoked_at = datetime.now()
