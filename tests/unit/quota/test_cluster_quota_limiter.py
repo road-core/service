@@ -1,4 +1,4 @@
-"""Unit tests for UserQuotaLimiter class."""
+"""Unit tests for ClusterQuotaLimiter class."""
 
 import datetime
 from unittest.mock import MagicMock, call, patch
@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 
 from ols.app.models.config import PostgresConfig
+from ols.src.quota.cluster_quota_limiter import ClusterQuotaLimiter
 from ols.src.quota.quota_exceed_error import QuotaExceedError
-from ols.src.quota.user_quota_limiter import UserQuotaLimiter
 
 
 @patch("psycopg2.connect")
@@ -21,7 +21,7 @@ def test_init_storage_failure_detection(mock_connect):
     # try to connect to mocked Postgres
     config = PostgresConfig()
     with pytest.raises(Exception, match=exception_message):
-        UserQuotaLimiter(config, 0)
+        ClusterQuotaLimiter(config, 0)
 
     # connection must be closed in case of exception
     mock_connect.return_value.close.assert_called_once_with()
@@ -32,8 +32,7 @@ def test_init_storage_failure_detection(mock_connect):
 def test_init_quota(mock_datetime, mock_connect):
     """Test the init quota operation."""
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - with empty storage
     mock_cursor = MagicMock()
@@ -48,15 +47,15 @@ def test_init_quota(mock_datetime, mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
-    # init quota for given user
-    q._init_quota(user_id)
+    # init quota for given cluster
+    q._init_quota()
 
     # new record should be inserted into storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.INIT_QUOTA,
-        (user_id, subject, quota_limit, quota_limit, timestamp),
+        ClusterQuotaLimiter.INIT_QUOTA,
+        ("", subject, quota_limit, quota_limit, timestamp),
     )
 
 
@@ -65,8 +64,7 @@ def test_available_quota_with_data(mock_connect):
     """Test the get available quota operation."""
     quota_limit = 100
     available_quota = 50
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - available data in the table
     mock_cursor = MagicMock()
@@ -75,14 +73,14 @@ def test_available_quota_with_data(mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
-    # try to retrieve available quota for given user
-    available = q.available_quota(user_id)
+    # try to retrieve available quota for given cluster
+    available = q.available_quota()
 
-    # quota for given user should be read from storage
+    # quota for given cluster should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)
+        ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)
     )
     assert available == available_quota
 
@@ -92,8 +90,7 @@ def test_available_quota_with_data(mock_connect):
 def test_available_quota_no_data(mock_datetime, mock_connect):
     """Test the get available quota operation."""
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -108,18 +105,18 @@ def test_available_quota_no_data(mock_datetime, mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
-    # try to retrieve available quota for given user
-    available = q.available_quota(user_id)
+    # try to retrieve available quota for given cluster
+    available = q.available_quota()
 
-    # quota for given user should be read from storage
+    # quota for given cluster should be read from storage
     # and the initialization of new record should be made
     calls = [
-        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
+        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
         call(
-            UserQuotaLimiter.INIT_QUOTA,
-            (user_id, subject, quota_limit, quota_limit, timestamp),
+            ClusterQuotaLimiter.INIT_QUOTA,
+            ("", subject, quota_limit, quota_limit, timestamp),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -131,8 +128,7 @@ def test_available_quota_no_data(mock_datetime, mock_connect):
 def test_revoke_quota(mock_datetime, mock_connect):
     """Test the operation to revoke quota."""
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -147,15 +143,15 @@ def test_revoke_quota(mock_datetime, mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to revoke quota
-    q.revoke_quota(user_id)
+    q.revoke_quota()
 
-    # quota for given user should be written into the storage
+    # quota for given cluster should be written into the storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SET_AVAILABLE_QUOTA,
-        (quota_limit, timestamp, user_id, subject),
+        ClusterQuotaLimiter.SET_AVAILABLE_QUOTA,
+        (quota_limit, timestamp, "", subject),
     )
 
 
@@ -165,8 +161,7 @@ def test_consume_tokens_not_enough(mock_connect):
     to_be_consumed = 100
     available_tokens = 50
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -175,17 +170,17 @@ def test_consume_tokens_not_enough(mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
     with pytest.raises(
-        QuotaExceedError, match="User 1234 has 50 tokens, but 100 tokens are needed"
+        QuotaExceedError, match="Cluster has 50 tokens, but 100 tokens are needed"
     ):
-        q.consume_tokens(to_be_consumed, 0, user_id)
+        q.consume_tokens(to_be_consumed, 0)
 
-    # quota for given user should be read from storage
+    # quota for given cluster should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)
+        ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)
     )
 
 
@@ -196,8 +191,7 @@ def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
     to_be_consumed = 50
     available_tokens = 100
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -212,18 +206,18 @@ def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
-    q.consume_tokens(to_be_consumed, 0, user_id)
+    q.consume_tokens(to_be_consumed, 0)
 
     calls = [
-        # quota for given user should be read from storage
-        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
+        # quota for given cluster should be read from storage
+        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
         # and the quota should be updated accordingly
         call(
-            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-            (-to_be_consumed, timestamp, user_id, subject),
+            ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+            (-to_be_consumed, timestamp, "", subject),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -236,8 +230,7 @@ def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
     to_be_consumed = 50
     available_tokens = 100
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -252,18 +245,18 @@ def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
-    q.consume_tokens(0, to_be_consumed, user_id)
+    q.consume_tokens(0, to_be_consumed)
 
     calls = [
-        # quota for given user should be read from storage
-        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
+        # quota for given cluster should be read from storage
+        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
         # and the quota should be updated accordingly
         call(
-            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-            (-to_be_consumed, timestamp, user_id, subject),
+            ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+            (-to_be_consumed, timestamp, "", subject),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -278,8 +271,7 @@ def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_conne
     to_be_consumed = input_tokens + output_tokens
     available_tokens = 100
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -294,18 +286,18 @@ def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_conne
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
-    q.consume_tokens(input_tokens, output_tokens, user_id)
+    q.consume_tokens(input_tokens, output_tokens)
 
     calls = [
-        # quota for given user should be read from storage
-        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
+        # quota for given cluster should be read from storage
+        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
         # and the quota should be updated accordingly
         call(
-            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-            (-to_be_consumed, timestamp, user_id, subject),
+            ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+            (-to_be_consumed, timestamp, "", subject),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -316,8 +308,7 @@ def test_consume_tokens_on_no_record(mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 100
     quota_limit = 100
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -326,17 +317,17 @@ def test_consume_tokens_on_no_record(mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit)
+    q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
     with pytest.raises(
-        QuotaExceedError, match="User 1234 has 0 tokens, but 100 tokens are needed"
+        QuotaExceedError, match="Cluster has 0 tokens, but 100 tokens are needed"
     ):
-        q.consume_tokens(to_be_consumed, 0, user_id)
+        q.consume_tokens(to_be_consumed, 0)
 
-    # quota for given user should be read from storage
+    # quota for given cluster should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)
+        ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)
     )
 
 
@@ -346,8 +337,7 @@ def test_increase_quota(mock_datetime, mock_connect):
     """Test the operation to increase quota."""
     quota_limit = 100
     additional_quota = 10
-    user_id = "1234"
-    subject = "u"
+    subject = "c"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -362,13 +352,13 @@ def test_increase_quota(mock_datetime, mock_connect):
 
     # initialize Postgres storage
     config = PostgresConfig()
-    q = UserQuotaLimiter(config, quota_limit, additional_quota)
+    q = ClusterQuotaLimiter(config, quota_limit, additional_quota)
 
     # try to increase quota
-    q.increase_quota(user_id)
+    q.increase_quota()
 
-    # quota for given user should be written into the storage
+    # quota for given cluster should be written into the storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-        (additional_quota, timestamp, user_id, subject),
+        ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (additional_quota, timestamp, "", subject),
     )
