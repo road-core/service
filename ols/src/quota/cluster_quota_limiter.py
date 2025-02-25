@@ -1,4 +1,4 @@
-"""Simple user quota limiter where each user have fixed quota."""
+"""Simple cluster quota limiter where quota is fixed for the whole cluster."""
 
 import logging
 
@@ -8,8 +8,8 @@ from ols.src.quota.revokable_quota_limiter import RevokableQuotaLimiter
 logger = logging.getLogger(__name__)
 
 
-class UserQuotaLimiter(RevokableQuotaLimiter):
-    """Simple user quota limiter where each user have fixed quota."""
+class ClusterQuotaLimiter(RevokableQuotaLimiter):
+    """Simple cluster quota limiter where quota is fixed for the whole cluster."""
 
     def __init__(
         self,
@@ -18,7 +18,7 @@ class UserQuotaLimiter(RevokableQuotaLimiter):
         increase_by: int = 0,
     ) -> None:
         """Initialize quota limiter storage."""
-        subject = "u"  # user
+        subject = "c"  # cluster
         super().__init__(initial_quota, increase_by, subject)
 
         # initialize connection to DB
