@@ -32,6 +32,7 @@ def test_init_quota(mock_datetime, mock_connect):
     """Test the init quota operation."""
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - with empty storage
     mock_cursor = MagicMock()
@@ -53,8 +54,8 @@ def test_init_quota(mock_datetime, mock_connect):
 
     # new record should be inserted into storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.INIT_QUOTA_FOR_USER,
-        (user_id, quota_limit, quota_limit, timestamp),
+        UserQuotaLimiter.INIT_QUOTA,
+        (user_id, subject, quota_limit, quota_limit, timestamp),
     )
 
 
@@ -64,6 +65,7 @@ def test_available_quota_with_data(mock_connect):
     quota_limit = 100
     available_quota = 50
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - available data in the table
     mock_cursor = MagicMock()
@@ -79,7 +81,7 @@ def test_available_quota_with_data(mock_connect):
 
     # quota for given user should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)
+        UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)
     )
     assert available == available_quota
 
@@ -90,6 +92,7 @@ def test_available_quota_no_data(mock_datetime, mock_connect):
     """Test the get available quota operation."""
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -112,10 +115,10 @@ def test_available_quota_no_data(mock_datetime, mock_connect):
     # quota for given user should be read from storage
     # and the initialization of new record should be made
     calls = [
-        call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
+        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
         call(
-            UserQuotaLimiter.INIT_QUOTA_FOR_USER,
-            (user_id, quota_limit, quota_limit, timestamp),
+            UserQuotaLimiter.INIT_QUOTA,
+            (user_id, subject, quota_limit, quota_limit, timestamp),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -128,6 +131,7 @@ def test_revoke_quota(mock_datetime, mock_connect):
     """Test the operation to revoke quota."""
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -149,8 +153,8 @@ def test_revoke_quota(mock_datetime, mock_connect):
 
     # quota for given user should be written into the storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SET_AVAILABLE_QUOTA_FOR_USER,
-        (quota_limit, timestamp, user_id),
+        UserQuotaLimiter.SET_AVAILABLE_QUOTA,
+        (quota_limit, timestamp, user_id, subject),
     )
 
 
@@ -161,6 +165,7 @@ def test_consume_tokens_not_enough(mock_connect):
     available_tokens = 50
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -179,7 +184,7 @@ def test_consume_tokens_not_enough(mock_connect):
 
     # quota for given user should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)
+        UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)
     )
 
 
@@ -191,6 +196,7 @@ def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
     available_tokens = 100
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -212,11 +218,11 @@ def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
 
     calls = [
         # quota for given user should be read from storage
-        call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
+        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
         # and the quota should be updated accordingly
         call(
-            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-            (-to_be_consumed, timestamp, user_id),
+            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+            (-to_be_consumed, timestamp, user_id, subject),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -230,6 +236,7 @@ def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
     available_tokens = 100
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -251,11 +258,11 @@ def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
 
     calls = [
         # quota for given user should be read from storage
-        call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
+        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
         # and the quota should be updated accordingly
         call(
-            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-            (-to_be_consumed, timestamp, user_id),
+            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+            (-to_be_consumed, timestamp, user_id, subject),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -271,6 +278,7 @@ def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_conne
     available_tokens = 100
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -292,11 +300,11 @@ def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_conne
 
     calls = [
         # quota for given user should be read from storage
-        call(UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)),
+        call(UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)),
         # and the quota should be updated accordingly
         call(
-            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-            (-to_be_consumed, timestamp, user_id),
+            UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+            (-to_be_consumed, timestamp, user_id, subject),
         ),
     ]
     mock_cursor.execute.assert_has_calls(calls, any_order=True)
@@ -308,6 +316,7 @@ def test_consume_tokens_on_no_record(mock_connect):
     to_be_consumed = 100
     quota_limit = 100
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -326,7 +335,7 @@ def test_consume_tokens_on_no_record(mock_connect):
 
     # quota for given user should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.SELECT_QUOTA_FOR_USER, (user_id,)
+        UserQuotaLimiter.SELECT_QUOTA, (user_id, subject)
     )
 
 
@@ -337,6 +346,7 @@ def test_increase_quota(mock_datetime, mock_connect):
     quota_limit = 100
     additional_quota = 10
     user_id = "1234"
+    subject = "u"
 
     # mock the query result - no data
     mock_cursor = MagicMock()
@@ -358,6 +368,6 @@ def test_increase_quota(mock_datetime, mock_connect):
 
     # quota for given user should be written into the storage
     mock_cursor.execute.assert_called_once_with(
-        UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA_FOR_USER,
-        (additional_quota, timestamp, user_id),
+        UserQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (additional_quota, timestamp, user_id, subject),
     )
