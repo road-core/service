@@ -104,7 +104,7 @@ class IndexLoader:
             port = postgres.port
             dbname = postgres.dbname
             table_name = self._index_id.replace("-", "_")
-            embed_dim = len(Settings.embed_model.get_text_embedding("random text"))
+            embed_dim = Settings.embed_model._model.get_sentence_embedding_dimension()
 
             self._vector_store = PGVectorStore.from_params(
                 database=dbname,
