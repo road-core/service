@@ -286,7 +286,7 @@ spec:
             - IMAGE_TAGS=latest 1.0.$(tasks.git-metadata.results.commit-timestamp)
             - GIT_COMMIT=$(tasks.clone-repository.results.commit)
             - RAG_CONTENTS_SUB_FOLDER=vector_db/aap_product_docs
-            - LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ansible/aap-rag-content:1.0.1739753069
+            - LIGHTSPEED_RAG_CONTENT_IMAGE=quay.io/ansible/aap-rag-content:latest
             - LIGHTSPEED_RAG_EMBEDDINGS_IMAGE=quay.io/ansible/aap-rag-embeddings-image:latest
         runAfter:
           - prefetch-dependencies
