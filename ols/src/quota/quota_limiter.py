@@ -23,6 +23,10 @@ class QuotaLimiter(ABC):
         """Increase quota for given user."""
 
     @abstractmethod
+    def ensure_available_quota(self) -> None:
+        """Ensure that there's avaiable quota left."""
+
+    @abstractmethod
     def consume_tokens(self, input_tokens: int, output_tokens: int) -> None:
         """Consume tokens by given user."""
 
