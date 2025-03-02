@@ -64,8 +64,7 @@ class RevokableQuotaLimiter(QuotaLimiter):
             if value is None:
                 self._init_quota(subject_id)
                 return self.initial_quota
-            else:
-                return value[0]
+            return value[0]
 
     def revoke_quota(self, subject_id: str = "") -> None:
         """Revoke quota for given subject."""

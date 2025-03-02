@@ -7,7 +7,6 @@ import pytest
 
 from ols.app.models.config import PostgresConfig
 from ols.src.quota.cluster_quota_limiter import ClusterQuotaLimiter
-from ols.src.quota.quota_exceed_error import QuotaExceedError
 
 
 @patch("psycopg2.connect")
@@ -156,7 +155,8 @@ def test_revoke_quota(mock_datetime, mock_connect):
 
 
 @patch("psycopg2.connect")
-def test_consume_tokens_not_enough(mock_connect):
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
+def test_consume_tokens_not_enough(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 100
     available_tokens = 50
@@ -168,19 +168,23 @@ def test_consume_tokens_not_enough(mock_connect):
     mock_cursor.fetchone.return_value = (available_tokens,)
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
 
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
+
     # initialize Postgres storage
     config = PostgresConfig()
     q = ClusterQuotaLimiter(config, quota_limit)
 
     # try to consume tokens
-    with pytest.raises(
-        QuotaExceedError, match="Cluster has 50 tokens, but 100 tokens are needed"
-    ):
-        q.consume_tokens(to_be_consumed, 0)
+    q.consume_tokens(to_be_consumed, 0)
 
-    # quota for given cluster should be read from storage
+    # quota for given user should be updated in storage
     mock_cursor.execute.assert_called_once_with(
-        ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)
+        ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (-to_be_consumed, timestamp, "", subject),
     )
 
 
@@ -211,16 +215,10 @@ def test_consume_input_tokens_enough_tokens(mock_datetime, mock_connect):
     # try to consume tokens
     q.consume_tokens(to_be_consumed, 0)
 
-    calls = [
-        # quota for given cluster should be read from storage
-        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
-        # and the quota should be updated accordingly
-        call(
-            ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-            (-to_be_consumed, timestamp, "", subject),
-        ),
-    ]
-    mock_cursor.execute.assert_has_calls(calls, any_order=True)
+    mock_cursor.execute.assert_called_once_with(
+        ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (-to_be_consumed, timestamp, "", subject),
+    )
 
 
 @patch("psycopg2.connect")
@@ -250,16 +248,10 @@ def test_consume_output_tokens_enough_tokens(mock_datetime, mock_connect):
     # try to consume tokens
     q.consume_tokens(0, to_be_consumed)
 
-    calls = [
-        # quota for given cluster should be read from storage
-        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
-        # and the quota should be updated accordingly
-        call(
-            ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-            (-to_be_consumed, timestamp, "", subject),
-        ),
-    ]
-    mock_cursor.execute.assert_has_calls(calls, any_order=True)
+    mock_cursor.execute.assert_called_once_with(
+        ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (-to_be_consumed, timestamp, "", subject),
+    )
 
 
 @patch("psycopg2.connect")
@@ -291,20 +283,15 @@ def test_consume_input_and_output_tokens_enough_tokens(mock_datetime, mock_conne
     # try to consume tokens
     q.consume_tokens(input_tokens, output_tokens)
 
-    calls = [
-        # quota for given cluster should be read from storage
-        call(ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)),
-        # and the quota should be updated accordingly
-        call(
-            ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
-            (-to_be_consumed, timestamp, "", subject),
-        ),
-    ]
-    mock_cursor.execute.assert_has_calls(calls, any_order=True)
+    mock_cursor.execute.assert_called_once_with(
+        ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (-to_be_consumed, timestamp, "", subject),
+    )
 
 
 @patch("psycopg2.connect")
-def test_consume_tokens_on_no_record(mock_connect):
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
+def test_consume_tokens_on_no_record(mock_datetime, mock_connect):
     """Test the operation to consume tokens."""
     to_be_consumed = 100
     quota_limit = 100
@@ -315,19 +302,22 @@ def test_consume_tokens_on_no_record(mock_connect):
     mock_cursor.fetchone.return_value = None
     mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
 
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
+
     # initialize Postgres storage
     config = PostgresConfig()
     q = ClusterQuotaLimiter(config, quota_limit)
 
-    # try to consume tokens
-    with pytest.raises(
-        QuotaExceedError, match="Cluster has 0 tokens, but 100 tokens are needed"
-    ):
-        q.consume_tokens(to_be_consumed, 0)
+    q.consume_tokens(to_be_consumed, 0)
 
     # quota for given cluster should be read from storage
     mock_cursor.execute.assert_called_once_with(
-        ClusterQuotaLimiter.SELECT_QUOTA, ("", subject)
+        ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
+        (-to_be_consumed, timestamp, "", subject),
     )
 
 
@@ -362,3 +352,32 @@ def test_increase_quota(mock_datetime, mock_connect):
         ClusterQuotaLimiter.UPDATE_AVAILABLE_QUOTA,
         (additional_quota, timestamp, "", subject),
     )
+
+
+@patch("psycopg2.connect")
+@patch("ols.src.quota.revokable_quota_limiter.datetime")
+def test_ensure_available_quota(mock_datetime, mock_connect):
+    """Test the operation to increase quota."""
+    quota_limit = 0
+    additional_quota = 0
+
+    # mock the query result - no data
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = None
+    mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # mock for real timestamp
+    timestamp = datetime.datetime(2000, 1, 1, 12, 0, 0)
+
+    # mock function to retrieve timestamp
+    mock_datetime.now = lambda: timestamp
+
+    # initialize Postgres storage
+    config = PostgresConfig()
+    q = ClusterQuotaLimiter(config, quota_limit, additional_quota)
+
+    exception_message = "Cluster has no available tokens"
+
+    # check available quota
+    with pytest.raises(Exception, match=exception_message):
+        q.ensure_available_quota()
