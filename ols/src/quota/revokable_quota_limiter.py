@@ -64,10 +64,13 @@ class RevokableQuotaLimiter(QuotaLimiter):
             if value is None:
                 self._init_quota(subject_id)
                 return self.initial_quota
-            return value[0]
+            else:
+                return value[0]
 
     def revoke_quota(self, subject_id: str = "") -> None:
         """Revoke quota for given subject."""
+        if self.subject_type == "c":
+            subject_id = ""
         # timestamp to be used
         revoked_at = datetime.now()
 
@@ -80,6 +83,8 @@ class RevokableQuotaLimiter(QuotaLimiter):
 
     def increase_quota(self, subject_id: str = "") -> None:
         """Increase quota for given subject."""
+        if self.subject_type == "c":
+            subject_id = ""
         # timestamp to be used
         updated_at = datetime.now()
 
@@ -97,29 +102,17 @@ class RevokableQuotaLimiter(QuotaLimiter):
         subject_id: str = "",
     ) -> None:
         """Consume tokens by given subject."""
+        if self.subject_type == "c":
+            subject_id = ""
+        logger.info(
+            "Consuming %d input and %d output tokens for subject %s",
+            input_tokens,
+            output_tokens,
+            subject_id,
+        )
         to_be_consumed = input_tokens + output_tokens
 
-        # note that checking available tokens and decreasing quota operations
-        # are performed in a transaction
         with self.connection.cursor() as cursor:
-            cursor.execute(
-                RevokableQuotaLimiter.SELECT_QUOTA,
-                (subject_id, self.subject_type),
-            )
-            value = cursor.fetchone()
-            if value is None:
-                available = 0
-            else:
-                available = value[0]
-
-            # check if ID still have available tokens to be consumed
-            if available < to_be_consumed:
-                e = QuotaExceedError(
-                    subject_id, self.subject_type, available, to_be_consumed
-                )
-                logger.exception("Quota exceed: %s", e)
-                raise e
-
             # timestamp to be used
             updated_at = datetime.now()
 
