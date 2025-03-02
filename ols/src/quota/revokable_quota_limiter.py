@@ -95,6 +95,18 @@ class RevokableQuotaLimiter(QuotaLimiter):
             )
             self.connection.commit()
 
+    def ensure_available_quota(self, subject_id: str = "") -> None:
+        """Ensure that there's avaiable quota left."""
+        if self.subject_type == "c":
+            subject_id = ""
+        available = self.available_quota(subject_id)
+        logger.info("Available quota for subject %s is %d", subject_id, available)
+        # check if ID still have available tokens to be consumed
+        if available <= 0:
+            e = QuotaExceedError(subject_id, self.subject_type, available)
+            logger.exception("Quota exceed: %s", e)
+            raise e
+
     def consume_tokens(
         self,
         input_tokens: int = 0,
