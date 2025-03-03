@@ -16,7 +16,9 @@ from pydantic import (
 )
 
 from ols import constants
+from ols.constants import VectorStoreType
 from ols.utils import checks, tls
+from ols.utils.checks import InvalidConfigurationError
 
 
 class ModelParameters(BaseModel):
@@ -828,9 +830,11 @@ class LoggingConfig(BaseModel):
 class ReferenceContent(BaseModel):
     """Reference content configuration."""
 
+    vector_store_type: Optional[str] = None
     product_docs_index_path: Optional[FilePath] = None
     product_docs_index_id: Optional[str] = None
     embeddings_model_path: Optional[FilePath] = None
+    postgres: Optional[PostgresConfig] = None
 
     def __init__(self, data: Optional[dict] = None) -> None:
         """Initialize configuration and perform basic validation."""
@@ -838,37 +842,69 @@ class ReferenceContent(BaseModel):
         if data is None:
             return
 
+        self.vector_store_type = data.get(
+            "vector_store_type", constants.VectorStoreType.FAISS
+        )
+        valid_vector_store_types = list(constants.VectorStoreType)
+        if self.vector_store_type not in valid_vector_store_types:
+            raise InvalidConfigurationError(
+                f"invalid vector store type: {self.vector_store_type}, supported types are"
+                f" {valid_vector_store_types}"
+            )
         self.product_docs_index_path = data.get("product_docs_index_path", None)
         self.product_docs_index_id = data.get("product_docs_index_id", None)
         self.embeddings_model_path = data.get("embeddings_model_path", None)
+        if (
+            self.vector_store_type == constants.VectorStoreType.POSTGRES
+            and "postgres" in data
+        ):
+            self.postgres = PostgresConfig(**data.get("postgres"))
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
         if isinstance(other, ReferenceContent):
-            return (
-                self.product_docs_index_path == other.product_docs_index_path
+            if (
+                self.vector_store_type == other.vector_store_type
+                and self.product_docs_index_path == other.product_docs_index_path
                 and self.product_docs_index_id == other.product_docs_index_id
                 and self.embeddings_model_path == other.embeddings_model_path
-            )
+            ):
+                return (
+                    self.vector_store_type != constants.VectorStoreType.POSTGRES
+                    or self.postgres == other.postgres
+                )
         return False
 
     def validate_yaml(self) -> None:
         """Validate reference content config."""
-        if self.product_docs_index_path is not None:
-            checks.dir_check(self.product_docs_index_path, "Reference content path")
+        if (
+            self.vector_store_type is None
+            or self.vector_store_type == VectorStoreType.FAISS
+        ):
+            if self.product_docs_index_path is not None:
+                checks.dir_check(self.product_docs_index_path, "Reference content path")
 
+                if self.product_docs_index_id is None:
+                    raise checks.InvalidConfigurationError(
+                        "product_docs_index_path is specified but product_docs_index_id is missing"
+                    )
+
+            if (
+                self.product_docs_index_id is not None
+                and self.product_docs_index_path is None
+            ):
+                raise checks.InvalidConfigurationError(
+                    "product_docs_index_id is specified but product_docs_index_path is missing"
+                )
+        elif self.vector_store_type == VectorStoreType.POSTGRES:
             if self.product_docs_index_id is None:
                 raise checks.InvalidConfigurationError(
-                    "product_docs_index_path is specified but product_docs_index_id is missing"
+                    "product_docs_index_id is missing"
                 )
-
-        if (
-            self.product_docs_index_id is not None
-            and self.product_docs_index_path is None
-        ):
-            raise checks.InvalidConfigurationError(
-                "product_docs_index_id is specified but product_docs_index_path is missing"
-            )
+            if self.postgres is None:
+                raise checks.InvalidConfigurationError(
+                    "vector_store_type is set to 'postgres', but postgres configuration is missing"
+                )
 
         if self.embeddings_model_path is not None:
             checks.dir_check(self.embeddings_model_path, "Embeddings model path")

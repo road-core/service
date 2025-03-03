@@ -31,6 +31,7 @@ from ols.app.models.config import (
     UserDataCollection,
     UserDataCollectorConfig,
 )
+from ols.constants import VectorStoreType
 from ols.utils.checks import InvalidConfigurationError
 
 
@@ -2872,6 +2873,36 @@ def test_reference_content_yaml_validation():
     reference_content.product_docs_index_path = "/root"
     with pytest.raises(InvalidConfigurationError):
         reference_content.validate_yaml()
+
+    # docs index point is reset to default,
+    # vector_store_type is set to 'postgres',
+    # but product_docs_index_id is not set
+    del reference_content.product_docs_index_path
+    reference_content.vector_store_type = VectorStoreType.POSTGRES
+    reference_content.product_docs_index_id = ""
+    with pytest.raises(InvalidConfigurationError):
+        reference_content.validate_yaml()
+
+    # docs index point to a proper directory,
+    # vector_store_type is set to 'postgres',
+    # product_docs_index_id is set to a valid value,
+    # but postgres configuration is not set
+    reference_content.product_docs_index_id = "product_docs_index_id"
+    with pytest.raises(InvalidConfigurationError):
+        reference_content.validate_yaml()
+
+    # docs index point to a proper directory,
+    # vector_store_type is set to 'postgres',
+    # product_docs_index_id is set to a valid value,
+    # and postgres configuration is set.
+    reference_content.postgres = PostgresConfig()
+    reference_content.postgres.host = "localhost"
+    reference_content.postgres.port = 5432
+    reference_content.postgres.dbname = "postgres"
+    reference_content.postgres.user = "postgres"
+
+    # should not raise an exception
+    reference_content.validate_yaml()
 
 
 def test_config_no_query_filter_node():

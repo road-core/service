@@ -1,0 +1,39 @@
+llm_providers:
+  - name: ollama
+    type: openai
+    url: "http://localhost:11434/v1/"
+    models:
+      - name: 'llama3.2'
+ols_config:
+  reference_content:
+    vector_store_type: postgres
+    product_docs_index_id: product_index
+    embeddings_model_path: "./embeddings_model"
+    postgres:
+      host: localhost
+      port: 15432
+      dbname: postgres
+      user: postgres
+      password_path: /var/tmp/secrets/postgres.txt
+  conversation_cache:
+    type: memory
+    memory:
+      max_entries: 1000
+  logging_config:
+    app_log_level: info
+    lib_log_level: warning
+    uvicorn_log_level: info
+    suppress_metrics_in_log: false
+    suppress_auth_checks_warning_in_log: false
+  default_provider: ollama
+  default_model: 'llama3.2'
+  expire_llm_is_ready_persistent_state: -1
+  enable_event_stream_format: true
+  query_validation_method: llm
+dev_config:
+  # config options specific to dev environment - launching OLS in local
+  enable_dev_ui: true
+  disable_auth: true
+  disable_tls: true
+  pyroscope_url: "https://pyroscope.pyroscope.svc.cluster.local:4040"
+  enable_system_prompt_override: true
