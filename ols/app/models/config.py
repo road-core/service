@@ -910,7 +910,7 @@ class LimiterConfig(BaseModel):
 
 
 class LimitersConfig(BaseModel):
-    """Configuration for all quota limiters"""
+    """Configuration for all quota limiters."""
 
     limiters: dict[str, LimiterConfig] = {}
 
