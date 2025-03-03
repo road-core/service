@@ -855,7 +855,7 @@ def test_valid_config_file():
             }
         )
         assert config.config == expected_config
-        assert config.user_data_collector_config is not None
+        assert config.user_data_collector_config is None
         assert config.ols_config.user_data_collection is not None
         assert config.ols_config.user_data_collection.feedback_disabled is True
     except Exception as e:
