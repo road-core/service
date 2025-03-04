@@ -225,12 +225,14 @@ MEDIA_TYPE_JSON = "application/json"
 # default value for token when no token is provided
 NO_USER_TOKEN = ""
 
+
 # Vector store types
 class VectorStoreType(StrEnum):
     """Supported vector store types."""
 
     FAISS = "faiss"
     POSTGRES = "postgres"
+
 
 # quota limiters constants
 USER_QUOTA_LIMITER = "user_limiter"
