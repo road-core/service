@@ -232,3 +232,8 @@ class VectorStoreType(StrEnum):
 
     FAISS = "faiss"
     POSTGRES = "postgres"
+
+
+# quota limiters constants
+USER_QUOTA_LIMITER = "user_limiter"
+CLUSTER_QUOTA_LIMITER = "cluster_limiter"
