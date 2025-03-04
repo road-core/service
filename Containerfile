@@ -7,7 +7,7 @@ FROM ${LIGHTSPEED_RAG_CONTENT_IMAGE} as lightspeed-rag-content
 
 FROM ${LIGHTSPEED_RAG_EMBEDDINGS_IMAGE} as lightspeed-rag-embeddings
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal AS production
 
 ARG APP_ROOT=/app-root
 
@@ -32,11 +32,12 @@ COPY --from=lightspeed-rag-embeddings /rag/embeddings_model ./embeddings_model
 
 # Add explicit files and directories
 # (avoid accidental inclusion of local directories or env files or credentials)
-COPY runner.py pyproject.toml LICENSE README.md ./
+COPY runner.py requirements.txt ./
+
+RUN pip3.11 install --upgrade pip
+RUN pip3.11 install --no-cache-dir -r requirements.txt
 
 COPY ols ./ols
-
-RUN pip3.11 install --no-cache-dir .
 
 # this directory is checked by ecosystem-cert-preflight-checks task in Konflux
 COPY LICENSE /licenses/
