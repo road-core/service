@@ -76,7 +76,9 @@ class AppConfig:
     def quota_limiters(self) -> list[QuotaLimiter]:
         """Return all quota limiters."""
         if self._quota_limiters is None:
-            self._quota_limiters = QuotaLimiterFactory.quota_limiters(self.ols_config.quota_limiter)
+            self._quota_limiters = QuotaLimiterFactory.quota_limiters(
+                self.ols_config.quota_limiter
+            )
         return self._quota_limiters
 
     @property

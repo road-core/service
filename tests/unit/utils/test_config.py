@@ -766,6 +766,27 @@ ols_config:
     level: info
   default_provider: p1
   default_model: m1
+  quota_limiter:
+    storage:
+      host: ""
+      port: "5432"
+      dbname: "test"
+      user: "tester"
+      password_path: tests/config/postgres_password.txt
+      ssl_mode: "disable"
+    limiters:
+      - name: user_monthly_limits
+        type: user_limiter
+        initial_quota: 1000
+        quota_increase: 10
+        period: "5 minutes"
+      - name: cluster_monthly_limits
+        type: cluster_limiter
+        initial_quota: 2000
+        quota_increase: 100
+        period: "5 minutes"
+    scheduler:
+      frequency: 100
   certificate_directory: '/foo/bar/baz'
   system_prompt_path: 'tests/config/system_prompt.txt'
   tlsSecurityProfile:
@@ -858,6 +879,7 @@ def test_valid_config_file():
         assert config.user_data_collector_config is not None
         assert config.ols_config.user_data_collection is not None
         assert config.ols_config.user_data_collection.feedback_disabled is True
+        assert config.ols_config.quota_limiter is not None
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")
@@ -1476,3 +1498,12 @@ def test_additional_config_file_incorrect_type():
         config.reload_additional_config_file(
             "tests/config/valid_rhdh_config.yaml", "wrongtype"
         )
+
+
+def test_quota_limiter_property():
+    """Check the quota limiter property."""
+    config.reload_empty()
+    assert config is not None
+    config.reload_from_yaml_file("tests/config/valid_config_without_query_filter.yaml")
+    # force reinitialization
+    assert config.quota_limiters is not None
