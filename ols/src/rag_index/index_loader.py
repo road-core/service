@@ -115,9 +115,9 @@ class IndexLoader:
                 table_name=table_name,
                 embed_dim=embed_dim,
             )
-        self._storage_context = StorageContext.from_defaults(
-            vector_store=self._vector_store,
-        )
+            self._storage_context = StorageContext.from_defaults(
+                vector_store=self._vector_store,
+            )
 
     def _load_index(self) -> None:
         """Load vector index."""
