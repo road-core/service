@@ -48,6 +48,12 @@ class TopicSummarizer(QueryHelper):
         Returns:
             str: summarized conversation topic
         """
+        if not prompts.TOPIC_SUMMARY_PROMPT_TEMPLATE:
+            logger.debug(
+                "TOPIC_SUMMARY_PROMPT_TEMPLATE is not set. Topic summarization is skipped."
+            )
+            return ""
+
         settings_string = (
             f"conversation_id: {conversation_id}, "
             f"query: {query}, "
