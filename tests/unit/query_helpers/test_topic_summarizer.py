@@ -71,3 +71,17 @@ def test_summarize_topic():
         )
 
         assert response == expected_response
+
+
+@patch("ols.customize.prompts.TOPIC_SUMMARY_PROMPT_TEMPLATE", "")
+def test_skip_summarize_topic():
+    """Test topic summarizer is skipped when TOPIC_SUMMARY_PROMPT_TEMPLATE is not set."""
+    config.reload_from_yaml_file("tests/config/valid_config.yaml")
+
+    summarizer = TopicSummarizer(llm_loader=mock_llm_loader(None))
+    response = summarizer.summarize_topic(
+        "123e4567-e89b-12d3-a456-426614174000",
+        "What are the latest developments in artificial intelligence?",
+    )
+
+    assert response == ""
