@@ -220,5 +220,14 @@ def list_conversations(
 
     if history_length is not None:
         conversations = conversations[:history_length]
+    
+    new_conversations = []
+    for conv in conversations:
+        conversation_id = conv["conversation_id"]
+        chat_history = CacheEntry.cache_entries_to_history(
+            retrieve_previous_input(user_id, conversation_id, skip_user_id_check)
+        )
+        conv["last_message_timestamp"] = chat_history[-1].response_metadata["created_at"]
+        new_conversations.append(conv)
 
-    return ListConversationsResponse(conversations=conversations)
+    return ListConversationsResponse(conversations=new_conversations)

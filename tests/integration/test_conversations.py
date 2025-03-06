@@ -191,10 +191,14 @@ def test_list_conversations_with_history(_setup, endpoint):
         found_conv_ids = {conv["conversation_id"] for conv in conversations}
         assert conv_id_1 in found_conv_ids
         assert conv_id_2 in found_conv_ids
+
         for conv in conversations:
             assert (
                 "topic_summary" in conv
             ), f"Conversation {conv['conversation_id']} is missing topic_summary"
+            assert (
+                "last_message_timestamp" in conv
+            ), f"Conversation {conv['conversation_id']} is missing last_message_timestamp"
 
 
 @pytest.mark.parametrize("endpoint", ("/conversations",))

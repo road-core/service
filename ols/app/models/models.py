@@ -240,15 +240,13 @@ class ChatHistoryResponse(BaseModel):
         }
     }
 
-
 class ListConversationsResponse(BaseModel):
     """Model representing a response to a request to retrieve a conversation history.
 
     Attributes:
-        conversations: List of conversation IDs.
+        conversations: List of conversation IDs, summary and last message timestamp.
     """
-
-    conversations: list[dict[str, str]]
+    conversations: list[dict[str, Union[str, float]]]
 
     # provides examples for /docs endpoint
     model_config = {
@@ -259,14 +257,17 @@ class ListConversationsResponse(BaseModel):
                         {
                             "conversation_id": "15a78660-a18e-447b-9fea-9deb27b63b5f",
                             "topic_summary": "topic1",
+                            "last_message_timestamp": 1741268849.345408,
                         },
                         {
                             "conversation_id": "c0a3bc27-77cc-46da-822f-93a9c0e0de4b",
                             "topic_summary": "topic2",
+                            "last_message_timestamp": 1741268599.387008,
                         },
                         {
                             "conversation_id": "51984bb1-f3a3-4ab2-9df6-cf92c30bbb7f",
                             "topic_summary": "topic3",
+                            "last_message_timestamp": 1741289849.349808,
                         },
                     ]
                 }
