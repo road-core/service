@@ -41,7 +41,7 @@ spec:
             requests:
               memory: 4Gi
             limits:
-              memory: 4Gi
+              memory: 8Gi
     - pipelineTaskName: clair-scan
       computeResources:
         requests:
