@@ -12,7 +12,9 @@ jobs:
       pull-requests: read
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+# Run tests only for Python 3.11 due to torch dependency.
+#        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
