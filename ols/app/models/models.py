@@ -240,12 +240,14 @@ class ChatHistoryResponse(BaseModel):
         }
     }
 
+
 class ListConversationsResponse(BaseModel):
     """Model representing a response to a request to retrieve a conversation history.
 
     Attributes:
         conversations: List of conversation IDs, summary and last message timestamp.
     """
+
     conversations: list[dict[str, Union[str, float]]]
 
     # provides examples for /docs endpoint
