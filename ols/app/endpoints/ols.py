@@ -27,6 +27,7 @@ from ols.app.models.models import (
     RagChunk,
     ReferencedDocument,
     SummarizerResponse,
+    TokenCounter,
     UnauthorizedResponse,
 )
 from ols.customize import keywords, prompts
@@ -151,22 +152,31 @@ def conversation_request(
     processed_request.timestamps["add references"] = time.time()
     log_processing_durations(processed_request.timestamps)
 
+    input_tokens = calc_input_tokens(summarizer_response.token_counter)
+    output_tokens = calc_output_tokens(summarizer_response.token_counter)
+
     return LLMResponse(
         conversation_id=processed_request.conversation_id,
         response=summarizer_response.response,
         referenced_documents=referenced_documents,
         truncated=summarizer_response.history_truncated,
-        input_tokens=(
-            0
-            if summarizer_response.token_counter is None
-            else summarizer_response.token_counter.input_tokens
-        ),
-        output_tokens=(
-            0
-            if summarizer_response.token_counter is None
-            else summarizer_response.token_counter.output_tokens
-        ),
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
     )
+
+
+def calc_input_tokens(token_counter: Optional[TokenCounter]) -> int:
+    """Calculate input tokens."""
+    if token_counter is None:
+        return 0
+    return token_counter.input_tokens
+
+
+def calc_output_tokens(token_counter: Optional[TokenCounter]) -> int:
+    """Calculate output tokens."""
+    if token_counter is None:
+        return 0
+    return token_counter.output_tokens
 
 
 def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
