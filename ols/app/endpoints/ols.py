@@ -37,6 +37,7 @@ from ols.src.query_helpers.attachment_appender import append_attachments_to_quer
 from ols.src.query_helpers.docs_summarizer import DocsSummarizer
 from ols.src.query_helpers.question_validator import QuestionValidator
 from ols.src.query_helpers.topic_summarizer import TopicSummarizer
+from ols.src.quota.quota_limiter import QuotaLimiter
 from ols.utils import errors_parsing, suid
 from ols.utils.token_handler import PromptTooLongError
 
@@ -155,6 +156,10 @@ def conversation_request(
     input_tokens = calc_input_tokens(summarizer_response.token_counter)
     output_tokens = calc_output_tokens(summarizer_response.token_counter)
 
+    consume_tokens(
+        config.quota_limiters, processed_request.user_id, input_tokens, output_tokens
+    )
+
     return LLMResponse(
         conversation_id=processed_request.conversation_id,
         response=summarizer_response.response,
@@ -177,6 +182,23 @@ def calc_output_tokens(token_counter: Optional[TokenCounter]) -> int:
     if token_counter is None:
         return 0
     return token_counter.output_tokens
+
+
+def consume_tokens(
+    quota_limiters: Optional[list[QuotaLimiter]],
+    user_id: str,
+    input_tokens: int,
+    output_tokens: int,
+) -> None:
+    """Consume tokens from cluster and/or user quotas."""
+    # no quota limiters specified
+    if quota_limiters is None:
+        return
+
+    for quota_limiter in quota_limiters:
+        quota_limiter.consume_tokens(
+            input_tokens=input_tokens, output_tokens=output_tokens, subject_id=user_id
+        )
 
 
 def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
@@ -236,6 +258,8 @@ def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
 
     validate_requested_provider_model(llm_request)
 
+    check_tokens_available(config.quota_limiters, user_id)
+
     # Validate the query
     if not previous_input:
         valid = validate_question(conversation_id, llm_request)
@@ -256,6 +280,29 @@ def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
         skip_user_id_check=skip_user_id_check,
         user_token=user_token,
     )
+
+
+def check_tokens_available(
+    quota_limiters: Optional[list[QuotaLimiter]], user_id: str
+) -> None:
+    """Check if tokens are available for user."""
+    # no quota limiters specified
+    if quota_limiters is None:
+        return
+
+    try:
+        for quota_limiter in quota_limiters:
+            quota_limiter.ensure_available_quota(subject_id=user_id)
+    except Exception as quota_exceed_error:
+        message = "The quota has been exceeded"
+        logger.error(message)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "response": message,
+                "cause": str(quota_exceed_error),
+            },
+        )
 
 
 def log_processing_durations(timestamps: dict[str, float]) -> None:
