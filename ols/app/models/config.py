@@ -1167,9 +1167,8 @@ class UserDataCollectorConfig(BaseModel):
     ingress_base_delay: int = 60  # exponential backoff parameter
     ingress_max_retries: int = 3  # exponential backoff parameter
     access_token_generation_timeout: int = 5
-    user_agent: str = (
-        "openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}"
-    )
+    user_agent: str
+    user_data_max_size: int = 100 * 1024 * 1024  # 100 MiB
 
     def __init__(self, **data: Any) -> None:
         """Initialize configuration."""
@@ -1226,9 +1225,13 @@ class Config(BaseModel):
             )
         # Always initialize dev config, even if there's no config for it.
         self.dev_config = DevConfig(**data.get("dev_config", {}))
-        self.user_data_collector_config = UserDataCollectorConfig(
-            **data.get("user_data_collector_config", {})
-        )
+        if not (
+            self.ols_config.user_data_collection.feedback_disabled
+            and self.ols_config.user_data_collection.transcripts_disabled
+        ):
+            self.user_data_collector_config = UserDataCollectorConfig(
+                **data.get("user_data_collector_config", {})
+            )
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
