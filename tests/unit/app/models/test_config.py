@@ -3697,7 +3697,7 @@ def test_ols_config_with_quota_limiter_section():
                     },
                 ],
                 "scheduler": {
-                    "frequency": 100,
+                    "period": 100,
                 },
             },
         }
@@ -3742,7 +3742,7 @@ def test_ols_config_with_quota_limiter_section_without_storage():
                         },
                     ],
                     "scheduler": {
-                        "frequency": 100,
+                        "period": 100,
                     },
                 },
             }
@@ -3817,7 +3817,7 @@ def test_ols_config_with_quota_limiter_section_without_limiters():
                     "ssl_mode": "disable",
                 },
                 "scheduler": {
-                    "frequency": 100,
+                    "period": 100,
                 },
             },
         }
@@ -3851,7 +3851,7 @@ def test_ols_config_with_quota_limiter_section_empty_limiters():
                     "ssl_mode": "disable",
                 },
                 "scheduler": {
-                    "frequency": 100,
+                    "period": 100,
                 },
             },
         }
@@ -3902,7 +3902,7 @@ def test_ols_config_with_quota_limiter_missing_name():
                         },
                     ],
                     "scheduler": {
-                        "frequency": 100,
+                        "period": 100,
                     },
                 },
             }
