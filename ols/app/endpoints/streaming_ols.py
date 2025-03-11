@@ -9,7 +9,7 @@ import logging
 import time
 from typing import Any, AsyncGenerator, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import StreamingResponse
 
 from ols import config, constants
@@ -28,7 +28,6 @@ from ols.app.models.models import (
     ErrorResponse,
     ForbiddenResponse,
     LLMRequest,
-    PromptTooLongResponse,
     RagChunk,
     ReferencedDocument,
     SummarizerResponse,
@@ -61,10 +60,6 @@ query_responses: dict[int | str, dict[str, Any]] = {
     403: {
         "description": "Client does not have permission to access resource",
         "model": ForbiddenResponse,
-    },
-    413: {
-        "description": "Prompt is too long",
-        "model": PromptTooLongResponse,
     },
     500: {
         "description": "Query can not be validated, LLM is not accessible or other internal error",
@@ -124,6 +119,7 @@ def conversation_request(
             topic_summary,
             processed_request.skip_user_id_check,
         ),
+        status_code=status.HTTP_200_OK,
         media_type=llm_request.media_type,
     )
 
@@ -217,6 +213,7 @@ def prompt_too_long_error(error: PromptTooLongError, media_type: str) -> str:
         {
             "event": "error",
             "data": {
+                "status_code": 413,
                 "response": "Prompt is too long",
                 "cause": str(error),
             },
@@ -380,6 +377,7 @@ async def response_processing_wrapper(
             yield build_yield_item(item, idx, media_type)
             idx += 1
     except PromptTooLongError as summarizer_error:
+        logger.error("Prompt is too long: %s", summarizer_error)
         yield prompt_too_long_error(summarizer_error, media_type)
         return  # stop execution after error
 

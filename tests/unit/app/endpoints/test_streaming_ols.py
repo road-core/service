@@ -63,9 +63,17 @@ def test_prompt_too_long_error():
         == "Prompt is too long: error"
     )
 
-    assert (
-        prompt_too_long_error("error", constants.MEDIA_TYPE_JSON)
-        == '{"event": "error", "data": {"response": "Prompt is too long", "cause": "error"}}'
+    assert prompt_too_long_error(
+        "error", constants.MEDIA_TYPE_JSON
+    ) == format_stream_data(
+        {
+            "event": "error",
+            "data": {
+                "status_code": 413,
+                "response": "Prompt is too long",
+                "cause": "error",
+            },
+        }
     )
 
 
@@ -76,9 +84,14 @@ def test_generic_llm_error():
         == "Oops, something went wrong during LLM invocation: error"
     )
 
-    assert (
-        generic_llm_error("error", constants.MEDIA_TYPE_JSON)
-        == '{"event": "error", "data": {"response": "Oops, something went wrong during LLM invocation", "cause": "error"}}'  # noqa: E501
+    assert generic_llm_error("error", constants.MEDIA_TYPE_JSON) == format_stream_data(
+        {
+            "event": "error",
+            "data": {
+                "response": "Oops, something went wrong during LLM invocation",
+                "cause": "error",
+            },
+        }
     )
 
 
