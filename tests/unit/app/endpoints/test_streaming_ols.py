@@ -5,7 +5,11 @@ import json
 import pytest
 
 from ols import config, constants
-from ols.app.endpoints.streaming_ols import (
+
+# needs to be setup there before is_user_authorized is imported
+config.ols_config.authentication_config.module = "k8s"
+
+from ols.app.endpoints.streaming_ols import (  # noqa:E402
     build_referenced_docs,
     build_yield_item,
     format_stream_data,
@@ -15,9 +19,9 @@ from ols.app.endpoints.streaming_ols import (
     stream_end_event,
     stream_start_event,
 )
-from ols.app.models.models import RagChunk, TokenCounter
-from ols.customize import prompts
-from ols.utils import suid
+from ols.app.models.models import RagChunk, TokenCounter  # noqa:E402
+from ols.customize import prompts  # noqa:E402
+from ols.utils import suid  # noqa:E402
 
 conversation_id = suid.get_suid()
 
@@ -36,6 +40,14 @@ def _load_config():
     config.reload_from_yaml_file("tests/config/test_app_endpoints.yaml")
 
 
+def test_format_stream_data():
+    """Test format_stream_data."""
+    data = {"bla": 5}
+    expected = f"data: {json.dumps(data)}\n\n"
+    actual = format_stream_data(data)
+    assert actual == expected
+
+
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("_load_config")
 async def test_invalid_response_generator():
@@ -50,9 +62,8 @@ async def test_invalid_response_generator():
 def test_build_yield_item():
     """Test build_yield_item."""
     assert build_yield_item("bla", 0, constants.MEDIA_TYPE_TEXT) == "bla"
-    assert (
-        build_yield_item("bla", 1, constants.MEDIA_TYPE_JSON)
-        == '{"event": "token", "data": {"id": 1, "token": "bla"}}'
+    assert build_yield_item("bla", 1, constants.MEDIA_TYPE_JSON) == format_stream_data(
+        {"event": "token", "data": {"id": 1, "token": "bla"}}
     )
 
 
@@ -97,7 +108,7 @@ def test_generic_llm_error():
 
 def test_stream_start_event():
     """Test stream_start_event."""
-    assert stream_start_event(conversation_id) == json.dumps(
+    assert stream_start_event(conversation_id) == format_stream_data(
         {
             "event": "start",
             "data": {
@@ -119,7 +130,7 @@ def test_stream_end_event():
 
     assert stream_end_event(
         ref_docs, truncated, constants.MEDIA_TYPE_JSON, None
-    ) == json.dumps(
+    ) == format_stream_data(
         {
             "event": "end",
             "data": {
@@ -136,7 +147,7 @@ def test_stream_end_event():
     token_counter = TokenCounter(input_tokens=123, output_tokens=456)
     assert stream_end_event(
         ref_docs, truncated, constants.MEDIA_TYPE_JSON, token_counter
-    ) == json.dumps(
+    ) == format_stream_data(
         {
             "event": "end",
             "data": {
@@ -163,26 +174,3 @@ def test_build_referenced_docs():
         {"doc_title": "title_1", "doc_url": "url_1"},
         {"doc_title": "title_2", "doc_url": "url_2"},
     ]
-
-
-@pytest.mark.usefixtures("_load_config")
-def test_format_stream_data():
-    """Test format_stream_data function."""
-    stream_data = {
-        "event": "token",
-        "data": {"id": "ABC-123456", "token": "***TOKEN***"},
-    }
-    stringified_data = json.dumps(stream_data)
-    data_in_event_stream_data_format = f"data: {stringified_data}\n\n"
-
-    saved_value = config.ols_config.enable_event_stream_format
-    try:
-        config.ols_config.enable_event_stream_format = False
-        output = format_stream_data((stream_data))
-        assert output == stringified_data
-
-        config.ols_config.enable_event_stream_format = True
-        output = format_stream_data((stream_data))
-        assert output == data_in_event_stream_data_format
-    finally:
-        config.ols_config.enable_event_stream_format = saved_value
