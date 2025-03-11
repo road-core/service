@@ -43,3 +43,4 @@ dev_config:
   disable_tls: true
 user_data_collector_config:
   user_agent: "lightspeed-operator/user-data-collection cluster/{cluster_id}"
+  ingress_url: "https://sso.redhat.com/"

@@ -46,16 +46,8 @@ class ClusterIDNotFoundError(Exception):
     """Cluster id is not found."""
 
 
-def get_ingress_upload_url(ingress_env: str) -> str:
-    """Get the Ingress upload URL based on the environment."""
-    upload_endpoint = "api/ingress/v1/upload"
-    if ingress_env == "prod":
-        return "https://console.redhat.com/" + upload_endpoint
-    return "https://console.stage.redhat.com/" + upload_endpoint
-
-
 def access_token_from_offline_token(
-    offline_token: str, ingress_env: str, access_token_generation_timeout: int
+    offline_token: str, ingress_url: str, access_token_generation_timeout: int
 ) -> str:
     """Generate "access token" from the "offline token".
 
@@ -65,15 +57,11 @@ def access_token_from_offline_token(
 
     Args:
         offline_token: Offline token from the Customer Portal.
-        ingress_env: chosen ingress environment
+        ingress_url: url of the chosen ingress environment
         access_token_generation_timeout: timeout for access token, in seconds
     Returns:
         Refresh token.
     """
-    if ingress_env == "prod":
-        url = "https://sso.redhat.com/"
-    else:
-        url = "https://sso.stage.redhat.com/"
     endpoint = "auth/realms/redhat-external/protocol/openid-connect/token"
     data = {
         "grant_type": "refresh_token",
@@ -82,7 +70,7 @@ def access_token_from_offline_token(
     }
 
     response = requests.post(
-        url + endpoint, data=data, timeout=access_token_generation_timeout
+        ingress_url + endpoint, data=data, timeout=access_token_generation_timeout
     )
     try:
         if response.status_code == requests.codes.ok:
@@ -186,7 +174,6 @@ def upload_data_to_ingress(
         Response object from the Ingress.
     """
     logger.info("sending collected data")
-    url = get_ingress_upload_url(udc_config.ingress_env)
     payload = {
         "file": (
             "ols.tgz",
@@ -204,7 +191,7 @@ def upload_data_to_ingress(
                 logger.debug("using CP offline token to generate refresh token")
                 token = access_token_from_offline_token(
                     udc_config.cp_offline_token,
-                    udc_config.ingress_env,
+                    udc_config.ingress_url,
                     udc_config.access_token_generation_timeout,
                 )
                 # when authenticating with token, user-agent is not accepted
@@ -221,9 +208,9 @@ def upload_data_to_ingress(
 
             with requests.Session() as s:
                 s.headers = headers
-                logger.debug("posting payload to %s", url)
+                logger.debug("posting payload to %s", udc_config.ingress_url)
                 response = s.post(
-                    url=url,
+                    url=udc_config.ingress_url,
                     files=payload,
                     timeout=udc_config.ingress_timeout,
                 )

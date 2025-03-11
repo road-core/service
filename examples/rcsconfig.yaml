@@ -97,6 +97,7 @@ ols_config:
     feedback_storage: "/tmp/data/feedback"
     transcripts_disabled: false
     transcripts_storage: "/tmp/data/transcripts"
+    ingress_url: "https://example.ingress.com/"
   tls_config:
     tls_certificate_path: /app-root/certs/certificate.crt
     tls_key_path: /app-root/certs/private.key

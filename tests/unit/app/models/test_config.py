@@ -5,7 +5,7 @@ import logging
 
 import pytest
 import yaml
-from pydantic import ValidationError
+from pydantic import AnyHttpUrl, ValidationError
 
 import ols.utils.tls as tls
 from ols import constants
@@ -3541,13 +3541,14 @@ def test_dev_config_bool_inputs():
 def test_user_data_collection_config__defaults():
     """Test the UserDataCollection model with default values."""
     udc_config = UserDataCollectorConfig(
-        user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}"
+        user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
+        ingress_url="https://sso.redhat.com/",
     )
     assert udc_config.data_storage is None
     assert udc_config.log_level == logging.INFO
     assert udc_config.collection_interval == 2 * 60 * 60
     assert udc_config.run_without_initial_wait is False
-    assert udc_config.ingress_env == "prod"
+    assert udc_config.ingress_url == AnyHttpUrl("https://sso.redhat.com/")
     assert udc_config.cp_offline_token is None
 
 
@@ -3556,35 +3557,16 @@ def test_user_data_collection_config__logging_level():
     udc_config = UserDataCollectorConfig(
         log_level="debug",
         user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
+        ingress_url="https://sso.redhat.com/",
     )
     assert udc_config.log_level == logging.DEBUG
 
     udc_config = UserDataCollectorConfig(
         log_level="DEBUG",
         user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
+        ingress_url="https://sso.redhat.com/",
     )
     assert udc_config.log_level == logging.DEBUG
-
-
-def test_user_data_collection_config__token_expectation():
-    """Test the UserDataCollection model with token expectation."""
-    udc_config = UserDataCollectorConfig(
-        ingress_env="stage",
-        cp_offline_token="123",  # noqa: S106
-        user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
-    )
-    assert udc_config.ingress_env == "stage"
-    assert udc_config.cp_offline_token == "123"  # noqa: S105
-
-    with pytest.raises(
-        ValueError,
-        match="cp_offline_token is required in stage environment",
-    ):
-        UserDataCollectorConfig(
-            ingress_env="stage",
-            cp_offline_token=None,
-            user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
-        )
 
 
 def test_ols_config_with_system_prompt(tmpdir):

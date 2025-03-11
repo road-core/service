@@ -3,7 +3,7 @@
 import logging
 import os
 import re
-from typing import Any, Literal, Optional, Self
+from typing import Any, Optional, Self
 
 from pydantic import (
     AnyHttpUrl,
@@ -1160,7 +1160,7 @@ class UserDataCollectorConfig(BaseModel):
     log_level: int = logging.INFO
     collection_interval: int = 2 * 60 * 60  # 2 hours
     run_without_initial_wait: bool = False
-    ingress_env: Literal["stage", "prod"] = "prod"
+    ingress_url: AnyHttpUrl
     cp_offline_token: Optional[str] = None
     initial_wait: int = 60 * 5  # 5 minutes in seconds
     ingress_timeout: int = 30
@@ -1177,18 +1177,6 @@ class UserDataCollectorConfig(BaseModel):
         if "log_level" in data:
             data["log_level"] = checks.get_log_level(data["log_level"])
         super().__init__(**data)
-
-    @model_validator(mode="after")
-    def validate_token_is_set_when_needed(self) -> Self:
-        """Check that cp_offline_token is set when env is stage."""
-        if self.ingress_env == "stage" and self.cp_offline_token is None:
-            raise ValueError("cp_offline_token is required in stage environment")
-        if "{cluster_id}" not in self.user_agent:
-            raise ValueError(
-                "user_agent must contain a {cluster_id} substring, "
-                "as a placeholder for k8s cluster ID"
-            )
-        return self
 
 
 class Config(BaseModel):
