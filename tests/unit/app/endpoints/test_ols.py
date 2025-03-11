@@ -219,13 +219,14 @@ def test_store_conversation_history(insert_or_append):
     skip_user_id_check = False
     query = "Tell me about Kubernetes"
     llm_request = LLMRequest(query=query)
+    response = ""
     topic_summary = "test summary"
 
     ols.store_conversation_history(
         constants.DEFAULT_USER_UID,
         conversation_id,
         llm_request,
-        "",
+        response,
         [],
         [],
         topic_summary,
