@@ -197,3 +197,19 @@ class RedisCache(Cache):
                 )
 
         return conversations
+
+    def ready(self) -> bool:
+        """Check if the cache is ready.
+
+           Redis cache checks if the connection is alive.
+
+        Returns:
+            True if the cache is ready, False otherwise.
+        """
+        if self.redis_client is None:
+            return False
+        try:
+            self.redis_client.ping()
+        except RedisConnectionError:
+            return False
+        return True

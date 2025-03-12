@@ -102,3 +102,11 @@ class Cache(ABC):
         Returns:
              A list of dictionaries containing conversation_id and topic_summary
         """
+
+    @abstractmethod
+    def ready(self) -> bool:
+        """Check if the cache is ready.
+
+        Returns:
+            True if the cache is ready, False otherwise.
+        """
