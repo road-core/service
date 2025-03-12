@@ -11,6 +11,7 @@ from ols.constants import (
     DEFAULT_CONFIGURATION_FILE,
     RHDH_CONFIGURATION_FILE_NAME_ENV_VARIABLE,
 )
+from ols.runners.quota_scheduler import start_quota_scheduler
 from ols.runners.uvicorn import start_uvicorn
 from ols.src.auth.auth import use_k8s_auth
 from ols.utils.certificates import generate_certificates_file
@@ -91,6 +92,9 @@ if __name__ == "__main__":
     # parallel with starting the Uvicorn server
     rag_index_thread = threading.Thread(target=load_index)
     rag_index_thread.start()
+
+    # start the quota scheduler
+    start_quota_scheduler(config)
 
     # start the Uvicorn server
     start_uvicorn(config)
