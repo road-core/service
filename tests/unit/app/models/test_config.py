@@ -23,7 +23,7 @@ from ols.app.models.config import (
     PostgresConfig,
     ProviderConfig,
     QueryFilter,
-    QuotaLimiterConfig,
+    QuotaHandlersConfig,
     RedisConfig,
     ReferenceContent,
     TLSConfig,
@@ -2381,10 +2381,10 @@ def test_ols_config_equality(subtests):
         ols_config_1.tls_security_profile = TLSSecurityProfile()
         assert ols_config_1 != ols_config_2
 
-    # quota limiters attribute (QuotaLimiterConfig)
-    with subtests.test(msg="Different attribute: quota_limiter"):
+    # quota handler attribute (QuotaHandlersConfig)
+    with subtests.test(msg="Different attribute: quota_handlers"):
         ols_config_1, ols_config_2 = get_ols_configs()
-        ols_config_1.quota_limiter = QuotaLimiterConfig()
+        ols_config_1.quota_handlers = QuotaHandlersConfig()
         assert ols_config_1 != ols_config_2
 
     # compare OLSConfig with other object
@@ -3659,8 +3659,8 @@ def test_ols_config_with_non_readable_system_prompt(tmpdir):
         )
 
 
-def test_ols_config_with_quota_limiter_section():
-    """Test OLSConfig model with quota limiters section specified."""
+def test_ols_config_with_quota_handlers_section():
+    """Test OLSConfig model with quota handlers section specified."""
     ols_config = OLSConfig(
         {
             "default_provider": "test_default_provider",
@@ -3671,7 +3671,7 @@ def test_ols_config_with_quota_limiter_section():
                     "max_entries": 100,
                 },
             },
-            "quota_limiter": {
+            "quota_handlers": {
                 "storage": {
                     "host": "",
                     "port": 5432,
@@ -3702,14 +3702,14 @@ def test_ols_config_with_quota_limiter_section():
             },
         }
     )
-    assert ols_config.quota_limiter is not None
-    assert ols_config.quota_limiter.scheduler is not None
-    assert ols_config.quota_limiter.storage is not None
-    assert ols_config.quota_limiter.limiters is not None
+    assert ols_config.quota_handlers is not None
+    assert ols_config.quota_handlers.scheduler is not None
+    assert ols_config.quota_handlers.storage is not None
+    assert ols_config.quota_handlers.limiters is not None
 
 
-def test_ols_config_with_quota_limiter_section_without_storage():
-    """Test OLSConfig model with quota limiters section specified but w/o storage part."""
+def test_ols_config_with_quota_handlers_section_without_storage():
+    """Test OLSConfig model with quota handlers section specified but w/o storage part."""
     with pytest.raises(
         InvalidConfigurationError,
         match="Missing storage configuration for quota limiters",
@@ -3724,7 +3724,7 @@ def test_ols_config_with_quota_limiter_section_without_storage():
                         "max_entries": 100,
                     },
                 },
-                "quota_limiter": {
+                "quota_handlers": {
                     "limiters": [
                         {
                             "name": "user_monthly_limits",
@@ -3749,8 +3749,8 @@ def test_ols_config_with_quota_limiter_section_without_storage():
         )
 
 
-def test_ols_config_with_quota_limiter_section_without_scheduler():
-    """Test OLSConfig model with quota limiters section specified but w/o scheduler part."""
+def test_ols_config_with_quota_handlers_section_without_scheduler():
+    """Test OLSConfig model with quota handlers section specified but w/o scheduler part."""
     with pytest.raises(
         InvalidConfigurationError,
         match="Missing scheduler configuration for quota limiters",
@@ -3765,7 +3765,7 @@ def test_ols_config_with_quota_limiter_section_without_scheduler():
                         "max_entries": 100,
                     },
                 },
-                "quota_limiter": {
+                "quota_handlers": {
                     "storage": {
                         "host": "",
                         "port": 5432,
@@ -3795,8 +3795,8 @@ def test_ols_config_with_quota_limiter_section_without_scheduler():
         )
 
 
-def test_ols_config_with_quota_limiter_section_without_limiters():
-    """Test OLSConfig model with quota limiters section specified w/o limiters section."""
+def test_ols_config_with_quota_handlers_section_without_limiters():
+    """Test OLSConfig model with quota handlers section specified w/o limiters section."""
     ols_config = OLSConfig(
         {
             "default_provider": "test_default_provider",
@@ -3807,7 +3807,7 @@ def test_ols_config_with_quota_limiter_section_without_limiters():
                     "max_entries": 100,
                 },
             },
-            "quota_limiter": {
+            "quota_handlers": {
                 "storage": {
                     "host": "",
                     "port": 5432,
@@ -3822,14 +3822,14 @@ def test_ols_config_with_quota_limiter_section_without_limiters():
             },
         }
     )
-    assert ols_config.quota_limiter is not None
-    assert ols_config.quota_limiter.scheduler is not None
-    assert ols_config.quota_limiter.storage is not None
-    assert ols_config.quota_limiter.limiters is not None
+    assert ols_config.quota_handlers is not None
+    assert ols_config.quota_handlers.scheduler is not None
+    assert ols_config.quota_handlers.storage is not None
+    assert ols_config.quota_handlers.limiters is not None
 
 
-def test_ols_config_with_quota_limiter_section_empty_limiters():
-    """Test OLSConfig model with quota limiters section specified with empty limiters section."""
+def test_ols_config_with_quota_handlers_section_empty_limiters():
+    """Test OLSConfig model with quota handlers section specified with empty limiters section."""
     ols_config = OLSConfig(
         {
             "default_provider": "test_default_provider",
@@ -3840,7 +3840,7 @@ def test_ols_config_with_quota_limiter_section_empty_limiters():
                     "max_entries": 100,
                 },
             },
-            "quota_limiter": {
+            "quota_handlers": {
                 "limiters": [],
                 "storage": {
                     "host": "",
@@ -3856,14 +3856,14 @@ def test_ols_config_with_quota_limiter_section_empty_limiters():
             },
         }
     )
-    assert ols_config.quota_limiter is not None
-    assert ols_config.quota_limiter.scheduler is not None
-    assert ols_config.quota_limiter.storage is not None
-    assert ols_config.quota_limiter.limiters is not None
+    assert ols_config.quota_handlers is not None
+    assert ols_config.quota_handlers.scheduler is not None
+    assert ols_config.quota_handlers.storage is not None
+    assert ols_config.quota_handlers.limiters is not None
 
 
-def test_ols_config_with_quota_limiter_missing_name():
-    """Test OLSConfig model with quota limiters section specified."""
+def test_ols_config_with_quota_handlesr_missing_name():
+    """Test OLSConfig model with quota handlers section specified."""
     with pytest.raises(
         InvalidConfigurationError,
         match="limiter name is missing",
@@ -3878,7 +3878,7 @@ def test_ols_config_with_quota_limiter_missing_name():
                         "max_entries": 100,
                     },
                 },
-                "quota_limiter": {
+                "quota_handlers": {
                     "storage": {
                         "host": "",
                         "port": 5432,

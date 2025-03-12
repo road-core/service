@@ -963,7 +963,7 @@ class LimitersConfig(BaseModel):
             self.limiters[limiter["name"]] = limiter_config
 
 
-class QuotaLimiterConfig(BaseModel):
+class QuotaHandlersConfig(BaseModel):
     """Quota limiter configuration."""
 
     storage: Optional[PostgresConfig] = None
@@ -1015,7 +1015,7 @@ class OLSConfig(BaseModel):
     certificate_directory: Optional[str] = None
 
     enable_event_stream_format: bool = False
-    quota_limiter: Optional[QuotaLimiterConfig] = None
+    quota_handlers: Optional[QuotaHandlersConfig] = None
 
     def __init__(
         self, data: Optional[dict] = None, ignore_missing_certs: bool = False
@@ -1068,7 +1068,7 @@ class OLSConfig(BaseModel):
             data.get("tlsSecurityProfile", None)
         )
         self.enable_event_stream_format = data.get("enable_event_stream_format", False)
-        self.quota_limiter = QuotaLimiterConfig(data.get("quota_limiter", None))
+        self.quota_handlers = QuotaHandlersConfig(data.get("quota_handlers", None))
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
@@ -1091,7 +1091,7 @@ class OLSConfig(BaseModel):
                 and self.expire_llm_is_ready_persistent_state
                 == other.expire_llm_is_ready_persistent_state
                 and self.enable_event_stream_format == other.enable_event_stream_format
-                and self.quota_limiter == other.quota_limiter
+                and self.quota_handlers == other.quota_handlers
             )
         return False
 
