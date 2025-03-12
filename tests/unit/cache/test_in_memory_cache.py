@@ -226,6 +226,11 @@ def test_list_after_delete(cache):
     assert conversations[0]["topic_summary"] == topic_2
 
 
+def test_ready(cache):
+    """Test if in memory cache always report ready."""
+    assert cache.ready()
+
+
 improper_user_uuids = [
     None,
     "",

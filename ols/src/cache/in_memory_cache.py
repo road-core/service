@@ -145,3 +145,13 @@ class InMemoryCache(Cache):
                     )
 
         return conversations
+
+    def ready(self) -> bool:
+        """Check if the cache is ready.
+
+           In memory cache is always ready.
+
+        Returns:
+            True if the cache is ready, False otherwise.
+        """
+        return True
