@@ -1014,7 +1014,6 @@ class OLSConfig(BaseModel):
     extra_ca: list[FilePath] = []
     certificate_directory: Optional[str] = None
 
-    enable_event_stream_format: bool = False
     quota_handlers: Optional[QuotaHandlersConfig] = None
 
     def __init__(
@@ -1067,7 +1066,6 @@ class OLSConfig(BaseModel):
         self.tls_security_profile = TLSSecurityProfile(
             data.get("tlsSecurityProfile", None)
         )
-        self.enable_event_stream_format = data.get("enable_event_stream_format", False)
         self.quota_handlers = QuotaHandlersConfig(data.get("quota_handlers", None))
 
     def __eq__(self, other: object) -> bool:
@@ -1090,7 +1088,6 @@ class OLSConfig(BaseModel):
                 and self.authentication_config == other.authentication_config
                 and self.expire_llm_is_ready_persistent_state
                 == other.expire_llm_is_ready_persistent_state
-                and self.enable_event_stream_format == other.enable_event_stream_format
                 and self.quota_handlers == other.quota_handlers
             )
         return False
