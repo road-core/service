@@ -19,6 +19,6 @@ jobs:
       - name: Install dependencies
         run: pdm install
       - name: Install devel dependencies
-        run: pdm install --dev
+        run: pdm install --group default,dev,evaluation
       - name: Python linter
         run: pdm run pylint ols/ scripts/ tests/ runner.py
