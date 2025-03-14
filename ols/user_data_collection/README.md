@@ -76,7 +76,7 @@ user_data_collector_config:
   log_level: debug
   collection_interval: 10  # seconds
   run_without_initial_wait: true
-  ingress_env: stage
+  ingress_url: "https://sso.stage.redhat.com/"
   cp_offline_token: token
 ```
 
