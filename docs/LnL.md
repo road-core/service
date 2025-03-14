@@ -4,15 +4,34 @@
 
 ## Installation
 
+### Linux
 1. `git clone https://github.com/road-core/service`
 1. `pip install --user pdm`
 1. `pdm --version`
 1. `pdm install`
-1. retrieve OpenAI key
-1. store into file `openai_api_key.txt`
 
+### MacOS
+#### Prerequisites
+- brew
+- git
+#### Installation
+1. `brew install pdm`
+1. `pdm --version` -- should return no error
+1. Clone the repo to the current dir:
+`git clone https://github.com/road-core/service`
+1. `cd service`
+1. `pdm info` -- should return no error
+1. change `torch==2.6.0+cpu` to `torch==2.6.0` in `pyproject.toml` (section `[project]/dependencies`)
+1. `pdm install` -- if it fails (for example because you ran `pdm install` before changing `pyproject.toml`) run:
+```sh
+pdm update
+pdm install
+```
 
-Minimal configuration file `rcsconfig.yaml`:
+## Configuration
+1. Retrieve OpenAI key
+1. Store into file `openai_api_key.txt`
+1. Minimal configuration file `rcsconfig.yaml`:
 
 ```yaml
 # Minimal service configuration
@@ -49,13 +68,17 @@ dev_config:
 1. [localhost:8080/ui](localhost:8080/ui)
 1. [localhost:8080/docs](localhost:8080/docs)
 
+Hit Ctrl-C to stop.
+
 ## RAG
 
 * Retrieval-augmented generation
 
+Stop the service before making these changes.
+
 `make get-rag`
 
-configuration with RAG:
+Configuration in `rcsconfig.yaml` with RAG:
 
 ```yaml
 llm_providers:
