@@ -88,6 +88,7 @@ class AppConfig:
         """Return token usage history object."""
         if (
             self._token_usage_history is None
+            and self.ols_config.quota_handlers is not None
             and self.ols_config.quota_handlers.enable_token_history
         ):
             self._token_usage_history = TokenUsageHistory(

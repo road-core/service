@@ -1,8 +1,9 @@
 """Class with implementation of storage for token usage history."""
 
-import psycopg2
 import logging
 from datetime import datetime
+
+import psycopg2
 
 from ols.app.models.config import PostgresConfig
 
@@ -22,12 +23,12 @@ class TokenUsageHistory:
             updated_at      timestamp with time zone,
             PRIMARY KEY(user_id, provider, model)
         );
-        """
+        """  # noqa: S105
 
     INIT_TOKEN_USAGE_FOR_USER = """
         INSERT INTO token_usage (user_id, provider, model, input_tokens, output_tokens, updated_at)
         VALUES (%s, %s, %s, 0, 0, %s)
-        """
+        """  # noqa: S105
 
     CONSUME_TOKENS_FOR_USER = """
         INSERT INTO token_usage (user_id, provider, model, input_tokens, output_tokens, updated_at)
@@ -40,7 +41,7 @@ class TokenUsageHistory:
          WHERE token_usage.user_id=%(user_id)s
            AND token_usage.provider=%(provider)s
            AND token_usage.model=%(model)s
-        """
+        """  # noqa: E501
 
     def __init__(self, config: PostgresConfig) -> None:
         """Initialize token usage history storage."""
