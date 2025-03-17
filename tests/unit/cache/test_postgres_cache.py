@@ -50,7 +50,9 @@ def test_get_operation_on_empty_cache():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # initialize Postgres cache
         config = PostgresConfig()
@@ -73,7 +75,9 @@ def test_get_operation_invalid_value():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # initialize Postgres cache
         config = PostgresConfig()
@@ -104,7 +108,9 @@ def test_get_operation_valid_value():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # initialize Postgres cache
         config = PostgresConfig()
@@ -129,7 +135,9 @@ def test_get_operation_on_exception():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # initialize Postgres cache
         config = PostgresConfig()
@@ -151,7 +159,9 @@ def test_insert_or_append_operation():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         test_topic = "some topic"
 
@@ -197,7 +207,9 @@ def test_insert_or_append_operation_append_item():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # initialize Postgres cache
         config = PostgresConfig()
@@ -231,7 +243,9 @@ def test_insert_or_append_operation_on_exception():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # initialize Postgres cache
         config = PostgresConfig()
@@ -257,7 +271,9 @@ def test_list_operation():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # Initialize Postgres cache
         config = PostgresConfig()
@@ -289,7 +305,9 @@ def test_list_operation_on_exception():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # Initialize Postgres cache
         config = PostgresConfig()
@@ -308,7 +326,9 @@ def test_delete_operation():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # Initialize Postgres cache
         config = PostgresConfig()
@@ -335,7 +355,9 @@ def test_delete_operation_not_found():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # Initialize Postgres cache
         config = PostgresConfig()
@@ -362,7 +384,9 @@ def test_delete_operation_on_exception():
 
     # do not use real PostgreSQL instance
     with patch("psycopg2.connect") as mock_connect:
-        mock_connect.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
 
         # Initialize Postgres cache
         config = PostgresConfig()
@@ -371,6 +395,42 @@ def test_delete_operation_on_exception():
         # Verify that the exception is raised
         with pytest.raises(CacheError, match="PLSQL error"):
             cache.delete(user_id, conversation_id)
+
+
+def test_cleanup_method_when_clean_not_needed():
+    """Test the static method that cleans up PG cache."""
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = (200,)
+    capacity = 1000
+
+    # do not use real PostgreSQL instance
+    with patch("psycopg2.connect"):
+        PostgresCache._cleanup(mock_cursor, capacity)
+
+    # Verify the query execution
+    mock_cursor.execute.assert_called_once_with(PostgresCache.QUERY_CACHE_SIZE)
+
+
+def test_cleanup_method_when_clean_performed():
+    """Test the static method that cleans up PG cache."""
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = (200,)
+    capacity = 100
+
+    # do not use real PostgreSQL instance
+    with patch("psycopg2.connect"):
+        PostgresCache._cleanup(mock_cursor, capacity)
+
+    # Verify the query execution
+    calls = [
+        call(
+            PostgresCache.QUERY_CACHE_SIZE,
+        ),
+        call(
+            PostgresCache.DELETE_CONVERSATION_HISTORY_STATEMENT + " 100)",
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=True)
 
 
 def test_ready():
