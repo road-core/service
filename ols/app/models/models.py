@@ -179,6 +179,7 @@ class LLMResponse(BaseModel):
         truncated: Set to True if conversation history was truncated to be within context window.
         input_tokens: Number of tokens sent to LLM
         output_tokens: Number of tokens received from LLM
+        available_quotas: Quota available as measured by all configured quota limiters
     """
 
     conversation_id: str
@@ -187,6 +188,7 @@ class LLMResponse(BaseModel):
     truncated: bool
     input_tokens: int
     output_tokens: int
+    available_quotas: dict[str, int]
 
     # provides examples for /docs endpoint
     model_config = {
@@ -205,6 +207,10 @@ class LLMResponse(BaseModel):
                     "truncated": False,
                     "input_tokens": 123,
                     "output_tokens": 456,
+                    "available_quotas": {
+                        "UserQuotaLimiter": 998911,
+                        "ClusterQuotaLimiter": 998911,
+                    },
                 }
             ]
         }

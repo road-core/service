@@ -124,12 +124,12 @@ def test_stream_end_event():
     truncated = False
 
     assert (
-        stream_end_event(ref_docs, truncated, constants.MEDIA_TYPE_TEXT, None)
+        stream_end_event(ref_docs, truncated, constants.MEDIA_TYPE_TEXT, None, {})
         == "\n\n---\n\ntitle_1: doc_url_1"
     )
 
     assert stream_end_event(
-        ref_docs, truncated, constants.MEDIA_TYPE_JSON, None
+        ref_docs, truncated, constants.MEDIA_TYPE_JSON, None, {}
     ) == format_stream_data(
         {
             "event": "end",
@@ -141,12 +141,17 @@ def test_stream_end_event():
                 "input_tokens": 0,
                 "output_tokens": 0,
             },
+            "available_quotas": {},
         }
     )
 
     token_counter = TokenCounter(input_tokens=123, output_tokens=456)
     assert stream_end_event(
-        ref_docs, truncated, constants.MEDIA_TYPE_JSON, token_counter
+        ref_docs,
+        truncated,
+        constants.MEDIA_TYPE_JSON,
+        token_counter,
+        {"limiter1": 10, "limiter2": 20},
     ) == format_stream_data(
         {
             "event": "end",
@@ -158,6 +163,7 @@ def test_stream_end_event():
                 "input_tokens": 123,
                 "output_tokens": 456,
             },
+            "available_quotas": {"limiter1": 10, "limiter2": 20},
         }
     )
 

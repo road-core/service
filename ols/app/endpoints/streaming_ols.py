@@ -18,6 +18,7 @@ from ols.app.endpoints.ols import (
     calc_output_tokens,
     consume_tokens,
     generate_response,
+    get_available_quotas,
     get_topic_summary,
     log_processing_durations,
     process_request,
@@ -157,7 +158,11 @@ def stream_start_event(conversation_id: str) -> str:
 
 
 def stream_end_event(
-    ref_docs: list[dict], truncated: bool, media_type: str, token_counter: TokenCounter
+    ref_docs: list[dict],
+    truncated: bool,
+    media_type: str,
+    token_counter: TokenCounter,
+    available_quotas: dict[str, int],
 ) -> str:
     """Yield the end of the data stream.
 
@@ -166,6 +171,7 @@ def stream_end_event(
         truncated: Indicates if the history was truncated.
         media_type: Media type of the response (e.g. text or JSON).
         token_counter: Token counter for the whole stream.
+        available_quotas: Quotas available for configured quota limiters.
     """
     if media_type == constants.MEDIA_TYPE_JSON:
         return format_stream_data(
@@ -177,6 +183,7 @@ def stream_end_event(
                     "input_tokens": calc_input_tokens(token_counter),
                     "output_tokens": calc_output_tokens(token_counter),
                 },
+                "available_quotas": available_quotas,
             }
         )
     ref_docs_string = "\n".join(
@@ -403,10 +410,6 @@ async def response_processing_wrapper(
         skip_user_id_check,
     )
 
-    yield stream_end_event(
-        build_referenced_docs(rag_chunks), history_truncated, media_type, token_counter
-    )
-
     input_tokens = calc_input_tokens(token_counter)
     output_tokens = calc_output_tokens(token_counter)
 
@@ -418,6 +421,16 @@ async def response_processing_wrapper(
         output_tokens,
         llm_request.provider or config.ols_config.default_provider,
         llm_request.model or config.ols_config.default_model,
+    )
+
+    available_quotas = get_available_quotas(config.quota_limiters, user_id)
+
+    yield stream_end_event(
+        build_referenced_docs(rag_chunks),
+        history_truncated,
+        media_type,
+        token_counter,
+        available_quotas,
     )
 
     timestamps["add references"] = time.time()
