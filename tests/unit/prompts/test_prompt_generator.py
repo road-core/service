@@ -14,7 +14,8 @@ from ols.constants import ModelFamily
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
     restructure_history,
-    restructure_rag_context,
+    restructure_rag_context_post,
+    restructure_rag_context_pre,
 )
 
 model = ["some-granite-model", "some-gpt-model"]
@@ -32,7 +33,10 @@ conversation_history = [
 
 def _restructure_prompt_input(rag_context, conversation_history, model):
     """Restructure prompt input."""
-    rag_formatted = [restructure_rag_context(text, model) for text in rag_context]
+    rag_formatted = [
+        restructure_rag_context_post(restructure_rag_context_pre(text, model), model)
+        for text in rag_context
+    ]
     history_formatted = [
         restructure_history(history, model) for history in conversation_history
     ]
@@ -311,5 +315,7 @@ def test_generate_prompt_without_rag_without_history(model):
             "Answer user queries in the context of openshift.\n"
         )
         assert prompt.format(**llm_input_values) == (
-            f"System: Answer user queries in the context of openshift.\n\nHuman: {query}"
+            "System: Answer user queries in the context of openshift.\n"
+            "\n"
+            f"Human: {query}"
         )
