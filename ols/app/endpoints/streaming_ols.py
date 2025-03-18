@@ -171,6 +171,7 @@ def stream_end_event(
         truncated: Indicates if the history was truncated.
         media_type: Media type of the response (e.g. text or JSON).
         token_counter: Token counter for the whole stream.
+        available_quotas: Quotas available for configured quota limiters.
     """
     if media_type == constants.MEDIA_TYPE_JSON:
         return format_stream_data(
