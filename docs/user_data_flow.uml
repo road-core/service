@@ -35,7 +35,7 @@ ols -> disk: Store feedback as JSON
 sidecar -> disk: Scan for new JSON files
 disk -> sidecar: New JSON files
 sidecar -> sidecar: Package data into tar.gz
-sidecar -> ingress: Upload ols.tgz
+sidecar -> ingress: Upload rcs.tgz
 
 == Data Processing ==
 ingress -> cs: Forward data

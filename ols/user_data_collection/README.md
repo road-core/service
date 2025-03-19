@@ -76,13 +76,14 @@ user_data_collector_config:
   log_level: debug
   collection_interval: 10  # seconds
   run_without_initial_wait: true
-  ingress_env: stage
+  ingress_url: "https://example.ingress.com/upload"
   cp_offline_token: token
 ```
 
 - `data_storage`: Absolute path of directory containing /transcripts and/or /feedback with data.
 - `run_without_initial_wait`: Set to `true` to avoid waiting before collection (default is 5 minutes).
-- `cp_offline_token`: Offline token generated for the environment you desire.
+- `ingress_url`: URL of the chosen ingress endpoint.
+- `cp_offline_token`: Offline token generated for the ingress endpoint located at `ingress_url`.
 
 If you don't want to create the data manually, you can use OLS service to do it for you (as it does in production). You need relevant config entry
 ```yaml

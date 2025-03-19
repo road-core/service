@@ -16,7 +16,6 @@ import pathlib
 import sys
 import tarfile
 import time
-from collections.abc import Callable
 from typing import Any
 
 import kubernetes
@@ -27,35 +26,14 @@ sys.path.append(pathlib.Path(__file__).parent.parent.parent.as_posix())
 
 # initialize config
 from ols import config  # pylint: disable=C0413
+from ols.app.models.config import UserDataCollectorConfig  # pylint: disable=C0413
 from ols.constants import (  # pylint: disable=C0413
     CONFIGURATION_FILE_NAME_ENV_VARIABLE,
     DEFAULT_CONFIGURATION_FILE,
 )
 
-OLS_USER_DATA_MAX_SIZE = 100 * 1024 * 1024  # 100 MiB
-
-cfg_file = os.environ.get(
-    CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
-)
-config.reload_from_yaml_file(
-    cfg_file, ignore_llm_secrets=True, ignore_missing_certs=True
-)
-udc_config = config.user_data_collector_config  # shortcut
-
-
 # pylint: disable-next=C0413
-from ols.src.auth.k8s import K8sClientSingleton  # noqa: E402
-
-logging.basicConfig(
-    level=udc_config.log_level,
-    stream=sys.stdout,
-    format="[%(asctime)s] %(levelname)s: %(message)s",
-)
-# silence libs logging
-# - urllib3 - we don't care about those debug posts
-# - kubernetes - prints resources content when debug, causing secrets leak
-logging.getLogger("kubernetes").setLevel(logging.WARNING)
-logging.getLogger("urllib3").setLevel(logging.WARNING)
+from ols.src.auth.k8s import K8sClientSingleton
 
 logger = logging.getLogger(__name__)
 
@@ -68,15 +46,9 @@ class ClusterIDNotFoundError(Exception):
     """Cluster id is not found."""
 
 
-def get_ingress_upload_url() -> str:
-    """Get the Ingress upload URL based on the environment."""
-    upload_endpoint = "api/ingress/v1/upload"
-    if udc_config.ingress_env == "prod":
-        return "https://console.redhat.com/" + upload_endpoint
-    return "https://console.stage.redhat.com/" + upload_endpoint
-
-
-def access_token_from_offline_token(offline_token: str) -> str:
+def access_token_from_offline_token(
+    offline_token: str, ingress_url: str, access_token_generation_timeout: int
+) -> str:
     """Generate "access token" from the "offline token".
 
     Offline token can be generated at:
@@ -85,14 +57,11 @@ def access_token_from_offline_token(offline_token: str) -> str:
 
     Args:
         offline_token: Offline token from the Customer Portal.
-
+        ingress_url: url of the chosen ingress environment
+        access_token_generation_timeout: timeout for access token, in seconds
     Returns:
         Refresh token.
     """
-    if udc_config.ingress_env == "prod":
-        url = "https://sso.redhat.com/"
-    else:
-        url = "https://sso.stage.redhat.com/"
     endpoint = "auth/realms/redhat-external/protocol/openid-connect/token"
     data = {
         "grant_type": "refresh_token",
@@ -101,7 +70,7 @@ def access_token_from_offline_token(offline_token: str) -> str:
     }
 
     response = requests.post(
-        url + endpoint, data=data, timeout=udc_config.access_token_generation_timeout
+        ingress_url + endpoint, data=data, timeout=access_token_generation_timeout
     )
     try:
         if response.status_code == requests.codes.ok:
@@ -190,48 +159,24 @@ def package_files_into_tarball(
     return tarball_io
 
 
-def exponential_backoff_decorator(max_retries: int, base_delay: int) -> Callable:
-    """Exponential backoff decorator."""
+def upload_data_to_ingress(
+    tarball: io.BytesIO, udc_config: UserDataCollectorConfig
+) -> requests.Response:
+    """Attempt to upload the tarball to a Ingress.
 
-    def decorator(func: Callable) -> Callable:
-        def wrapper(*args: Any, **kwargs: Any) -> None:
-            retries = 0
-            while retries < max_retries:
-                try:
-                    func(*args, **kwargs)
-                    return
-                except Exception as e:
-                    logger.error(
-                        "attempt %d failed with error: %s", retries + 1, str(e)
-                    )
-                    retries += 1
-                    delay = base_delay * 2**retries
-                    logger.info("retrying in %d seconds...", delay)
-                    time.sleep(delay)
-            logger.error("max retries reached, operation failed.")
-
-        return wrapper
-
-    return decorator
-
-
-@exponential_backoff_decorator(
-    max_retries=udc_config.ingress_max_retries, base_delay=udc_config.ingress_base_delay
-)
-def upload_data_to_ingress(tarball: io.BytesIO) -> requests.Response:
-    """Upload the tarball to a Ingress.
+    If upload fails, for any reason, another attempt is made, with delay
+    and number of repetitions set in the `udc_config`.
 
     Args:
         tarball: BytesIO object representing the tarball to be uploaded.
-
+        udc_config: Configuration for the data collector
     Returns:
         Response object from the Ingress.
     """
     logger.info("sending collected data")
-    url = get_ingress_upload_url()
     payload = {
         "file": (
-            "ols.tgz",
+            "rcs.tgz",
             tarball.read(),
             "application/vnd.redhat.openshift.periodic+tar",
         ),
@@ -239,42 +184,58 @@ def upload_data_to_ingress(tarball: io.BytesIO) -> requests.Response:
 
     headers: dict[str, str | bytes]
 
-    if udc_config.cp_offline_token:
-        logger.debug("using CP offline token to generate refresh token")
-        token = access_token_from_offline_token(udc_config.cp_offline_token)
-        # when authenticating with token, user-agent is not accepted
-        # causing "UHC services authentication failed"
-        headers = {"Authorization": f"Bearer {token}"}
-    else:
-        logger.debug("using cluster pull secret to authenticate")
-        cluster_id = K8sClientSingleton.get_cluster_id()
-        token = get_cloud_openshift_pull_secret()
-        headers = {
-            "User-Agent": udc_config.user_agent.format(cluster_id=cluster_id),
-            "Authorization": f"Bearer {token}",
-        }
+    retries = 0
+    while retries < udc_config.ingress_max_retries:
+        try:
+            if udc_config.cp_offline_token:
+                logger.debug("using CP offline token to generate refresh token")
+                token = access_token_from_offline_token(
+                    udc_config.cp_offline_token,
+                    udc_config.ingress_url,
+                    udc_config.access_token_generation_timeout,
+                )
+                # when authenticating with token, user-agent is not accepted
+                # causing "UHC services authentication failed"
+                headers = {"Authorization": f"Bearer {token}"}
+            else:
+                logger.debug("using cluster pull secret to authenticate")
+                cluster_id = K8sClientSingleton.get_cluster_id()
+                token = get_cloud_openshift_pull_secret()
+                headers = {
+                    "User-Agent": udc_config.user_agent.format(cluster_id=cluster_id),
+                    "Authorization": f"Bearer {token}",
+                }
 
-    with requests.Session() as s:
-        s.headers = headers
-        logger.debug("posting payload to %s", url)
-        response = s.post(
-            url=url,
-            files=payload,
-            timeout=udc_config.ingress_timeout,
-        )
+            with requests.Session() as s:
+                s.headers = headers
+                logger.debug("posting payload to %s", udc_config.ingress_url)
+                response = s.post(
+                    url=udc_config.ingress_url,
+                    files=payload,
+                    timeout=udc_config.ingress_timeout,
+                )
 
-    if response.status_code != requests.codes.accepted:
-        logger.error(
-            "posting payload failed, response: %d: %s",
-            response.status_code,
-            response.text,
-        )
-        raise requests.exceptions.HTTPError(
-            f"data upload failed with response code: {response.status_code}"
-        )
+            if response.status_code != requests.codes.accepted:
+                logger.error(
+                    "posting payload failed, response: %d: %s",
+                    response.status_code,
+                    response.text,
+                )
+                raise requests.exceptions.HTTPError(
+                    f"data upload failed with response code: {response.status_code}"
+                )
 
-    request_id = response.json()["request_id"]
-    logger.info("data uploaded with request_id: '%s'", request_id)
+            request_id = response.json()["request_id"]
+            logger.info("data uploaded with request_id: '%s'", request_id)
+
+        except Exception as e:
+            logger.error("attempt %d failed with error: %s", retries + 1, str(e))
+            retries += 1
+            delay = udc_config.ingress_base_delay * 2**retries
+            logger.info("retrying in %d seconds...", delay)
+            time.sleep(delay)
+
+    logger.error("max retries reached, operation failed.")
 
     return response
 
@@ -293,7 +254,7 @@ def delete_data(file_paths: list[pathlib.Path]) -> None:
 
 
 def chunk_data(
-    data: list[pathlib.Path], chunk_max_size: int = OLS_USER_DATA_MAX_SIZE
+    data: list[pathlib.Path], chunk_max_size: int
 ) -> list[list[pathlib.Path]]:
     """Chunk the data into smaller parts.
 
@@ -323,23 +284,25 @@ def chunk_data(
     return chunks
 
 
-def gather_ols_user_data(data_path: str) -> None:
+def gather_ols_user_data(udc_config: UserDataCollectorConfig) -> None:
     """Gather OLS user data and upload it to the Ingress service."""
-    collected_files = collect_ols_data_from(data_path)
-    data_chunks = chunk_data(collected_files)
+    collected_files = collect_ols_data_from(udc_config.data_storage.as_posix())
+    data_chunks = chunk_data(collected_files, udc_config.user_data_max_size)
     if any(data_chunks):
         logger.info(
             "collected %d files (splitted to %d chunks) from '%s'",
             len(collected_files),
             len(data_chunks),
-            data_path,
+            udc_config.data_storage.as_posix(),
         )
         logger.debug("collected files: %s", collected_files)
         for i, data_chunk in enumerate(data_chunks):
             logger.info("uploading data chunk %d/%d", i + 1, len(data_chunks))
-            tarball = package_files_into_tarball(data_chunk, path_to_strip=data_path)
+            tarball = package_files_into_tarball(
+                data_chunk, path_to_strip=udc_config.data_storage.as_posix()
+            )
             try:
-                upload_data_to_ingress(tarball)
+                upload_data_to_ingress(tarball, udc_config)
                 delete_data(data_chunk)
                 logger.info("uploaded data removed")
             except (ClusterPullSecretNotFoundError, ClusterIDNotFoundError) as e:
@@ -350,12 +313,15 @@ def gather_ols_user_data(data_path: str) -> None:
             # close the tarball to release mem
             tarball.close()
     else:
-        logger.info("'%s' contains no data, nothing to do...", data_path)
+        logger.info(
+            "'%s' contains no data, nothing to do...",
+            udc_config.data_storage.as_posix(),
+        )
 
 
 def ensure_data_dir_is_not_bigger_than_defined(
-    data_dir: str = udc_config.data_storage.as_posix(),
-    max_size: int = OLS_USER_DATA_MAX_SIZE,
+    data_dir: str,
+    max_size: int,
 ) -> None:
     """Ensure that the data dir is not bigger than it should be.
 
@@ -383,21 +349,41 @@ def ensure_data_dir_is_not_bigger_than_defined(
 # NOTE: This condition is here mainly to have a way how to influence
 # when the collector is running in the e2e tests. It is not meant to be
 # used in the production.
-def disabled_by_file() -> bool:
+def disabled_by_file(data_storage: pathlib.Path) -> bool:
     """Check if the data collection is disabled by a file.
 
     Pure existence of the file `disable_collector` in the root of the
     user data dir is enough to disable the data collection.
     """
-    if udc_config.data_storage is None:
+    if data_storage is None:
         logger.warning(
             "Data storage path is None, cannot check for disable_collector file."
         )
         return False
-    return (udc_config.data_storage / "disable_collector").exists()
+    return (data_storage / "disable_collector").exists()
 
 
 if __name__ == "__main__":
+
+    cfg_file = os.environ.get(
+        CONFIGURATION_FILE_NAME_ENV_VARIABLE, DEFAULT_CONFIGURATION_FILE
+    )
+    config.reload_from_yaml_file(
+        cfg_file, ignore_llm_secrets=True, ignore_missing_certs=True
+    )
+    udc_config = config.user_data_collector_config  # shortcut
+
+    logging.basicConfig(
+        level=udc_config.log_level,
+        stream=sys.stdout,
+        format="[%(asctime)s] %(levelname)s: %(message)s",
+    )
+    # silence libs logging
+    # - urllib3 - we don't care about those debug posts
+    # - kubernetes - prints resources content when debug, causing secrets leak
+    logging.getLogger("kubernetes").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
     if not udc_config.run_without_initial_wait:
         logger.info(
             "collection script started, waiting %d seconds before first collection",
@@ -405,9 +391,11 @@ if __name__ == "__main__":
         )
         time.sleep(udc_config.initial_wait)
     while True:
-        if not disabled_by_file():
+        if not disabled_by_file(udc_config.data_storage):
             gather_ols_user_data(udc_config.data_storage.as_posix())
-            ensure_data_dir_is_not_bigger_than_defined()
+            ensure_data_dir_is_not_bigger_than_defined(
+                udc_config.data_storage.as_posix(), udc_config.user_data_max_size
+            )
         else:
             logger.info("disabled by control file, skipping data collection")
         time.sleep(udc_config.collection_interval)

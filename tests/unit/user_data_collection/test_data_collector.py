@@ -9,24 +9,21 @@ from unittest.mock import Mock, patch
 import pytest
 from requests.models import Response
 
+from ols.app.models.config import UserDataCollectorConfig
+from ols.user_data_collection import data_collector
+from ols.user_data_collection.data_collector import collect_ols_data_from
 from ols.utils import suid
 
 
-@pytest.fixture(scope="module", autouse=True)
-def with_mocked_config():
-    """Run test with mocked config.
-
-    We don't need that for unit tests.
-    """
-    global data_collector
-    global original_collect_ols_data_from
-    with patch("ols.config", new=Mock()):
-        from ols.user_data_collection import data_collector
-        from ols.user_data_collection.data_collector import (
-            collect_ols_data_from as original_collect_ols_data_from,
-        )
-
-        yield
+@pytest.fixture
+def mock_data_collector_config(tmp_path):
+    """Mock UserDataCollectorConfig file with valid path."""
+    udc_config = UserDataCollectorConfig(
+        user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
+        ingress_url="https://example.ingress.com/upload",
+    )
+    udc_config.data_storage = pathlib.Path(tmp_path)
+    return udc_config
 
 
 def mock_ingress_response(*args, **kwargs):
@@ -112,7 +109,7 @@ def test_delete_data(tmp_path):
 def mock_collect_ols_data_from(data_path: str) -> list[pathlib.Path]:
     """Mock collect_ols_data_from function."""
     # call the original function and get its result
-    original_result = original_collect_ols_data_from(data_path)
+    original_result = collect_ols_data_from(data_path)
 
     # create a new file
     with open(data_path + "/new_file.json", "w") as f:
@@ -122,7 +119,7 @@ def mock_collect_ols_data_from(data_path: str) -> list[pathlib.Path]:
     return original_result
 
 
-def test_new_files_stays(tmp_path):
+def test_new_files_stays(tmp_path, mock_data_collector_config):
     """Test gather_ols_user_data.
 
     During the test, a new file is added to directory that is being
@@ -146,7 +143,7 @@ def test_new_files_stays(tmp_path):
             return_value=mock_ingress_response(),
         ),
     ):
-        data_collector.gather_ols_user_data(tmp_path.as_posix())
+        data_collector.gather_ols_user_data(mock_data_collector_config)
 
     # feedback is a dir that is not removed and new_file.json is what
     # we are looking for here
@@ -156,16 +153,16 @@ def test_new_files_stays(tmp_path):
     ]
 
 
-def test_gather_ols_user_data_nothing_to_collect(tmp_path, caplog):
+def test_gather_ols_user_data_nothing_to_collect(caplog, mock_data_collector_config):
     """Test gather_ols_user_data with no data to collect."""
     caplog.set_level(logging.INFO)
 
-    data_collector.gather_ols_user_data(tmp_path.as_posix())
+    data_collector.gather_ols_user_data(mock_data_collector_config)
 
     assert "contains no data, nothing to do..." in caplog.text
 
 
-def test_gather_ols_user_data_full_flow(tmp_path, caplog):
+def test_gather_ols_user_data_full_flow(tmp_path, caplog, mock_data_collector_config):
     """Test gather_ols_user_data.
 
     This is basically script e2e test. We just mocks the ingress.
@@ -181,7 +178,7 @@ def test_gather_ols_user_data_full_flow(tmp_path, caplog):
         "ols.user_data_collection.data_collector.upload_data_to_ingress",
         return_value=mock_ingress_response(),
     ):
-        data_collector.gather_ols_user_data(tmp_path.as_posix())
+        data_collector.gather_ols_user_data(mock_data_collector_config)
 
     # assert correct logs and empty dir where data was
     assert "collected 1 files (splitted to 1 chunks)" in caplog.text
@@ -235,4 +232,6 @@ def test_access_token_from_offline_token():
     """Test the access_token_from_offline_token function."""
     with patch("requests.post", return_value=Response()):
         with pytest.raises(Exception, match="Response is not JSON"):
-            data_collector.access_token_from_offline_token("offline_token")
+            data_collector.access_token_from_offline_token(
+                "offline_token", "ingress_env", 10
+            )

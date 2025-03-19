@@ -3,7 +3,7 @@
 import logging
 import os
 import re
-from typing import Any, Literal, Optional, Self
+from typing import Any, Optional, Self
 
 from pydantic import (
     AnyHttpUrl,
@@ -1159,16 +1159,15 @@ class UserDataCollectorConfig(BaseModel):
     log_level: int = logging.INFO
     collection_interval: int = 2 * 60 * 60  # 2 hours
     run_without_initial_wait: bool = False
-    ingress_env: Literal["stage", "prod"] = "prod"
+    ingress_url: AnyHttpUrl = AnyHttpUrl(constants.DEFAULT_INGRESS_URL)
     cp_offline_token: Optional[str] = None
     initial_wait: int = 60 * 5  # 5 minutes in seconds
     ingress_timeout: int = 30
     ingress_base_delay: int = 60  # exponential backoff parameter
     ingress_max_retries: int = 3  # exponential backoff parameter
     access_token_generation_timeout: int = 5
-    user_agent: str = (
-        "openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}"
-    )
+    user_agent: str
+    user_data_max_size: int = 100 * 1024 * 1024  # 100 MiB
 
     def __init__(self, **data: Any) -> None:
         """Initialize configuration."""
@@ -1177,18 +1176,6 @@ class UserDataCollectorConfig(BaseModel):
         if "log_level" in data:
             data["log_level"] = checks.get_log_level(data["log_level"])
         super().__init__(**data)
-
-    @model_validator(mode="after")
-    def validate_token_is_set_when_needed(self) -> Self:
-        """Check that cp_offline_token is set when env is stage."""
-        if self.ingress_env == "stage" and self.cp_offline_token is None:
-            raise ValueError("cp_offline_token is required in stage environment")
-        if "{cluster_id}" not in self.user_agent:
-            raise ValueError(
-                "user_agent must contain a {cluster_id} substring, "
-                "as a placeholder for k8s cluster ID"
-            )
-        return self
 
 
 class Config(BaseModel):
@@ -1225,9 +1212,13 @@ class Config(BaseModel):
             )
         # Always initialize dev config, even if there's no config for it.
         self.dev_config = DevConfig(**data.get("dev_config", {}))
-        self.user_data_collector_config = UserDataCollectorConfig(
-            **data.get("user_data_collector_config", {})
-        )
+        if not (
+            self.ols_config.user_data_collection.feedback_disabled
+            and self.ols_config.user_data_collection.transcripts_disabled
+        ):
+            self.user_data_collector_config = UserDataCollectorConfig(
+                **data.get("user_data_collector_config", {})
+            )
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
