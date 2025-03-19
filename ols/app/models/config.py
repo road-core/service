@@ -1160,7 +1160,7 @@ class UserDataCollectorConfig(BaseModel):
     log_level: int = logging.INFO
     collection_interval: int = 2 * 60 * 60  # 2 hours
     run_without_initial_wait: bool = False
-    ingress_url: AnyHttpUrl = constants.DEFAULT_INGRESS_URL
+    ingress_url: AnyHttpUrl = AnyHttpUrl(constants.DEFAULT_INGRESS_URL)
     cp_offline_token: Optional[str] = None
     initial_wait: int = 60 * 5  # 5 minutes in seconds
     ingress_timeout: int = 30
