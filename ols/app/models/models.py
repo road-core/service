@@ -144,12 +144,12 @@ class ReferencedDocument:
     """RAG referenced document.
 
     Attributes:
-    docs_url: URL of the corresponding OCP documentation page
-    title: Title of the corresponding OCP documentation page
+    doc_url: URL of the corresponding OCP documentation page
+    doc_title: Title of the corresponding OCP documentation page
     """
 
-    docs_url: str
-    title: str
+    doc_url: str
+    doc_title: str
 
     @staticmethod
     def from_rag_chunks(rag_chunks: list["RagChunk"]) -> list["ReferencedDocument"]:
