@@ -20,7 +20,7 @@ def mock_data_collector_config(tmp_path):
     """Mock UserDataCollectorConfig file with valid path."""
     udc_config = UserDataCollectorConfig(
         user_agent="openshift-lightspeed-operator/user-data-collection cluster/{cluster_id}",
-        ingress_url="https://sso.redhat.com/",
+        ingress_url="https://example.ingress.com/upload",
     )
     udc_config.data_storage = pathlib.Path(tmp_path)
     return udc_config
