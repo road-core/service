@@ -502,8 +502,8 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 - `minTLSVersion` can be set to: VersionTLS10, VersionTLS11, VersionTLS12, or VersionTLS13
 - `ciphers` is list of enabled ciphers. The values are not checked.
 
-Please look into `examples` folder that contains `olsconfig.yaml` with filled-in TLS security profile for the service.
-Additionally the TLS security profile can be set for any configured provider. In this case the `tlsSecurityProfile` needs to be added into the `olsconfig.yaml` file into `llm_providers/{selected_provider}` section. For example:
+Please look into `examples` folder that contains `rcsconfig.yaml` with filled-in TLS security profile for the service.
+Additionally the TLS security profile can be set for any configured provider. In this case the `tlsSecurityProfile` needs to be added into the `rcsconfig.yaml` file into `llm_providers/{selected_provider}` section. For example:
 
 ```
 llm_providers:

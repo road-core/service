@@ -36,7 +36,7 @@ EVAL_MODES = {
 }
 
 DEFAULT_QNA_FILE = "question_answer_pair.json"
-DEFAULT_CONFIG_FILE = "olsconfig.yaml"
+DEFAULT_CONFIG_FILE = "rcsconfig.yaml"
 
 DEFAULT_INPUT_DIR = "eval_data"
 DEFAULT_RESULT_DIR = "eval_result"
