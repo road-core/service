@@ -199,9 +199,9 @@ class LLMResponse(BaseModel):
                     "response": "Operator Lifecycle Manager (OLM) helps users install...",
                     "referenced_documents": [
                         {
-                            "docs_url": "https://docs.openshift.com/container-platform/4.15/operators/"
+                            "doc_url": "https://docs.openshift.com/container-platform/4.15/operators/"
                             "understanding/olm/olm-understanding-olm.html",
-                            "title": "Operator Lifecycle Manager concepts and resources",
+                            "doc_title": "Operator Lifecycle Manager concepts and resources",
                         },
                     ],
                     "truncated": False,
