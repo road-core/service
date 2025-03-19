@@ -237,3 +237,6 @@ class VectorStoreType(StrEnum):
 # quota limiters constants
 USER_QUOTA_LIMITER = "user_limiter"
 CLUSTER_QUOTA_LIMITER = "cluster_limiter"
+
+# URL for data collector ingress endpoint
+DEFAULT_INGRESS_URL = "https://console.redhat.com/api/ingress/v1/upload"
