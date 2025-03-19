@@ -176,7 +176,7 @@ def upload_data_to_ingress(
     logger.info("sending collected data")
     payload = {
         "file": (
-            "ols.tgz",
+            "rcs.tgz",
             tarball.read(),
             "application/vnd.redhat.openshift.periodic+tar",
         ),
