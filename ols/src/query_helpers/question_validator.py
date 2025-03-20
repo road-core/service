@@ -3,9 +3,6 @@
 import logging
 from typing import Any
 
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.constants import SUBJECT_REJECTED, GenericLLMParameters
@@ -53,10 +50,9 @@ class QuestionValidator(QueryHelper):
         )
         logger.info("%s call settings: %s", conversation_id, settings_string)
 
-        prompt_instructions = PromptTemplate.from_template(
-            prompts.QUESTION_VALIDATOR_PROMPT_TEMPLATE
+        prompt_instructions = prompts.QUESTION_VALIDATOR_PROMPT_TEMPLATE.replace(
+            "{query}", query
         )
-
         bare_llm = self.llm_loader(
             self.provider, self.model, self.generic_llm_params, self.streaming
         )
@@ -70,12 +66,6 @@ class QuestionValidator(QueryHelper):
             query, model_config.context_window_size, self.max_tokens_for_response
         )
 
-        llm_chain = LLMChain(
-            llm=bare_llm,
-            prompt=prompt_instructions,
-            verbose=verbose,
-        )
-
         logger.debug("%s validating user query: %s", conversation_id, query)
 
         with TokenMetricUpdater(
@@ -83,10 +73,10 @@ class QuestionValidator(QueryHelper):
             provider=provider_config.type,
             model=self.model,
         ) as generic_token_counter:
-            response = llm_chain.invoke(
-                input={"query": query}, config={"callbacks": [generic_token_counter]}
+            response = bare_llm.invoke(
+                input=prompt_instructions, config={"callbacks": [generic_token_counter]}
             )
-        clean_response = str(response["text"]).strip()
+        clean_response = response.strip()
 
         logger.debug(
             "%s query validation response: %s", conversation_id, clean_response
