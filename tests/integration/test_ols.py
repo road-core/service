@@ -146,16 +146,18 @@ def test_post_question_on_generic_response_type_summarize_error(_setup, endpoint
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_that_is_not_validated(_setup, endpoint):
     """Check the REST API query endpoints for question that is not validated."""
     # let's pretend the question can not be validated
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=Exception("can not validate"),
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=Exception("can not validate"),
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         conversation_id = suid.get_suid()
         response = pytest.client.post(
@@ -242,10 +244,6 @@ def test_unknown_provider_in_post(_setup, endpoint):
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_unsupported_model_in_post(_setup, endpoint):
     """Check the REST API query endpoints with POST method when unsupported model is requested."""
     test_provider = "test-provider"
@@ -253,24 +251,28 @@ def test_unsupported_model_in_post(_setup, endpoint):
     provider_config.models = {}  # no models configured
     config.llm_config.providers = {test_provider: provider_config}
 
-    response = pytest.client.post(
-        endpoint,
-        json={
-            "query": "hello?",
-            "provider": test_provider,
-            "model": "some-model",
-        },
-    )
+    with patch(
+        "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+        constants.QueryValidationMethod.LLM,
+    ):
+        response = pytest.client.post(
+            endpoint,
+            json={
+                "query": "hello?",
+                "provider": test_provider,
+                "model": "some-model",
+            },
+        )
 
-    assert response.status_code == requests.codes.unprocessable
-    expected_json = {
-        "detail": {
-            "cause": "Model 'some-model' is not a valid model for "
-            "provider 'test-provider'. Valid models are: []",
-            "response": "Unable to process this request",
+        assert response.status_code == requests.codes.unprocessable
+        expected_json = {
+            "detail": {
+                "cause": "Model 'some-model' is not a valid model for "
+                "provider 'test-provider'. Valid models are: []",
+                "response": "Unable to process this request",
+            }
         }
-    }
-    assert response.json() == expected_json
+        assert response.json() == expected_json
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
@@ -332,12 +334,7 @@ def test_post_question_on_noyaml_response_type(_setup, endpoint) -> None:
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.KEYWORD,
-)
-@patch("ols.app.endpoints.ols.QuestionValidator.validate_question")
-def test_post_question_with_keyword(mock_llm_validation, _setup, endpoint) -> None:
+def test_post_question_with_keyword(_setup, endpoint) -> None:
     """Check the REST API /v1/query with keyword validation."""
     query = "What is Openshift ?"
 
@@ -355,6 +352,13 @@ def test_post_question_with_keyword(mock_llm_validation, _setup, endpoint) -> No
             "ols.src.query_helpers.topic_summarizer.LLMChain",
             new=mock_llm_chain(None),
         ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.KEYWORD,
+        ),
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question"
+        ) as mock_llm_validation,
     ):
         conversation_id = suid.get_suid()
         response = pytest.client.post(
@@ -514,10 +518,6 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_without_attachments(_setup, endpoint) -> None:
     """Check the REST API query endpoints without attachments."""
     answer = True
@@ -529,9 +529,15 @@ def test_post_question_without_attachments(_setup, endpoint) -> None:
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -561,10 +567,6 @@ def test_post_question_without_attachments(_setup, endpoint) -> None:
 
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 @pytest.mark.attachment
 def test_post_question_with_empty_list_of_attachments(_setup, endpoint) -> None:
     """Check the REST API query endpoints with empty list of attachments."""
@@ -577,9 +579,15 @@ def test_post_question_with_empty_list_of_attachments(_setup, endpoint) -> None:
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -611,10 +619,6 @@ def test_post_question_with_empty_list_of_attachments(_setup, endpoint) -> None:
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
 @pytest.mark.attachment
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_with_one_plaintext_attachment(_setup, endpoint) -> None:
     """Check the REST API query endpoints with one attachment."""
     answer = True
@@ -626,9 +630,15 @@ def test_post_question_with_one_plaintext_attachment(_setup, endpoint) -> None:
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -673,10 +683,6 @@ this is attachment
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
 @pytest.mark.attachment
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_with_one_yaml_attachment(_setup, endpoint) -> None:
     """Check the REST API query endpoints with YAML attachment."""
     answer = True
@@ -688,9 +694,15 @@ def test_post_question_with_one_yaml_attachment(_setup, endpoint) -> None:
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -744,10 +756,6 @@ metadata:
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
 @pytest.mark.attachment
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_with_two_yaml_attachments(_setup, endpoint) -> None:
     """Check the REST API query endpoints with two YAML attachments."""
     answer = True
@@ -759,9 +767,15 @@ def test_post_question_with_two_yaml_attachments(_setup, endpoint) -> None:
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -835,10 +849,6 @@ metadata:
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
 @pytest.mark.attachment
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_with_one_yaml_without_kind_attachment(_setup, endpoint) -> None:
     """Check the REST API query endpoints with one YAML without kind attachment."""
     answer = True
@@ -850,9 +860,15 @@ def test_post_question_with_one_yaml_without_kind_attachment(_setup, endpoint) -
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -904,10 +920,6 @@ metadata:
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
 @pytest.mark.attachment
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_with_one_yaml_without_name_attachment(_setup, endpoint) -> None:
     """Check the REST API query endpoints with one YAML without name attachment."""
     answer = True
@@ -919,9 +931,15 @@ def test_post_question_with_one_yaml_without_name_attachment(_setup, endpoint) -
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -975,10 +993,6 @@ metadata:
 
 @pytest.mark.parametrize("endpoint", ("/v1/query", "/v1/streaming_query"))
 @pytest.mark.attachment
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_question_with_one_invalid_yaml_attachment(_setup, endpoint) -> None:
     """Check the REST API query endpoints with one invalid YAML attachment."""
     answer = True
@@ -990,9 +1004,15 @@ def test_post_question_with_one_invalid_yaml_attachment(_setup, endpoint) -> Non
         query_passed = query
         return answer
 
-    with patch(
-        "ols.app.endpoints.ols.QuestionValidator.validate_question",
-        side_effect=validate_question,
+    with (
+        patch(
+            "ols.app.endpoints.ols.QuestionValidator.validate_question",
+            side_effect=validate_question,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
     ):
         ml = mock_langchain_interface("test response")
         with (
@@ -1175,40 +1195,43 @@ def _post_with_system_prompt_override(_setup, caplog, query, system_prompt):
     assert response.status_code == requests.codes.ok
 
 
-@patch(
-    "ols.app.endpoints.ols.config.dev_config.enable_system_prompt_override",
-    True,
-)
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_with_system_prompt_override(_setup, caplog):
     """Check the POST /v1/query API with a system prompt."""
     query = "test query"
     system_prompt = "You are an expert in something marvelous."
 
-    _post_with_system_prompt_override(_setup, caplog, query, system_prompt)
+    with (
+        patch(
+            "ols.app.endpoints.ols.config.dev_config.enable_system_prompt_override",
+            True,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
+    ):
+        _post_with_system_prompt_override(_setup, caplog, query, system_prompt)
 
     # Specified system prompt should appear three times in query_helper debug log outputs.
     # One is from question_validator, one is from docs_summarizer, another is from topic_summarizer.
     assert caplog.text.count("System prompt: " + system_prompt) == 3
 
 
-@patch(
-    "ols.app.endpoints.ols.config.dev_config.enable_system_prompt_override",
-    False,
-)
-@patch(
-    "ols.app.endpoints.ols.config.ols_config.query_validation_method",
-    constants.QueryValidationMethod.LLM,
-)
 def test_post_with_system_prompt_override_disabled(_setup, caplog):
     """Check the POST /v1/query API with a system prompt when overriding is disabled."""
     query = "test query"
     system_prompt = "You are an expert in something marvelous."
-
-    _post_with_system_prompt_override(_setup, caplog, query, system_prompt)
+    with (
+        patch(
+            "ols.app.endpoints.ols.config.dev_config.enable_system_prompt_override",
+            False,
+        ),
+        patch(
+            "ols.app.endpoints.ols.config.ols_config.query_validation_method",
+            constants.QueryValidationMethod.LLM,
+        ),
+    ):
+        _post_with_system_prompt_override(_setup, caplog, query, system_prompt)
 
     # Specified system prompt should NOT appear in query_helper debug log outputs
     # as enable_system_prompt_override is set to False.
