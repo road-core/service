@@ -19,6 +19,7 @@ def mock_llm_chain(retval):
             with patch("ols.src.query_helpers.question_validator.LLMChain", new=ml):
                 some test steps
 
+        None: it is better to use context manager to patch LLMChain, compared to `patch` decorator
         """
 
         def __init__(self, *args, **kwargs):
