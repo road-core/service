@@ -438,39 +438,42 @@ def mocked_token_cache():
     return MockedTokenCache
 
 
-@patch(
-    "ols.src.llms.providers.azure_openai.ClientSecretCredential", new=MockedCredential
-)
 def test_retrieve_access_token(provider_config_access_token_related_parameters):
     """Test that access token is being retrieved."""
-    azure_openai = AzureOpenAI(
-        model="uber-model",
-        params={},
-        provider_config=provider_config_access_token_related_parameters,
-    )
-    assert "api_key" not in azure_openai.default_params
-    assert (
-        azure_openai.default_params["azure_ad_token"]
-        == "this-is-access-token"  # noqa: S105
-    )
+    with patch(
+        "ols.src.llms.providers.azure_openai.ClientSecretCredential",
+        new=MockedCredential,
+    ):
+        azure_openai = AzureOpenAI(
+            model="uber-model",
+            params={},
+            provider_config=provider_config_access_token_related_parameters,
+        )
+        assert "api_key" not in azure_openai.default_params
+        assert (
+            azure_openai.default_params["azure_ad_token"]
+            == "this-is-access-token"  # noqa: S105
+        )
 
 
-@patch(
-    "ols.src.llms.providers.azure_openai.ClientSecretCredential",
-    new=MockedCredentialThrowingException,
-)
-@patch("ols.src.llms.providers.azure_openai.TokenCache.expires_on", new=0)
 def test_retrieve_access_token_on_error(
     provider_config_access_token_related_parameters,
 ):
     """Test how error is handled during accessing token."""
-    azure_openai = AzureOpenAI(
-        model="uber-model",
-        params={},
-        provider_config=provider_config_access_token_related_parameters,
-    )
-    assert "api_key" not in azure_openai.default_params
-    assert azure_openai.default_params["azure_ad_token"] is None
+    with (
+        patch(
+            "ols.src.llms.providers.azure_openai.ClientSecretCredential",
+            new=MockedCredentialThrowingException,
+        ),
+        patch("ols.src.llms.providers.azure_openai.TokenCache.expires_on", new=0),
+    ):
+        azure_openai = AzureOpenAI(
+            model="uber-model",
+            params={},
+            provider_config=provider_config_access_token_related_parameters,
+        )
+        assert "api_key" not in azure_openai.default_params
+        assert azure_openai.default_params["azure_ad_token"] is None
 
 
 def test_token_is_expired():
