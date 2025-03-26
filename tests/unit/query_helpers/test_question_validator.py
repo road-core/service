@@ -63,7 +63,6 @@ def test_passing_parameters():
     )
 
 
-@patch("ols.src.query_helpers.question_validator.LLMChain", new=mock_llm_chain(None))
 def test_validate_question_llm_loader():
     """Test that LLM is loaded within validate_question method with proper parameters."""
     # it is needed to initialize configuration in order to be able
@@ -85,8 +84,11 @@ def test_validate_question_llm_loader():
     # check that LLM loader was called with expected parameters
     question_validator = QuestionValidator(llm_loader=llm_loader)
 
-    # just run the validation, we just need to check parameters passed to LLM
-    # that is performed in mock object
-    question_validator.validate_question(
-        "123e4567-e89b-12d3-a456-426614174000", "query"
-    )
+    with patch(
+        "ols.src.query_helpers.question_validator.LLMChain", new=mock_llm_chain(None)
+    ):
+        # just run the validation, we just need to check parameters passed to LLM
+        # that is performed in mock object
+        question_validator.validate_question(
+            "123e4567-e89b-12d3-a456-426614174000", "query"
+        )

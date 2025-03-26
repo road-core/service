@@ -54,7 +54,6 @@ def test_prepare_llm():
     assert summarizer.bare_llm is not None
 
 
-@patch("ols.src.query_helpers.topic_summarizer.LLMChain", new=mock_llm_chain(None))
 def test_summarize_topic():
     """Test the summarize_topic method with mocked LLM chain."""
     config.reload_from_yaml_file("tests/config/valid_config.yaml")
@@ -73,15 +72,15 @@ def test_summarize_topic():
         assert response == expected_response
 
 
-@patch("ols.customize.prompts.TOPIC_SUMMARY_PROMPT_TEMPLATE", "")
 def test_skip_summarize_topic():
     """Test topic summarizer is skipped when TOPIC_SUMMARY_PROMPT_TEMPLATE is not set."""
     config.reload_from_yaml_file("tests/config/valid_config.yaml")
 
-    summarizer = TopicSummarizer(llm_loader=mock_llm_loader(None))
-    response = summarizer.summarize_topic(
-        "123e4567-e89b-12d3-a456-426614174000",
-        "What are the latest developments in artificial intelligence?",
-    )
+    with patch("ols.customize.prompts.TOPIC_SUMMARY_PROMPT_TEMPLATE", ""):
+        summarizer = TopicSummarizer(llm_loader=mock_llm_loader(None))
+        response = summarizer.summarize_topic(
+            "123e4567-e89b-12d3-a456-426614174000",
+            "What are the latest developments in artificial intelligence?",
+        )
 
-    assert response == ""
+        assert response == ""
