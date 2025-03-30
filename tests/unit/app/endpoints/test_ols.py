@@ -1299,3 +1299,18 @@ def test_check_token_available_on_exceed_error():
     )
     with pytest.raises(HTTPException, match=expected):
         ols.check_tokens_available(quota_limiters, user_id)
+
+
+def test_check_token_available_configured_quota_limiter():
+    """Test the function check_tokens_available if one quota limiter is configured."""
+
+    class MockQuotaLimiter:
+        def ensure_available_quota(self, subject_id=""):
+            self._subject_id = subject_id
+
+    mock_quota_limiter = MockQuotaLimiter()
+    quota_limiters = [mock_quota_limiter]
+    user_id = "user_id"
+
+    ols.check_tokens_available(quota_limiters, user_id)
+    assert mock_quota_limiter._subject_id == user_id
