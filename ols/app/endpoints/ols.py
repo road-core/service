@@ -91,7 +91,6 @@ def conversation_request(
     Returns:
         Response containing the processed information.
     """
-    # processed_request = process_request(auth, llm_request, disable_model_check)
     processed_request = process_request(auth, llm_request)
 
     summarizer_response: SummarizerResponse | Generator
@@ -239,13 +238,12 @@ def consume_tokens(
             )
 
 
-def process_request(auth: Any, llm_request: LLMRequest, disable_model_check = constants.DISABLE_MODEL_CHECK) -> ProcessedRequest:
+def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
     """Process incoming request.
 
     Args:
         auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
         llm_request: The request containing a query, conversation ID, and optional attachments.
-        disable_model_check: The model check should be disabled when query from llm server.
 
     Returns:
         Tuple containing the processed information.
