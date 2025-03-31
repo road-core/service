@@ -19,7 +19,6 @@ from ols.app.endpoints.ols import (
     consume_tokens,
     generate_response,
     get_available_quotas,
-    # get_disable_model_check,
     get_topic_summary,
     log_processing_durations,
     process_request,
@@ -49,8 +48,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["streaming_query"])
 auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
-
-# disable_model_check = get_disable_model_check(config.ols_config)
 
 query_responses: dict[int | str, dict[str, Any]] = {
     200: {

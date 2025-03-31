@@ -51,15 +51,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["query"])
 auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
 
-# def get_disable_model_check(ols_config: OLSConfig) -> bool:
-#     """Return True if model check is set to be disabled when query from llm server."""
-#     if ols_config is None or ols_config.disable_model_check is None:
-#         return constants.DISABLE_MODEL_CHECK  # return default value False
-
-#     return ols_config.disable_model_check
-
-# disable_model_check = get_disable_model_check(config.ols_config)
-
 query_responses: dict[int | str, dict[str, Any]] = {
     200: {
         "description": "Query is valid and correct response from LLM is returned",
