@@ -15,7 +15,6 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
 from ols.app import metrics
-from ols.app.models.config import OLSConfig
 from ols.app.models.models import (
     Attachment,
     CacheEntry,
@@ -293,7 +292,6 @@ def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
     llm_request.query = append_attachments_to_query(llm_request.query, attachments)
     timestamps["append attachments"] = time.time()
 
-    # if not disable_model_check:
     validate_requested_provider_model(llm_request)
 
     check_tokens_available(config.quota_limiters, user_id)
