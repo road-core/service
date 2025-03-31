@@ -77,7 +77,6 @@ def test_validate_question_llm_loader():
             "p1",
             "m1",
             {GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: 4},
-            False,
         ),
     )
 
