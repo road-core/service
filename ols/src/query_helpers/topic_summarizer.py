@@ -8,7 +8,7 @@ from langchain.prompts import PromptTemplate
 
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
-from ols.constants import GenericLLMParameters
+from ols.constants import DUMMY_MODEL_NAME, GenericLLMParameters
 from ols.customize import prompts
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
@@ -31,8 +31,10 @@ class TopicSummarizer(QueryHelper):
         """Prepare the LLM configuration."""
         self.provider_config = config.llm_config.providers.get(self.provider)
         self.model_config = self.provider_config.models.get(self.model)
+        if self.provider_config.disable_model_check and self.model_config is None:
+            self.model_config = self.provider_config.models.get(DUMMY_MODEL_NAME)
         self.generic_llm_params = {
-            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response  # noqa: E501
+            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response # noqa: E501
         }
         self.bare_llm = self.llm_loader(
             self.provider, self.model, self.generic_llm_params
@@ -73,9 +75,8 @@ class TopicSummarizer(QueryHelper):
         # without care about the return value. This is to ensure that
         # the query is within the token limit.
         provider_config = config.llm_config.providers.get(self.provider)
-        model_config = provider_config.models.get(self.model)
         TokenHandler().calculate_and_check_available_tokens(
-            query, model_config.context_window_size, self.max_tokens_for_response
+            query,  self.model_config.context_window_size, self.max_tokens_for_response
         )
 
         llm_chain = LLMChain(

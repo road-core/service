@@ -15,6 +15,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
 from ols.app import metrics
+from ols.app.models.config import OLSConfig
 from ols.app.models.models import (
     Attachment,
     CacheEntry,
@@ -49,6 +50,15 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["query"])
 auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
+
+# def get_disable_model_check(ols_config: OLSConfig) -> bool:
+#     """Return True if model check is set to be disabled when query from llm server."""
+#     if ols_config is None or ols_config.disable_model_check is None:
+#         return constants.DISABLE_MODEL_CHECK  # return default value False
+
+#     return ols_config.disable_model_check
+
+# disable_model_check = get_disable_model_check(config.ols_config)
 
 query_responses: dict[int | str, dict[str, Any]] = {
     200: {
@@ -90,6 +100,7 @@ def conversation_request(
     Returns:
         Response containing the processed information.
     """
+    # processed_request = process_request(auth, llm_request, disable_model_check)
     processed_request = process_request(auth, llm_request)
 
     summarizer_response: SummarizerResponse | Generator
@@ -237,12 +248,13 @@ def consume_tokens(
             )
 
 
-def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
+def process_request(auth: Any, llm_request: LLMRequest, disable_model_check = constants.DISABLE_MODEL_CHECK) -> ProcessedRequest:
     """Process incoming request.
 
     Args:
         auth: The Authentication handler (FastAPI Depends) that will handle authentication Logic.
         llm_request: The request containing a query, conversation ID, and optional attachments.
+        disable_model_check: The model check should be disabled when query from llm server.
 
     Returns:
         Tuple containing the processed information.
@@ -292,6 +304,7 @@ def process_request(auth: Any, llm_request: LLMRequest) -> ProcessedRequest:
     llm_request.query = append_attachments_to_query(llm_request.query, attachments)
     timestamps["append attachments"] = time.time()
 
+    # if not disable_model_check:
     validate_requested_provider_model(llm_request)
 
     check_tokens_available(config.quota_limiters, user_id)

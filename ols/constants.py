@@ -40,6 +40,7 @@ SUPPORTED_PROVIDER_TYPES = frozenset(
 )
 DEFAULT_AZURE_API_VERSION = "2024-02-15-preview"
 
+DISABLE_MODEL_CHECK = False
 
 # models
 class ModelFamily(StrEnum):
@@ -240,3 +241,6 @@ CLUSTER_QUOTA_LIMITER = "cluster_limiter"
 
 # URL for data collector ingress endpoint
 DEFAULT_INGRESS_URL = "https://console.redhat.com/api/ingress/v1/upload"
+
+# a dummy model name to set model config if model list is not provided
+DUMMY_MODEL_NAME = "dummy-model-name"
