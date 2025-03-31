@@ -58,7 +58,7 @@ class QuestionValidator(QueryHelper):
         )
 
         bare_llm = self.llm_loader(
-            self.provider, self.model, self.generic_llm_params, self.streaming
+            self.provider, self.model, self.generic_llm_params
         )
 
         # Tokens-check: We trigger the computation of the token count
