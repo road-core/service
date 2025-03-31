@@ -35,7 +35,7 @@ class TopicSummarizer(QueryHelper):
             GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response  # noqa: E501
         }
         self.bare_llm = self.llm_loader(
-            self.provider, self.model, self.generic_llm_params, self.streaming
+            self.provider, self.model, self.generic_llm_params
         )
 
     def summarize_topic(self, conversation_id: str, query: str) -> str:
@@ -67,9 +67,7 @@ class TopicSummarizer(QueryHelper):
             prompts.TOPIC_SUMMARY_PROMPT_TEMPLATE
         )
 
-        bare_llm = self.llm_loader(
-            self.provider, self.model, self.generic_llm_params, self.streaming
-        )
+        bare_llm = self.llm_loader(self.provider, self.model, self.generic_llm_params)
 
         # Tokens-check: We trigger the computation of the token count
         # without care about the return value. This is to ensure that
