@@ -3,6 +3,7 @@
 from unittest.mock import patch
 
 import pytest
+from langchain_core.messages import AIMessage
 
 from ols import config
 from ols.constants import GenericLLMParameters
@@ -14,7 +15,6 @@ from ols.src.query_helpers.question_validator import (  # noqa: E402
     QueryHelper,
     QuestionValidator,
 )
-from tests.mock_classes.mock_llm_chain import mock_llm_chain  # noqa: E402
 from tests.mock_classes.mock_llm_loader import mock_llm_loader  # noqa: E402
 
 
@@ -84,8 +84,9 @@ def test_validate_question_llm_loader():
     question_validator = QuestionValidator(llm_loader=llm_loader)
 
     with patch(
-        "ols.src.query_helpers.question_validator.LLMChain", new=mock_llm_chain(None)
-    ):
+        "ols.src.query_helpers.question_validator.QuestionValidator._invoke_llm"
+    ) as mock_invoke:
+        mock_invoke.return_value = AIMessage(content="REJECTED")
         # just run the validation, we just need to check parameters passed to LLM
         # that is performed in mock object
         question_validator.validate_question(

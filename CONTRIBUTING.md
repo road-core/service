@@ -228,8 +228,7 @@ It is possible to use patching inside the test implementation as a context manag
 
 ```python
 def test_xyz():
-    ml = mock_llm_chain({"text": retval})
-    with patch("ols.src.query_helpers.question_validator.LLMChain", new=ml):
+    with patch("ols.config", new=Mock()):
         ...
         ...
         ...
