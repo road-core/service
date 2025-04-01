@@ -1,7 +1,7 @@
-"""FastAPI endpoint for the OLS streaming query.
+"""FastAPI endpoint for manipulation with converstation history.
 
-This module defines the endpoint and supporting functions for handling
-streaming queries.
+This module defines endpoints and supporting functions for handling
+converstation history (read, delete).
 """
 
 import logging
