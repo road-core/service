@@ -337,7 +337,10 @@ class ProviderConfig(BaseModel):
             # resolution based on the specific provider
             m["provider"] = self.type
             model = ModelConfig(**m)
-            self.models[m["name"]] = model
+            if self.models is not None:
+                self.models[m["name"]] = model
+            else:
+                self.models = {m["name"]: model}
 
     def set_provider_specific_configuration(self, data: dict) -> None:  # noqa: C901
         """Set the provider-specific configuration."""
