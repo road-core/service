@@ -24,7 +24,6 @@ from tests.mock_classes.mock_langchain_interface import (  # noqa:E402
     mock_langchain_interface,
 )
 from tests.mock_classes.mock_llama_index import MockLlamaIndex  # noqa:E402
-from tests.mock_classes.mock_llm_chain import mock_llm_chain  # noqa:E402
 from tests.mock_classes.mock_llm_loader import mock_llm_loader  # noqa:E402
 
 conversation_id = suid.get_suid()
@@ -66,9 +65,6 @@ def test_summarize_empty_history():
     with (
         patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4),
         patch("ols.utils.token_handler.MINIMUM_CONTEXT_TOKEN_LIMIT", 1),
-        patch(
-            "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-        ),
     ):
         summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
         question = "What's the ultimate question with answer 42?"
@@ -83,9 +79,6 @@ def test_summarize_no_history():
     with (
         patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4),
         patch("ols.utils.token_handler.MINIMUM_CONTEXT_TOKEN_LIMIT", 3),
-        patch(
-            "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-        ),
     ):
         summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
         question = "What's the ultimate question with answer 42?"
@@ -100,9 +93,6 @@ def test_summarize_history_provided():
     with (
         patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4),
         patch("ols.utils.token_handler.MINIMUM_CONTEXT_TOKEN_LIMIT", 3),
-        patch(
-            "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-        ),
     ):
         summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
         question = "What's the ultimate question with answer 42?"
@@ -130,12 +120,7 @@ def test_summarize_history_provided():
 
 def test_summarize_truncation():
     """Basic test for DocsSummarizer to check if truncation is done."""
-    with (
-        patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4),
-        patch(
-            "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-        ),
-    ):
+    with patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4):
         summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
         question = "What's the ultimate question with answer 42?"
         rag_index = MockLlamaIndex()
@@ -150,12 +135,7 @@ def test_summarize_truncation():
 
 def test_prepare_prompt_context():
     """Basic test for DocsSummarizer to check re-structuring of context for the 'temp' prompt."""
-    with (
-        patch(
-            "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-        ),
-        patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4),
-    ):
+    with patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4):
         summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
         question = "What's the ultimate question with answer 42?"
         history = [HumanMessage("What is Kubernetes?")]
@@ -178,17 +158,14 @@ def test_prepare_prompt_context():
 
 def test_summarize_no_reference_content():
     """Basic test for DocsSummarizer using mocked index and query engine."""
-    with patch(
-        "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-    ):
-        summarizer = DocsSummarizer(
-            llm_loader=mock_llm_loader(mock_langchain_interface("test response")())
-        )
-        question = "What's the ultimate question with answer 42?"
-        summary = summarizer.create_response(question)
-        assert question in summary.response
-        assert summary.rag_chunks == []
-        assert not summary.history_truncated
+    summarizer = DocsSummarizer(
+        llm_loader=mock_llm_loader(mock_langchain_interface("test response")())
+    )
+    question = "What's the ultimate question with answer 42?"
+    summary = summarizer.create_response(question)
+    assert question in summary.response
+    assert summary.rag_chunks == []
+    assert not summary.history_truncated
 
 
 def test_summarize_reranker(caplog):
@@ -202,9 +179,6 @@ def test_summarize_reranker(caplog):
     with (
         patch("ols.utils.token_handler.RAG_SIMILARITY_CUTOFF", 0.4),
         patch("ols.utils.token_handler.MINIMUM_CONTEXT_TOKEN_LIMIT", 3),
-        patch(
-            "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-        ),
     ):
         summarizer = DocsSummarizer(llm_loader=mock_llm_loader(None))
         question = "What's the ultimate question with answer 42?"
@@ -220,18 +194,15 @@ def test_summarize_reranker(caplog):
 @pytest.mark.asyncio
 async def test_response_generator():
     """Test response generator method."""
-    with patch(
-        "ols.src.query_helpers.docs_summarizer.LLMChain", new=mock_llm_chain(None)
-    ):
-        summarizer = DocsSummarizer(
-            llm_loader=mock_llm_loader(mock_langchain_interface("test response")())
-        )
-        question = "What's the ultimate question with answer 42?"
-        summary_gen = summarizer.generate_response(question)
-        generated_content = ""
+    summarizer = DocsSummarizer(
+        llm_loader=mock_llm_loader(mock_langchain_interface("test response")())
+    )
+    question = "What's the ultimate question with answer 42?"
+    summary_gen = summarizer.generate_response(question)
+    generated_content = ""
 
-        async for item in summary_gen:
-            if isinstance(item, str):
-                generated_content += item
+    async for item in summary_gen:
+        if isinstance(item, str):
+            generated_content += item
 
-        assert generated_content == question
+    assert generated_content == question
