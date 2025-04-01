@@ -329,8 +329,7 @@ class ProviderConfig(BaseModel):
                 raise checks.InvalidConfigurationError(
                     f"no models configured for provider {data['name']}"
                 )
-            else: 
-                data["models"] = [{"name": DUMMY_MODEL_NAME},]
+            data["models"] = [{"name": DUMMY_MODEL_NAME},]
         for m in data["models"]:
             if "name" not in m:
                 raise checks.InvalidConfigurationError("model name is missing")

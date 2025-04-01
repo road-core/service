@@ -11,7 +11,7 @@ from llama_index.core import VectorStoreIndex
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import RagChunk, SummarizerResponse
-from ols.constants import DEFAULT_MAX_TOKENS_FOR_RESPONSE, DUMMY_MODEL_NAME, RAG_CONTENT_LIMIT, GenericLLMParameters
+from ols.constants import DUMMY_MODEL_NAME, RAG_CONTENT_LIMIT, GenericLLMParameters
 from ols.customize import reranker
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
