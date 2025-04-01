@@ -32,10 +32,9 @@ def test_load_non_existent_config():
 
 def test_no_model_config():
     """Test how loading of config without model defined is handled."""
-    with pytest.raises(
-        InvalidConfigurationError, match="no models configured"
-    ):
+    with pytest.raises(InvalidConfigurationError, match="no models configured"):
         config.reload_from_yaml_file("tests/config/invalid_config_no_models.yaml")
+
 
 def test_no_model_config_with_disable_model_check():
     """Test how loading of config without model defined and with model check disabled is handled."""

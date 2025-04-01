@@ -42,6 +42,7 @@ DEFAULT_AZURE_API_VERSION = "2024-02-15-preview"
 
 DISABLE_MODEL_CHECK = False
 
+
 # models
 class ModelFamily(StrEnum):
     """Different LLM models family/group."""

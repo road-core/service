@@ -40,7 +40,7 @@ class DocsSummarizer(QueryHelper):
         if self.provider_config.disable_model_check and self.model_config is None:
             self.model_config = self.provider_config.models.get(DUMMY_MODEL_NAME)
         self.generic_llm_params = {
-            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response # noqa: E501
+            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response  # noqa: E501
         }
         self.bare_llm = self.llm_loader(
             self.provider, self.model, self.generic_llm_params

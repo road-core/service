@@ -57,6 +57,7 @@ def test_model_config_missing_error():
     with pytest.raises(ModelConfigMissingError, match=message):
         load_llm(provider="bam", model="bla")
 
+
 def test_unsupported_provider_error():
     """Test raise when provider is not in the registry (not implemented)."""
     providers = LLMProviders(
@@ -89,6 +90,7 @@ def test_load_llm():
         llm = load_llm(provider="fake-provider", model="model")
         assert llm == "fake_llm"
 
+
 @pytest.mark.usefixtures("_registered_fake_provider")
 def test_model_config_disable_model_check():
     """Test should not raise when model check is disabled with an unknown model."""
@@ -105,6 +107,7 @@ def test_model_config_disable_model_check():
         )
         config.config.llm_providers = providers
         load_llm(provider="fake-provider", model="bla")
+
 
 def test_load_llm_no_provider_config():
     """Test load_llm function."""
