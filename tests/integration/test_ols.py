@@ -9,7 +9,11 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage, HumanMessage
 
 from ols import config, constants
-from ols.app.models.config import LoggingConfig, ProviderConfig, QueryFilter
+from ols.app.models.config import (
+    LoggingConfig,
+    ProviderConfig,
+    QueryFilter,
+)
 from ols.customize import prompts
 from ols.utils import suid
 from ols.utils.errors_parsing import DEFAULT_ERROR_MESSAGE, DEFAULT_STATUS_CODE
@@ -235,7 +239,8 @@ def test_unknown_provider_in_post(_setup, endpoint):
     assert response.status_code == requests.codes.unprocessable
     expected_json = {
         "detail": {
-            "cause": "Provider 'some-provider' is not a valid provider. Valid providers are: []",
+            "cause": "Provider 'some-provider' is not a valid provider. "
+            "Valid providers are: []",
             "response": "Unable to process this request",
         }
     }
