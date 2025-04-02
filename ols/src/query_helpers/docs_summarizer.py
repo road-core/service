@@ -192,8 +192,6 @@ class DocsSummarizer(QueryHelper):
 
                 # openai returns an `AIMessageChunk` while Watsonx plain string
                 chunk_content = chunk.content if hasattr(chunk, "content") else chunk
-                if "<|endoftext|>" in chunk_content:
-                    chunk_content = chunk_content.replace("<|endoftext|>", "")
                 yield chunk_content
 
         yield SummarizerResponse("", rag_chunks, truncated, generic_token_counter.token_counter)  # type: ignore[misc]
