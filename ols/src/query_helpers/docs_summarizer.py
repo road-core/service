@@ -11,7 +11,7 @@ from llama_index.core import VectorStoreIndex
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.models import RagChunk, SummarizerResponse
-from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
+from ols.constants import DUMMY_MODEL_NAME, RAG_CONTENT_LIMIT, GenericLLMParameters
 from ols.customize import reranker
 from ols.src.prompts.prompt_generator import (
     GeneratePrompt,
@@ -37,6 +37,8 @@ class DocsSummarizer(QueryHelper):
         """Prepare the LLM configuration."""
         self.provider_config = config.llm_config.providers.get(self.provider)
         self.model_config = self.provider_config.models.get(self.model)
+        if self.provider_config.disable_model_check and self.model_config is None:
+            self.model_config = self.provider_config.models.get(DUMMY_MODEL_NAME)
         self.generic_llm_params = {
             GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response  # noqa: E501
         }

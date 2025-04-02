@@ -42,12 +42,12 @@ def resolve_provider_config(
         )
 
     provider_config = providers_config.providers.get(provider)
-
-    if model not in provider_config.models:
-        raise ModelConfigMissingError(
-            f"Model '{model}' is not a valid model for provider '{provider}'. "
-            f"Valid models are: {list(provider_config.models.keys())}"
-        )
+    if not provider_config.disable_model_check:
+        if provider_config.models is not None and model not in provider_config.models:
+            raise ModelConfigMissingError(
+                f"Model '{model}' is not a valid model for provider '{provider}'. "
+                f"Valid models are: {list(provider_config.models.keys())}"
+            )
 
     return provider_config
 

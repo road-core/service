@@ -91,6 +91,24 @@ def test_load_llm():
         assert llm == "fake_llm"
 
 
+@pytest.mark.usefixtures("_registered_fake_provider")
+def test_model_config_disable_model_check():
+    """Test should not raise when model check is disabled with an unknown model."""
+    with patch("ols.constants.SUPPORTED_PROVIDER_TYPES", new=["fake-provider"]):
+        providers = LLMProviders(
+            [
+                {
+                    "name": "fake-provider",
+                    "type": "fake-provider",
+                    "disable_model_check": "true",
+                    "models": [{"name": "model"}],
+                }
+            ]
+        )
+        config.config.llm_providers = providers
+        load_llm(provider="fake-provider", model="bla")
+
+
 def test_load_llm_no_provider_config():
     """Test load_llm function."""
     config.config.llm_providers = None

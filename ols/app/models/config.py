@@ -16,7 +16,7 @@ from pydantic import (
 )
 
 from ols import constants
-from ols.constants import VectorStoreType
+from ols.constants import DUMMY_MODEL_NAME, VectorStoreType
 from ols.utils import checks, tls
 from ols.utils.checks import InvalidConfigurationError
 
@@ -244,7 +244,8 @@ class ProviderConfig(BaseModel):
     url: Optional[AnyHttpUrl] = None
     credentials: Optional[str] = None
     project_id: Optional[str] = None
-    models: dict[str, ModelConfig] = {}
+    models: Optional[dict[str, ModelConfig]] = {}
+    disable_model_check: Optional[bool] = None
     api_version: Optional[str] = None
     deployment_name: Optional[str] = None
     openai_config: Optional[OpenAIConfig] = None
@@ -319,10 +320,18 @@ class ProviderConfig(BaseModel):
 
     def setup_models_config(self, data: dict) -> None:
         """Set up models configuration."""
+        self.disable_model_check = (
+            str(data.get("disable_model_check", constants.DISABLE_MODEL_CHECK)).lower()
+            == "true"
+        )
         if "models" not in data or len(data["models"]) == 0:
-            raise checks.InvalidConfigurationError(
-                f"no models configured for provider {data['name']}"
-            )
+            if not self.disable_model_check:
+                raise checks.InvalidConfigurationError(
+                    f"no models configured for provider {data['name']}"
+                )
+            data["models"] = [
+                {"name": DUMMY_MODEL_NAME},
+            ]
         for m in data["models"]:
             if "name" not in m:
                 raise checks.InvalidConfigurationError("model name is missing")
@@ -330,7 +339,10 @@ class ProviderConfig(BaseModel):
             # resolution based on the specific provider
             m["provider"] = self.type
             model = ModelConfig(**m)
-            self.models[m["name"]] = model
+            if self.models is not None:
+                self.models[m["name"]] = model
+            else:
+                self.models = {m["name"]: model}
 
     def set_provider_specific_configuration(self, data: dict) -> None:  # noqa: C901
         """Set the provider-specific configuration."""

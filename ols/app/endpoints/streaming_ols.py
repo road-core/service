@@ -49,7 +49,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["streaming_query"])
 auth_dependency = get_auth_dependency(config.ols_config, virtual_path="/ols-access")
 
-
 query_responses: dict[int | str, dict[str, Any]] = {
     200: {
         "description": "Query is valid and stream/events from endpoint is returned",

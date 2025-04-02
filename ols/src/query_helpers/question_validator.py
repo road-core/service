@@ -9,7 +9,7 @@ from langchain_core.messages import AIMessage
 
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
-from ols.constants import SUBJECT_REJECTED, GenericLLMParameters
+from ols.constants import DUMMY_MODEL_NAME, SUBJECT_REJECTED, GenericLLMParameters
 from ols.customize import prompts
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
@@ -87,6 +87,10 @@ class QuestionValidator(QueryHelper):
         # Tokens-check: We trigger the computation of the token count
         # without care about the return value. This is to ensure that
         # the query is within the token limit.
+        provider_config = config.llm_config.providers.get(self.provider)
+        model_config = provider_config.models.get(self.model)
+        if provider_config.disable_model_check and model_config is None:
+            model_config = provider_config.models.get(DUMMY_MODEL_NAME)
         TokenHandler().calculate_and_check_available_tokens(
             query, self.model_config.context_window_size, self.max_tokens_for_response
         )
