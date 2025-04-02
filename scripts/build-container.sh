@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version
-RCS_VERSION=v0.3.0
+RCS_VERSION=v0.3.1
 
 # To build container for local use
 if [ -z "$RCS_NO_IMAGE_CACHE" ]; then
