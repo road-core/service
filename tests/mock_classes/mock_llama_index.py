@@ -16,7 +16,7 @@ class MockLlamaIndex:
         with patch("ols.src.query_helpers.docs_summarizer.load_index_from_storage", new=MockLlamaIndex):
             some test steps
 
-    None: it is better to use context manager to patch llama index, compared to `patch` decorator
+    Note: it is better to use context manager to patch llama index, compared to `patch` decorator
     """  # noqa: E501
 
     def __init__(self, *args, **kwargs):

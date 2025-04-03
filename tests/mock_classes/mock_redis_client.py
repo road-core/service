@@ -15,7 +15,7 @@ class MockRedisClient:
         with patch("redis.StrictRedis", new=MockRedis):
             some test steps
 
-    None: it is better to use context manager to patch StrictRedis, compared to `patch` decorator
+    Note: it is better to use context manager to patch StrictRedis, compared to `patch` decorator
     """
 
     def __init__(self, **kwargs):
