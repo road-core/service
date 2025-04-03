@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:393354db367ffe209a4cb2747706a83dcf338422f58803e4eb460c81edec6e94"
+content_hash = "sha256:ab83301a0a0e547deba37a6ffccbf3fe0eed6350d257ae0b586cf5dc9f7ea46d"
 
 [[metadata.targets]]
 requires_python = ">=3.11.1,<=3.12.8"
@@ -289,6 +289,25 @@ files = [
 ]
 
 [[package]]
+name = "banks"
+version = "2.1.1"
+requires_python = ">=3.9"
+summary = "A prompt programming language"
+groups = ["default"]
+dependencies = [
+    "deprecated",
+    "eval-type-backport; python_version < \"3.10\"",
+    "griffe",
+    "jinja2",
+    "platformdirs",
+    "pydantic",
+]
+files = [
+    {file = "banks-2.1.1-py3-none-any.whl", hash = "sha256:06e4ee46a0ff2fcdf5f64a5f028a7b7ceb719d5c7b9339f5aa90b24936fbb7f5"},
+    {file = "banks-2.1.1.tar.gz", hash = "sha256:95ec9c8f3c173c9f1c21eb2451ba0e21dda87f1ceb738854fabadb54bc387b86"},
+]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.12.3"
 requires_python = ">=3.6.0"
@@ -508,7 +527,6 @@ version = "0.4.6"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Cross-platform colored terminal text."
 groups = ["default", "dev"]
-marker = "platform_system == \"Windows\" or os_name == \"nt\" or sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -1093,6 +1111,20 @@ files = [
     {file = "greenlet-3.1.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:23f20bb60ae298d7d8656c6ec6db134bca379ecefadb0b19ce6f19d1f232a942"},
     {file = "greenlet-3.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:7124e16b4c55d417577c2077be379514321916d5790fa287c9ed6f23bd2ffd01"},
     {file = "greenlet-3.1.1.tar.gz", hash = "sha256:4ce3ac6cdb6adf7946475d7ef31777c26d94bccc377e070a7986bd2d5c515467"},
+]
+
+[[package]]
+name = "griffe"
+version = "1.7.2"
+requires_python = ">=3.9"
+summary = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
+groups = ["default"]
+dependencies = [
+    "colorama>=0.4",
+]
+files = [
+    {file = "griffe-1.7.2-py3-none-any.whl", hash = "sha256:1ed9c2e338a75741fc82083fe5a1bc89cb6142efe126194cc313e34ee6af5423"},
+    {file = "griffe-1.7.2.tar.gz", hash = "sha256:98d396d803fab3b680c2608f300872fd57019ed82f0672f5b5323a9ad18c540c"},
 ]
 
 [[package]]
@@ -1778,19 +1810,18 @@ files = [
 
 [[package]]
 name = "llama-index"
-version = "0.12.2"
+version = "0.12.28"
 requires_python = "<4.0,>=3.9"
 summary = "Interface between LLMs and your data"
 groups = ["default"]
 dependencies = [
     "llama-index-agent-openai<0.5.0,>=0.4.0",
-    "llama-index-cli<0.5.0,>=0.4.0",
-    "llama-index-core<0.13.0,>=0.12.2",
+    "llama-index-cli<0.5.0,>=0.4.1",
+    "llama-index-core<0.13.0,>=0.12.28",
     "llama-index-embeddings-openai<0.4.0,>=0.3.0",
     "llama-index-indices-managed-llama-cloud>=0.4.0",
-    "llama-index-legacy<0.10.0,>=0.9.48",
     "llama-index-llms-openai<0.4.0,>=0.3.0",
-    "llama-index-multi-modal-llms-openai<0.4.0,>=0.3.0",
+    "llama-index-multi-modal-llms-openai<0.5.0,>=0.4.0",
     "llama-index-program-openai<0.4.0,>=0.3.0",
     "llama-index-question-gen-openai<0.4.0,>=0.3.0",
     "llama-index-readers-file<0.5.0,>=0.4.0",
@@ -1798,8 +1829,8 @@ dependencies = [
     "nltk>3.8.1",
 ]
 files = [
-    {file = "llama_index-0.12.2-py3-none-any.whl", hash = "sha256:971528db7889f5a0d15fd9039a403bc6f92bfafc2d4e1bab2d166657728ae94c"},
-    {file = "llama_index-0.12.2.tar.gz", hash = "sha256:da9738dd666e219689839c7451c9df8bed72e6510a6f7d6f7d9907bfdd4588eb"},
+    {file = "llama_index-0.12.28-py3-none-any.whl", hash = "sha256:e5e422a54cf4a7ee38a2c4ffacbd0c34a33bd57df993dad1213544e47b8fffec"},
+    {file = "llama_index-0.12.28.tar.gz", hash = "sha256:11f2e4bd25a9b9e2a6a0ff326b4336af10a62433d1b13ec1831debcff31a1ac8"},
 ]
 
 [[package]]
@@ -1820,7 +1851,7 @@ files = [
 
 [[package]]
 name = "llama-index-cli"
-version = "0.4.0"
+version = "0.4.1"
 requires_python = "<4.0,>=3.9"
 summary = "llama-index cli"
 groups = ["default"]
@@ -1830,13 +1861,13 @@ dependencies = [
     "llama-index-llms-openai<0.4.0,>=0.3.0",
 ]
 files = [
-    {file = "llama_index_cli-0.4.0-py3-none-any.whl", hash = "sha256:60d12f89e6b85e80a0cc3a8b531f05a911b5eebaebc37314411476d1ba685904"},
-    {file = "llama_index_cli-0.4.0.tar.gz", hash = "sha256:d6ab201359962a8a34368aeda3a49bbbe67e9e009c59bd925c4fb2be4ace3906"},
+    {file = "llama_index_cli-0.4.1-py3-none-any.whl", hash = "sha256:6dfc931aea5b90c256e476b48dfac76f48fb2308fdf656bb02ee1e4f2cab8b06"},
+    {file = "llama_index_cli-0.4.1.tar.gz", hash = "sha256:3f97f1f8f5f401dfb5b6bc7170717c176dcd981538017430073ef12ffdcbddfa"},
 ]
 
 [[package]]
 name = "llama-index-core"
-version = "0.12.2"
+version = "0.12.28"
 requires_python = "<4.0,>=3.9"
 summary = "Interface between LLMs and your data"
 groups = ["default"]
@@ -1844,6 +1875,7 @@ dependencies = [
     "PyYAML>=6.0.1",
     "SQLAlchemy[asyncio]>=1.4.49",
     "aiohttp<4.0.0,>=3.8.6",
+    "banks<3.0.0,>=2.0.0",
     "dataclasses-json",
     "deprecated>=1.2.9.3",
     "dirtyjson<2.0.0,>=1.0.8",
@@ -1856,9 +1888,9 @@ dependencies = [
     "nltk>3.8.1",
     "numpy",
     "pillow>=9.0.0",
-    "pydantic<2.10.0,>=2.7.0",
+    "pydantic>=2.8.0",
     "requests>=2.31.0",
-    "tenacity!=8.4.0,<9.0.0,>=8.2.0",
+    "tenacity!=8.4.0,<10.0.0,>=8.2.0",
     "tiktoken>=0.3.3",
     "tqdm<5.0.0,>=4.66.1",
     "typing-extensions>=4.5.0",
@@ -1866,8 +1898,8 @@ dependencies = [
     "wrapt",
 ]
 files = [
-    {file = "llama_index_core-0.12.2-py3-none-any.whl", hash = "sha256:27a5548523435a5c2b84f75c15894a44522b7f968e9f29a03f9a301ca09fb7fa"},
-    {file = "llama_index_core-0.12.2.tar.gz", hash = "sha256:a48b2de9c3a09608ab5c03c5a313428f119c86946acdefde555992b7c0b8a38e"},
+    {file = "llama_index_core-0.12.28-py3-none-any.whl", hash = "sha256:9bd24224bd57dd5e97bb0a2550f31f6c08b7dc396305f35bbe9714d17b1409a6"},
+    {file = "llama_index_core-0.12.28.tar.gz", hash = "sha256:bf4a9697525e1294855d2df5c3a56b9720c185cde0eae2da713e7629c456c643"},
 ]
 
 [[package]]
@@ -1917,37 +1949,6 @@ files = [
 ]
 
 [[package]]
-name = "llama-index-legacy"
-version = "0.9.48.post4"
-requires_python = "<4.0,>=3.8.1"
-summary = "Interface between LLMs and your data"
-groups = ["default"]
-dependencies = [
-    "SQLAlchemy[asyncio]>=1.4.49",
-    "aiohttp<4.0.0,>=3.8.6",
-    "dataclasses-json",
-    "deprecated>=1.2.9.3",
-    "dirtyjson<2.0.0,>=1.0.8",
-    "fsspec>=2023.5.0",
-    "httpx",
-    "nest-asyncio<2.0.0,>=1.5.8",
-    "networkx>=3.0",
-    "nltk>=3.8.1",
-    "numpy",
-    "openai>=1.1.0",
-    "pandas",
-    "requests>=2.31.0",
-    "tenacity<9.0.0,>=8.2.0",
-    "tiktoken>=0.3.3",
-    "typing-extensions>=4.5.0",
-    "typing-inspect>=0.8.0",
-]
-files = [
-    {file = "llama_index_legacy-0.9.48.post4-py3-none-any.whl", hash = "sha256:4b817d7c343fb5f7f00c4410eff519f320013b8d5f24c4fedcf270c471f92038"},
-    {file = "llama_index_legacy-0.9.48.post4.tar.gz", hash = "sha256:f8a9764e7e134a52bfef5e53d2d62561bfc01fc09874c51cc001df6f5302ae30"},
-]
-
-[[package]]
 name = "llama-index-llms-openai"
 version = "0.3.2"
 requires_python = "<4.0,>=3.9"
@@ -1964,17 +1965,17 @@ files = [
 
 [[package]]
 name = "llama-index-multi-modal-llms-openai"
-version = "0.3.0"
+version = "0.4.3"
 requires_python = "<4.0,>=3.9"
 summary = "llama-index multi-modal-llms openai integration"
 groups = ["default"]
 dependencies = [
-    "llama-index-core<0.13.0,>=0.12.0",
+    "llama-index-core<0.13.0,>=0.12.3",
     "llama-index-llms-openai<0.4.0,>=0.3.0",
 ]
 files = [
-    {file = "llama_index_multi_modal_llms_openai-0.3.0-py3-none-any.whl", hash = "sha256:9b7e3e39b19b2668b9c75014bcb90795bb546f0f9e1af8b7f1087f8687805763"},
-    {file = "llama_index_multi_modal_llms_openai-0.3.0.tar.gz", hash = "sha256:71e983c7771c39088e4058cd78029219315a0fb631b9e12b903e53243b9a3fd6"},
+    {file = "llama_index_multi_modal_llms_openai-0.4.3-py3-none-any.whl", hash = "sha256:1ceb42716472ac8bd5130afa29b793869d367946aedd02e48a3b03184e443ad1"},
+    {file = "llama_index_multi_modal_llms_openai-0.4.3.tar.gz", hash = "sha256:5e6ca54069d3d18c2f5f7ca34f3720fba1d1b9126482ad38feb0c858f4feb63b"},
 ]
 
 [[package]]
@@ -2058,20 +2059,20 @@ files = [
 
 [[package]]
 name = "llama-index-vector-stores-postgres"
-version = "0.4.0"
+version = "0.4.2"
 requires_python = "<4.0,>=3.9"
 summary = "llama-index vector_stores postgres integration"
 groups = ["default"]
 dependencies = [
     "asyncpg<1.0.0,>=0.29.0",
-    "llama-index-core<0.13.0,>=0.12.0",
+    "llama-index-core<0.13.0,>=0.12.6",
     "pgvector<1.0.0,>=0.3.6",
     "psycopg2-binary<3.0.0,>=2.9.9",
     "sqlalchemy[asyncio]<2.1,>=1.4.49",
 ]
 files = [
-    {file = "llama_index_vector_stores_postgres-0.4.0-py3-none-any.whl", hash = "sha256:8f8728b9c6d1f72d0f7c2b93dc0749d02dcc17e2d1ad325ff677cee45c67387b"},
-    {file = "llama_index_vector_stores_postgres-0.4.0.tar.gz", hash = "sha256:ca4d6e1cf1f5062a60cbe58dc79290e48bafa7a6f9f2ebdc6242cfe4c6b84932"},
+    {file = "llama_index_vector_stores_postgres-0.4.2-py3-none-any.whl", hash = "sha256:e99a02bf7d92934ac737445fef7e1c064b3c0e8dfc80ea0cf84bdb9dac209332"},
+    {file = "llama_index_vector_stores_postgres-0.4.2.tar.gz", hash = "sha256:4719a5c1cc4f9aa73820bcc6d35d763e9d7af7ad0b6dfdb5d776836af0ea0e00"},
 ]
 
 [[package]]
