@@ -14,7 +14,6 @@ from ols.src.query_helpers.topic_summarizer import (  # noqa: E402
     QueryHelper,
     TopicSummarizer,
 )
-from tests.mock_classes.mock_llm_chain import mock_llm_chain  # noqa: E402
 from tests.mock_classes.mock_llm_loader import mock_llm_loader  # noqa: E402
 
 
