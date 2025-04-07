@@ -2,6 +2,8 @@
 
 from unittest.mock import patch
 
+from langchain_core.messages import AIMessage
+
 from ols import config
 from ols.constants import GenericLLMParameters
 
@@ -9,7 +11,6 @@ from ols.constants import GenericLLMParameters
 config.ols_config.authentication_config.module = "k8s"
 
 from ols.src.query_helpers.question_validator import QuestionValidator  # noqa: E402
-from tests.mock_classes.mock_llm_chain import mock_llm_chain  # noqa: E402
 from tests.mock_classes.mock_llm_loader import mock_llm_loader  # noqa: E402
 
 
@@ -20,8 +21,10 @@ def perform_question_validation_benchmark(benchmark, question):
     config.reload_from_yaml_file("tests/config/valid_config.yaml")
 
     with patch(
-        "ols.src.query_helpers.question_validator.LLMChain", new=mock_llm_chain(None)
-    ):
+        "ols.src.query_helpers.question_validator.QuestionValidator._invoke_llm"
+    ) as mock_invoke:
+        mock_invoke.return_value = AIMessage(content="ACCEPTED")
+
         # when the LLM will be initialized the check for provided parameters will
         # be performed
         llm_loader = mock_llm_loader(
@@ -30,7 +33,6 @@ def perform_question_validation_benchmark(benchmark, question):
                 "p1",
                 "m1",
                 {GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: 4},
-                False,
             ),
         )
 
