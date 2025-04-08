@@ -65,6 +65,7 @@ configure model, and connect to it.
         * [Optionally run inside an OpenShift environment](#optionally-run-inside-an-openshift-environment)
     * [Communication with the service](#communication-with-the-service)
         * [Query the server](#query-the-server)
+        * [Validation if the logged-in user is authorized to access service](#validation-if-the-logged-in-user-is-authorized-to-access-service)
         * [Swagger UI](#swagger-ui)
         * [OpenAPI](#openapi)
         * [Metrics](#metrics)
