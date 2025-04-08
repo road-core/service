@@ -31,10 +31,6 @@ from tests.e2e.utils.postgres import (
     retrieve_connection,
 )
 
-# on_cluster attribute is set to true when the tests are being run
-# against ols running on a cluster
-pytest.on_cluster: bool = False
-
 
 @pytest.fixture(name="postgres_connection", scope="module")
 def fixture_postgres_connection():
@@ -208,6 +204,7 @@ def test_transcripts_storing_cluster():
         }
     ]
     assert transcript["attachments"] == expected_attachment_node
+    assert transcript["tool_calls"] == []
 
 
 @retry(max_attempts=3, wait_between_runs=10)
@@ -310,7 +307,6 @@ def test_conversation_in_postgres_cache(postgres_connection) -> None:
     assert "OpenShift" in deserialized[3].content
 
 
-@pytest.mark.not_konflux
 @pytest.mark.cluster
 def test_user_data_collection():
     """Test user data collection.
