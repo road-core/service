@@ -17,6 +17,8 @@ from ols.app.models.config import (
     InMemoryCacheConfig,
     LLMProviders,
     LoggingConfig,
+    MCPServerConfig,
+    MCPServers,
     ModelConfig,
     ModelParameters,
     OLSConfig,
@@ -33,6 +35,108 @@ from ols.app.models.config import (
 )
 from ols.constants import VectorStoreType
 from ols.utils.checks import InvalidConfigurationError
+
+
+def test_mcp_server_config():
+    """Test the MCPServerConfig model."""
+    mcp_server_config = MCPServerConfig({"name": "test_name"})
+    assert mcp_server_config.name == "test_name"
+
+
+def test_mcp_server_config_validation():
+    """Test the MCPServerConfig model."""
+    mcp_server_config = MCPServerConfig({"name": "test_name"})
+    mcp_server_config.validate_yaml()
+
+    mcp_server_config = MCPServerConfig()
+    with pytest.raises(InvalidConfigurationError, match="MCP server name is missing"):
+        mcp_server_config.validate_yaml()
+
+
+def test_mcp_server_config_equality():
+    """Test the MCPServerConfig model."""
+    mcp_server_config_1 = MCPServerConfig({"name": "test_name"})
+    mcp_server_config_2 = MCPServerConfig({"name": "test_name"})
+    mcp_server_config_3 = MCPServerConfig({"name": "other"})
+
+    # compare the same configurations
+    assert mcp_server_config_1 == mcp_server_config_2
+
+    # compare different configurations
+    assert mcp_server_config_1 != mcp_server_config_3
+
+    # compare with value of different type
+    other_value = "foo"
+    assert mcp_server_config_1 != other_value
+
+
+def test_mcp_servers():
+    """Test the MCPServers model."""
+    mcp_servers = MCPServers()
+    assert mcp_servers.servers == {}
+
+    mcp_servers = MCPServers(
+        [
+            {"name": "foo"},
+            {"name": "bar"},
+        ]
+    )
+    assert "foo" in mcp_servers.servers
+    assert "bar" in mcp_servers.servers
+
+
+def test_mcp_servers_invalid_input():
+    """Test the MCPServers model."""
+    with pytest.raises(InvalidConfigurationError, match="MCP server name is missing"):
+        MCPServers(
+            [
+                {"noname": "foo"},
+                {"name": "bar"},
+            ]
+        )
+
+
+def test_mcp_servers_equality():
+    """Test the MCPServers model."""
+    mcp_servers_1 = MCPServers(
+        [
+            {"name": "foo"},
+            {"name": "bar"},
+        ]
+    )
+    mcp_servers_2 = MCPServers(
+        [
+            {"name": "foo"},
+            {"name": "bar"},
+        ]
+    )
+    mcp_servers_3 = MCPServers(
+        [
+            {"name": "something"},
+            {"name": "else"},
+        ]
+    )
+
+    # compare the same configurations
+    assert mcp_servers_1 == mcp_servers_2
+
+    # compare different configurations
+    assert mcp_servers_1 != mcp_servers_3
+
+    # compare with value of different type
+    other_value = "foo"
+    assert mcp_servers_1 != other_value
+
+
+def test_mcp_servers_validation():
+    """Test the MCPServers model."""
+    mcp_servers_1 = MCPServers(
+        [
+            {"name": "foo"},
+            {"name": "bar"},
+        ]
+    )
+    mcp_servers_1.validate_yaml()
 
 
 def test_model_parameters():
