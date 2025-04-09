@@ -81,10 +81,15 @@ For Input Analysis:
 
 For Output Constraints:
 - Maximum 5 words
-- Uppercase first letter of significant words
-- Avoid articles prepositions
-- Exclude punctuation
+- Capitalize only significant words (e.g., nouns, verbs, adjectives, adverbs).
+- Do not use all uppercase - capitalize only the first letter of significant words
+- Exclude articles, prepositions, and punctuation (e.g., "a," "the," "of," "on," "in")
 - Neutral objective language
+
+Examples:
+- "AI Capabilities Summary" (Correct)
+- "Machine Learning Applications" (Correct)
+- "AI CAPABILITIES SUMMARY" (Incorrect—should not be fully uppercase)
 
 Processing Steps
 1. Analyze semantic structure
