@@ -795,6 +795,9 @@ ols_config:
         - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
     minTLSVersion: VersionTLS13
+mcp_servers:
+  - name: foo
+  - name: bar
 dev_config:
   enable_dev_ui: true
   disable_auth: false
@@ -873,6 +876,10 @@ def test_valid_config_file():
                     "system_prompt_path": "tests/config/system_prompt.txt",
                     "user_data_collection": {"transcripts_disabled": True},
                 },
+                "mcp_servers": [
+                    {"name": "foo"},
+                    {"name": "bar"},
+                ],
             }
         )
         assert config.config == expected_config
@@ -880,6 +887,7 @@ def test_valid_config_file():
         assert config.ols_config.user_data_collection is not None
         assert config.ols_config.user_data_collection.feedback_disabled is True
         assert config.ols_config.quota_handlers is not None
+        assert config.mcp_servers is not None
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")

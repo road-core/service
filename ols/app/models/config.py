@@ -568,6 +568,61 @@ class LLMProviders(BaseModel):
         return all_converted_providers
 
 
+class MCPServerConfig(BaseModel):
+    """MCP server configuration."""
+
+    name: Optional[str] = None
+
+    def __init__(self, data: Optional[dict] = None) -> None:
+        """Initialize configuration and perform basic validation."""
+        super().__init__()
+        if data is None:
+            return
+        self.name = data.get("name", None)
+
+    def __eq__(self, other: object) -> bool:
+        """Compare two objects for equality."""
+        if isinstance(other, MCPServerConfig):
+            return self.name == other.name
+        return False
+
+    def validate_yaml(self) -> None:
+        """Validate MCP server config."""
+        if self.name is None:
+            raise checks.InvalidConfigurationError("MCP server name is missing")
+
+
+class MCPServers(BaseModel):
+    """MCP servers configuration."""
+
+    servers: dict[str, MCPServerConfig] = {}
+
+    def __init__(
+        self,
+        data: Optional[dict] = None,
+    ) -> None:
+        """Initialize configuration and perform basic validation."""
+        super().__init__()
+        if data is None:
+            return
+        for server_cfg in data:
+            if "name" not in server_cfg:
+                raise checks.InvalidConfigurationError("MCP server name is missing")
+            server = MCPServerConfig(server_cfg)
+            self.servers[server_cfg["name"]] = server
+
+    def __eq__(self, other: object) -> bool:
+        """Compare two objects for equality."""
+        if isinstance(other, MCPServers):
+            return self.servers == other.servers
+        return False
+
+    def validate_yaml(self) -> None:
+        """Validate LLM config."""
+        for v in self.servers.values():
+            v.validate_yaml()
+
+
 class PostgresConfig(BaseModel):
     """Postgres configuration."""
 
@@ -1210,6 +1265,7 @@ class Config(BaseModel):
     ols_config: OLSConfig = OLSConfig()
     dev_config: DevConfig = DevConfig()
     user_data_collector_config: Optional[UserDataCollectorConfig] = None
+    mcp_servers: MCPServers = MCPServers()
 
     def __init__(
         self,
@@ -1235,6 +1291,12 @@ class Config(BaseModel):
             raise checks.InvalidConfigurationError(
                 "no LLM providers config section found"
             )
+
+        # initialize MCP servers
+        s = data.get("mcp_servers")
+        if s is not None:
+            self.mcp_servers = MCPServers(s)
+
         # Always initialize dev config, even if there's no config for it.
         self.dev_config = DevConfig(**data.get("dev_config", {}))
         if not (
@@ -1251,6 +1313,7 @@ class Config(BaseModel):
             return (
                 self.ols_config == other.ols_config
                 and self.llm_providers == other.llm_providers
+                and self.mcp_servers == other.mcp_servers
             )
         return False
 
