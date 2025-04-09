@@ -5,7 +5,7 @@
 groups = ["default", "dev", "evaluation"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:bf2370517afdaf8558973b32861bc1e82e13c39b55c126077ac6e6a1b85fda49"
+content_hash = "sha256:4d66b71cb158a6e12da2b2b494055396c7d6ca2ff4758f9a2f21d8bda2e2b642"
 
 [[metadata.targets]]
 requires_python = ">=3.11.1,<=3.12.8"
@@ -291,6 +291,25 @@ files = [
 ]
 
 [[package]]
+name = "banks"
+version = "2.1.1"
+requires_python = ">=3.9"
+summary = "A prompt programming language"
+groups = ["default"]
+dependencies = [
+    "deprecated",
+    "eval-type-backport; python_version < \"3.10\"",
+    "griffe",
+    "jinja2",
+    "platformdirs",
+    "pydantic",
+]
+files = [
+    {file = "banks-2.1.1-py3-none-any.whl", hash = "sha256:06e4ee46a0ff2fcdf5f64a5f028a7b7ceb719d5c7b9339f5aa90b24936fbb7f5"},
+    {file = "banks-2.1.1.tar.gz", hash = "sha256:95ec9c8f3c173c9f1c21eb2451ba0e21dda87f1ceb738854fabadb54bc387b86"},
+]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.13.3"
 requires_python = ">=3.7.0"
@@ -511,7 +530,6 @@ version = "0.4.6"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Cross-platform colored terminal text."
 groups = ["default", "dev", "evaluation"]
-marker = "platform_system == \"Windows\" or os_name == \"nt\" or sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -1114,6 +1132,20 @@ files = [
     {file = "greenlet-3.1.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:23f20bb60ae298d7d8656c6ec6db134bca379ecefadb0b19ce6f19d1f232a942"},
     {file = "greenlet-3.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:7124e16b4c55d417577c2077be379514321916d5790fa287c9ed6f23bd2ffd01"},
     {file = "greenlet-3.1.1.tar.gz", hash = "sha256:4ce3ac6cdb6adf7946475d7ef31777c26d94bccc377e070a7986bd2d5c515467"},
+]
+
+[[package]]
+name = "griffe"
+version = "1.7.2"
+requires_python = ">=3.9"
+summary = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
+groups = ["default"]
+dependencies = [
+    "colorama>=0.4",
+]
+files = [
+    {file = "griffe-1.7.2-py3-none-any.whl", hash = "sha256:1ed9c2e338a75741fc82083fe5a1bc89cb6142efe126194cc313e34ee6af5423"},
+    {file = "griffe-1.7.2.tar.gz", hash = "sha256:98d396d803fab3b680c2608f300872fd57019ed82f0672f5b5323a9ad18c540c"},
 ]
 
 [[package]]
@@ -1831,14 +1863,14 @@ files = [
 
 [[package]]
 name = "llama-index"
-version = "0.12.24"
+version = "0.12.28"
 requires_python = "<4.0,>=3.9"
 summary = "Interface between LLMs and your data"
 groups = ["default"]
 dependencies = [
     "llama-index-agent-openai<0.5.0,>=0.4.0",
     "llama-index-cli<0.5.0,>=0.4.1",
-    "llama-index-core<0.13.0,>=0.12.24",
+    "llama-index-core<0.13.0,>=0.12.28",
     "llama-index-embeddings-openai<0.4.0,>=0.3.0",
     "llama-index-indices-managed-llama-cloud>=0.4.0",
     "llama-index-llms-openai<0.4.0,>=0.3.0",
@@ -1850,8 +1882,8 @@ dependencies = [
     "nltk>3.8.1",
 ]
 files = [
-    {file = "llama_index-0.12.24-py3-none-any.whl", hash = "sha256:9b35c90110177630d7bfd1f92c5ccd637ec3bbeebb268b8d29e29639ae3fb0bb"},
-    {file = "llama_index-0.12.24.tar.gz", hash = "sha256:66f2c064620a5ef7f0fb858d79b3ea45bdd04efefd3b4ebb5e557295681fff24"},
+    {file = "llama_index-0.12.28-py3-none-any.whl", hash = "sha256:e5e422a54cf4a7ee38a2c4ffacbd0c34a33bd57df993dad1213544e47b8fffec"},
+    {file = "llama_index-0.12.28.tar.gz", hash = "sha256:11f2e4bd25a9b9e2a6a0ff326b4336af10a62433d1b13ec1831debcff31a1ac8"},
 ]
 
 [[package]]
@@ -1888,7 +1920,7 @@ files = [
 
 [[package]]
 name = "llama-index-core"
-version = "0.12.24"
+version = "0.12.28"
 requires_python = "<4.0,>=3.9"
 summary = "Interface between LLMs and your data"
 groups = ["default"]
@@ -1896,6 +1928,7 @@ dependencies = [
     "PyYAML>=6.0.1",
     "SQLAlchemy[asyncio]>=1.4.49",
     "aiohttp<4.0.0,>=3.8.6",
+    "banks<3.0.0,>=2.0.0",
     "dataclasses-json",
     "deprecated>=1.2.9.3",
     "dirtyjson<2.0.0,>=1.0.8",
@@ -1918,8 +1951,8 @@ dependencies = [
     "wrapt",
 ]
 files = [
-    {file = "llama_index_core-0.12.24-py3-none-any.whl", hash = "sha256:3323da503e668676935168abf4303569a543e75f595ee6b327fb2eabbff2a894"},
-    {file = "llama_index_core-0.12.24.tar.gz", hash = "sha256:fac61f7eefed1133e46fe74927d961311623269b9cafb999a66051dd205abb17"},
+    {file = "llama_index_core-0.12.28-py3-none-any.whl", hash = "sha256:9bd24224bd57dd5e97bb0a2550f31f6c08b7dc396305f35bbe9714d17b1409a6"},
+    {file = "llama_index_core-0.12.28.tar.gz", hash = "sha256:bf4a9697525e1294855d2df5c3a56b9720c185cde0eae2da713e7629c456c643"},
 ]
 
 [[package]]
