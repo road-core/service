@@ -667,10 +667,12 @@ class MCPServerConfig(BaseModel):
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""
         if isinstance(other, MCPServerConfig):
-            return self.name == other.name
-            return self.transport == other.transport
-            return self.stdio == other.stdio
-            return self.sse == other.sse
+            return (
+                self.name == other.name
+                and self.transport == other.transport
+                and self.stdio == other.stdio
+                and self.sse == other.sse
+            )
         return False
 
     def validate_yaml(self) -> None:
