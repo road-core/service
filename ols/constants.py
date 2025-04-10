@@ -245,3 +245,12 @@ DEFAULT_INGRESS_URL = "https://console.redhat.com/api/ingress/v1/upload"
 
 # a dummy model name to set model config if model list is not provided
 DUMMY_MODEL_NAME = "dummy-model-name"
+
+# MCP transport types
+MCP_TRANSPORT_STDIO = "stdio"
+MCP_TRANSPORT_SSE = "sse"
+SSE_TRANSPORT_DEFAULT_TIMEOUT = 5
+SSE_TRANSPORT_DEFAULT_READ_TIMEOUT = 10
+STDIO_TRANSPORT_DEFAULT_ENCODING = "utf-8"
+STDIO_TRANSPORT_DEFAULT_ENV = ""
+STDIO_TRANSPORT_DEFAULT_CWD = "."
