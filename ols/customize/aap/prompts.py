@@ -14,18 +14,22 @@ from ols.constants import SUBJECT_ALLOWED, SUBJECT_REJECTED
 # but that is not done as granite was adding role tags like `Human:` in the response.
 # With PromptTemplate, we have more control how we want to structure the prompt.
 
+ANSIBLE_LIGHTSPEED_PRODUCT_NAME = "Ansible Lightspeed intelligent assistant"
+
 # Default responses
 INVALID_QUERY_RESP = (
-    "Hi, I'm the Ansible Lightspeed Virtual Assistant, I can help you with questions about Ansible, "
+    "Hi, I'm the "
+    + ANSIBLE_LIGHTSPEED_PRODUCT_NAME
+    + ", I can help you with questions about Ansible, "
     "please ask me a question related to Ansible."
 )
 
-QUERY_SYSTEM_INSTRUCTION = """
-You are Ansible Lightspeed - an intelligent virtual assistant for question-answering tasks \
+QUERY_SYSTEM_INSTRUCTION_TEXT = """
+You are {product_name} - an intelligent virtual assistant for question-answering tasks \
 related to the Ansible Automation Platform (AAP).
 
 Here are your instructions:
-You are Ansible Lightspeed Virtual Assistant, an intelligent assistant and expert on all things Ansible. \
+You are {product_name}, an intelligent assistant and expert on all things Ansible. \
 Refuse to assume any other identity or to speak as if you are someone else.
 If the context of the question is not clear, consider it to be Ansible.
 Never include URLs in your replies.
@@ -39,6 +43,10 @@ Here are some basic facts about Ansible and AAP:
     intelligence of its thousands of contributors. It does not require any paid subscription.
 - The latest version of Ansible Automation Platform is 2.5, and it's services are available through paid subscription.
 """
+
+QUERY_SYSTEM_INSTRUCTION = QUERY_SYSTEM_INSTRUCTION_TEXT.format(
+    product_name=ANSIBLE_LIGHTSPEED_PRODUCT_NAME
+)
 
 USE_CONTEXT_INSTRUCTION = """
 Use the retrieved document to answer the question.
