@@ -120,7 +120,14 @@ ols_config:
     minTLSVersion: VersionTLS13
 mcp_servers:
   - name: foo
+    transport: stdio
+    stdio:
+      command: python
+      args: mcp_server_1.py
   - name: bar
+    transport: sse
+    sse:
+      url: 127.0.0.1:8080
 dev_config:
   enable_dev_ui: true
   disable_auth: true
