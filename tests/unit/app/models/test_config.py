@@ -28,6 +28,8 @@ from ols.app.models.config import (
     QuotaHandlersConfig,
     RedisConfig,
     ReferenceContent,
+    SseTransportConfig,
+    StdioTransportConfig,
     TLSConfig,
     TLSSecurityProfile,
     UserDataCollection,
@@ -37,27 +39,138 @@ from ols.constants import VectorStoreType
 from ols.utils.checks import InvalidConfigurationError
 
 
-def test_mcp_server_config():
-    """Test the MCPServerConfig model."""
-    mcp_server_config = MCPServerConfig({"name": "test_name"})
-    assert mcp_server_config.name == "test_name"
+@pytest.fixture
+def mcp_server_config_stdio_transport():
+    """MCP server config map fixture."""
+    return {
+        "name": "foo",
+        "transport": "stdio",
+        "stdio": {"command": "python", "args": "server1.py"},
+    }
 
 
-def test_mcp_server_config_validation():
+@pytest.fixture
+def mcp_server_config_sse_transport():
+    """MCP server config map fixture."""
+    return {
+        "name": "bar",
+        "transport": "sse",
+        "sse": {"url": "127.0.0.1:8080"},
+    }
+
+
+def test_mcp_server_config(
+    mcp_server_config_stdio_transport, mcp_server_config_sse_transport
+):
     """Test the MCPServerConfig model."""
-    mcp_server_config = MCPServerConfig({"name": "test_name"})
+    mcp_server_config = MCPServerConfig(mcp_server_config_stdio_transport)
+    assert mcp_server_config.name == "foo"
+
+    mcp_server_config = MCPServerConfig(mcp_server_config_sse_transport)
+    assert mcp_server_config.name == "bar"
+
+
+def test_mcp_server_config_missing_transport():
+    """Test the MCPServerConfig model for missing transport option."""
+    configuration_without_transport = {
+        "name": "bar",
+    }
+    with pytest.raises(
+        InvalidConfigurationError,
+        match="MCP transport type must be specified",
+    ):
+        MCPServerConfig(configuration_without_transport)
+
+
+def test_mcp_server_config_improper_transport():
+    """Test the MCPServerConfig model for improper transport option."""
+    configuration_with_improper_transport = {
+        "name": "bar",
+        "transport": "foo",
+    }
+    with pytest.raises(
+        InvalidConfigurationError,
+        match="unknown MCP transport type specified: foo",
+    ):
+        MCPServerConfig(configuration_with_improper_transport)
+
+
+def test_mcp_server_config_missing_options():
+    """Test the MCPServerConfig model for missing options."""
+    configuration_without_stdio_config = {
+        "name": "bar",
+        "transport": "stdio",
+    }
+    with pytest.raises(
+        InvalidConfigurationError,
+        match="STDIO transport type is specified, but STDIO configuration is missing",
+    ):
+        MCPServerConfig(configuration_without_stdio_config)
+
+    configuration_without_sse_config = {
+        "name": "bar",
+        "transport": "sse",
+    }
+    with pytest.raises(
+        InvalidConfigurationError,
+        match="SSE transport type is specified, but SSE configuration is missing",
+    ):
+        MCPServerConfig(configuration_without_sse_config)
+
+    configuration_without_stdio_config = {
+        "name": "bar",
+        "transport": "stdio",
+        "stdio": {},
+    }
+    with pytest.raises(
+        InvalidConfigurationError,
+        match="command needs to be specified for STDIO transport",
+    ):
+        MCPServerConfig(configuration_without_stdio_config)
+
+    configuration_without_sse_config = {
+        "name": "bar",
+        "transport": "sse",
+        "sse": {},
+    }
+    with pytest.raises(
+        InvalidConfigurationError,
+        match="URL needs to be specified for SSE transport",
+    ):
+        MCPServerConfig(configuration_without_sse_config)
+
+
+def test_mcp_server_config_validation(mcp_server_config_stdio_transport):
+    """Test the MCPServerConfig model."""
+    mcp_server_config = MCPServerConfig(mcp_server_config_stdio_transport)
     mcp_server_config.validate_yaml()
 
     mcp_server_config = MCPServerConfig()
     with pytest.raises(InvalidConfigurationError, match="MCP server name is missing"):
         mcp_server_config.validate_yaml()
 
+    mcp_server_config = MCPServerConfig(mcp_server_config_stdio_transport)
+    mcp_server_config.transport = None
+    with pytest.raises(InvalidConfigurationError, match="MCP transport type is missin"):
+        mcp_server_config.validate_yaml()
 
-def test_mcp_server_config_equality():
+    mcp_server_config = MCPServerConfig(mcp_server_config_stdio_transport)
+    mcp_server_config.transport = "foo"
+    with pytest.raises(InvalidConfigurationError, match="unknown transport type: foo"):
+        mcp_server_config.validate_yaml()
+
+
+def test_mcp_server_config_equality(mcp_server_config_stdio_transport):
     """Test the MCPServerConfig model."""
-    mcp_server_config_1 = MCPServerConfig({"name": "test_name"})
-    mcp_server_config_2 = MCPServerConfig({"name": "test_name"})
-    mcp_server_config_3 = MCPServerConfig({"name": "other"})
+    mcp_server_config_1 = MCPServerConfig(mcp_server_config_stdio_transport)
+    mcp_server_config_2 = MCPServerConfig(mcp_server_config_stdio_transport)
+    mcp_server_config_3 = MCPServerConfig(
+        {
+            "name": "other",
+            "transport": "stdio",
+            "stdio": {"command": "python", "args": "server1.py"},
+        }
+    )
 
     # compare the same configurations
     assert mcp_server_config_1 == mcp_server_config_2
@@ -70,15 +183,17 @@ def test_mcp_server_config_equality():
     assert mcp_server_config_1 != other_value
 
 
-def test_mcp_servers():
+def test_mcp_servers(
+    mcp_server_config_stdio_transport, mcp_server_config_sse_transport
+):
     """Test the MCPServers model."""
     mcp_servers = MCPServers()
     assert mcp_servers.servers == {}
 
     mcp_servers = MCPServers(
         [
-            {"name": "foo"},
-            {"name": "bar"},
+            mcp_server_config_stdio_transport,
+            mcp_server_config_sse_transport,
         ]
     )
     assert "foo" in mcp_servers.servers
@@ -96,24 +211,26 @@ def test_mcp_servers_invalid_input():
         )
 
 
-def test_mcp_servers_equality():
+def test_mcp_servers_equality(
+    mcp_server_config_stdio_transport, mcp_server_config_sse_transport
+):
     """Test the MCPServers model."""
     mcp_servers_1 = MCPServers(
         [
-            {"name": "foo"},
-            {"name": "bar"},
+            mcp_server_config_stdio_transport,
+            mcp_server_config_sse_transport,
         ]
     )
     mcp_servers_2 = MCPServers(
         [
-            {"name": "foo"},
-            {"name": "bar"},
+            mcp_server_config_stdio_transport,
+            mcp_server_config_sse_transport,
         ]
     )
     mcp_servers_3 = MCPServers(
         [
-            {"name": "something"},
-            {"name": "else"},
+            mcp_server_config_stdio_transport,
+            mcp_server_config_stdio_transport,
         ]
     )
 
@@ -128,15 +245,33 @@ def test_mcp_servers_equality():
     assert mcp_servers_1 != other_value
 
 
-def test_mcp_servers_validation():
+def test_mcp_servers_validation(
+    mcp_server_config_stdio_transport, mcp_server_config_sse_transport
+):
     """Test the MCPServers model."""
     mcp_servers_1 = MCPServers(
         [
-            {"name": "foo"},
-            {"name": "bar"},
+            mcp_server_config_stdio_transport,
+            mcp_server_config_sse_transport,
         ]
     )
     mcp_servers_1.validate_yaml()
+
+
+def test_sse_transport_configuration_on_no_data():
+    """Test the SSE transport configuration handling when no data are provided."""
+    with pytest.raises(
+        InvalidConfigurationError, match="SSE transport configuration is missing"
+    ):
+        SseTransportConfig()
+
+
+def test_stdio_transport_configuration_on_no_data():
+    """Test the STDIO transport configuration handling when no data are provided."""
+    with pytest.raises(
+        InvalidConfigurationError, match="stdio transport configuration is missing"
+    ):
+        StdioTransportConfig()
 
 
 def test_model_parameters():

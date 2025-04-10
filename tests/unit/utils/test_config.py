@@ -797,7 +797,14 @@ ols_config:
     minTLSVersion: VersionTLS13
 mcp_servers:
   - name: foo
+    transport: stdio
+    stdio:
+      command: python
+      args: mcp_server_1.py
   - name: bar
+    transport: sse
+    sse:
+      url: 127.0.0.1:8080
 dev_config:
   enable_dev_ui: true
   disable_auth: false
@@ -877,11 +884,29 @@ def test_valid_config_file():
                     "user_data_collection": {"transcripts_disabled": True},
                 },
                 "mcp_servers": [
-                    {"name": "foo"},
-                    {"name": "bar"},
+                    {
+                        "name": "foo",
+                        "transport": "stdio",
+                        "stdio": {
+                            "command": "python",
+                            "args": "mcp_server_1.py",
+                            "env": "",
+                            "cwd": ".",
+                        },
+                    },
+                    {
+                        "name": "bar",
+                        "transport": "sse",
+                        "sse": {
+                            "url": "127.0.0.1:8080",
+                            "timeout": 5,
+                            "sse_read_timeout": 10,
+                        },
+                    },
                 ],
             }
         )
+        # self.encoding = data.get("command", constants.STDIO_TRANSPORT_DEFAULT_ENCODING)`
         assert config.config == expected_config
         assert config.user_data_collector_config is None
         assert config.ols_config.user_data_collection is not None

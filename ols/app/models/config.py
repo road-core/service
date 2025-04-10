@@ -584,7 +584,7 @@ class StdioTransportConfig(BaseModel):
             raise InvalidConfigurationError("stdio transport configuration is missing")
         if "command" not in data:
             raise InvalidConfigurationError(
-                "command needs to be specified for stdio transport"
+                "command needs to be specified for STDIO transport"
             )
         self.command = data.get("command", "")
         self.args = data.get("args", "")
@@ -689,7 +689,7 @@ class MCPServerConfig(BaseModel):
                 self.sse.validate_yaml()
             case _:
                 raise checks.InvalidConfigurationError(
-                    f"unknown conversation cache type: {self.type}"
+                    f"unknown transport type: {self.transport}"
                 )
 
 
