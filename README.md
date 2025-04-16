@@ -561,15 +561,15 @@ Activate token quota limits for the service by adding a new configuration struct
       - name: user_monthly_limits
         type: user_limiter
         initial_quota: 100000 <3>
-        quota_increase: 10
+        quota_increase: 10 <4>
         period: 30 days
       - name: cluster_monthly_limits
         type: cluster_limiter
         initial_quota: 100000 <3>
-        quota_increase: 1000000
+        quota_increase: 1000000 <4>
         period: 30 days
     scheduler:
-      period: 300 <4>
+      period: 300 <5>
 ```
 
 <1> Specifies the IP address for the PostgresSQL database
