@@ -24,7 +24,7 @@ python -m scripts.evaluation.driver
 
 ### Sample run command
 ```
-OPENAI_API_KEY=IGNORED python -m scripts.evaluation.driver --qna_pool_file ./scripts/evaluation/eval_data/aap-sample.parquet --eval_provider_model_id my_rhoai+granite3-8b --eval_metrics answer_relevancy answer_similarity_llm cos_score rougeL_precision --eval_modes vanilla --judge_model granite3-8b --judge_provider my_rhoai3 --eval_query_ids qna1
+OPENAI_API_KEY=IGNORED python -m scripts.evaluation.driver --qna_pool_file ./scripts/evaluation/eval_data/aap-sample.parquet --eval_provider_model_id my_rhoai_g31+granite3-1-8b --eval_metrics answer_relevancy answer_similarity_llm cos_score rougeL_precision --eval_modes vanilla --judge_model granite3-1-8b --judge_provider my_rhoai_g31 --eval_query_ids qna1
 ```
 
 ### Input Data/QnA pool
