@@ -590,7 +590,7 @@ class StdioTransportConfig(BaseModel):
         self.args = data.get("args", "")
         self.env = data.get("env", constants.STDIO_TRANSPORT_DEFAULT_ENV)
         self.cwd = data.get("cwd", constants.STDIO_TRANSPORT_DEFAULT_CWD)
-        self.encoding = data.get("command", constants.STDIO_TRANSPORT_DEFAULT_ENCODING)
+        self.encoding = data.get("encoding", constants.STDIO_TRANSPORT_DEFAULT_ENCODING)
 
     def validate_yaml(self) -> None:
         """Validate STDIO transport config."""
@@ -613,7 +613,7 @@ class SseTransportConfig(BaseModel):
                 "URL needs to be specified for SSE transport"
             )
         self.url = data.get("url", "")
-        self.timeout = data.get("args", constants.SSE_TRANSPORT_DEFAULT_TIMEOUT)
+        self.timeout = data.get("timeout", constants.SSE_TRANSPORT_DEFAULT_TIMEOUT)
         self.sse_read_timeout = data.get(
             "sse_read_timeout", constants.SSE_TRANSPORT_DEFAULT_READ_TIMEOUT
         )
