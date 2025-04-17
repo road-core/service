@@ -1,9 +1,10 @@
 # Minimal service configuration
 ---
 llm_providers:
-  - name: my_bam
-    type: bam
+  - name: my_watsonx
+    type: watsonx
     url: "http://wont-be-used"
+    project_id: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
     models:
       - name: ibm/granite-3-8b-instruct
 ols_config:
@@ -14,7 +15,7 @@ ols_config:
   logging_config:
     app_log_level: info
     lib_log_level: warning
-  default_provider: my_bam
+  default_provider: my_watsonx
   default_model: ibm/granite-3-8b-instruct
 dev_config:
   enable_dev_ui: false
