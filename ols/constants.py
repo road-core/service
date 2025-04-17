@@ -213,6 +213,9 @@ SUPPORTED_AUTHENTICATION_MODULES = {"k8s", "noop"}
 # Default configuration file name for RCS
 DEFAULT_CONFIGURATION_FILE = "rcsconfig.yaml"
 
+# Configuration can be dumped into this file
+CONFIGURATION_DUMP_FILE_NAME = "configuration.json"
+
 # Environment variable containing configuration file name to override default
 # configuration file
 CONFIGURATION_FILE_NAME_ENV_VARIABLE = "RCS_CONFIG_FILE"
