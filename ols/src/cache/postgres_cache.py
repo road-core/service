@@ -93,6 +93,18 @@ class PostgresCache(Cache):
     def __init__(self, config: PostgresConfig) -> None:
         """Create a new instance of Postgres cache."""
         # initialize connection to DB
+        self.connect(config)
+        try:
+            self.initialize_cache()
+        except Exception as e:
+            self.connection.close()
+            logger.exception("Error initializing Postgres cache:\n%s", e)
+            raise
+        self.capacity = config.max_entries
+
+    # pylint: disable=W0201
+    def connect(self, config: PostgresConfig) -> None:
+        """Initialize connection to database."""
         self.connection = psycopg2.connect(
             host=config.host,
             port=config.port,
@@ -104,13 +116,6 @@ class PostgresCache(Cache):
             gssencmode=config.gss_encmode,
         )
         self.connection.autocommit = True
-        try:
-            self.initialize_cache()
-        except Exception as e:
-            self.connection.close()
-            logger.exception("Error initializing Postgres cache:\n%s", e)
-            raise
-        self.capacity = config.max_entries
 
     def initialize_cache(self) -> None:
         """Initialize cache - clean it up etc."""
