@@ -92,8 +92,10 @@ class PostgresCache(Cache):
 
     def __init__(self, config: PostgresConfig) -> None:
         """Create a new instance of Postgres cache."""
+        self.postgres_config = config
+
         # initialize connection to DB
-        self.connect(config)
+        self.connect()
         try:
             self.initialize_cache()
         except Exception as e:
@@ -103,8 +105,13 @@ class PostgresCache(Cache):
         self.capacity = config.max_entries
 
     # pylint: disable=W0201
-    def connect(self, config: PostgresConfig) -> None:
+    def connect(self) -> None:
         """Initialize connection to database."""
+        logger.info("Connecting to storage")
+        # make sure the connection will have known state
+        # even if PG is not alive
+        self.connection = None
+        config = self.postgres_config
         self.connection = psycopg2.connect(
             host=config.host,
             port=config.port,
