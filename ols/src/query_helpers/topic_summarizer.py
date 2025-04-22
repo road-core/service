@@ -8,7 +8,7 @@ from langchain.prompts import PromptTemplate
 
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
-from ols.constants import DUMMY_MODEL_NAME, GenericLLMParameters
+from ols.constants import DEFAULT_MODEL_NAME, GenericLLMParameters
 from ols.customize import prompts
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
@@ -32,7 +32,7 @@ class TopicSummarizer(QueryHelper):
         self.provider_config = config.llm_config.providers.get(self.provider)
         self.model_config = self.provider_config.models.get(self.model)
         if self.provider_config.disable_model_check and self.model_config is None:
-            self.model_config = self.provider_config.models.get(DUMMY_MODEL_NAME)
+            self.model_config = self.provider_config.models.get(DEFAULT_MODEL_NAME)
         self.generic_llm_params = {
             GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.model_config.parameters.max_tokens_for_response  # noqa: E501
         }

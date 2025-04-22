@@ -247,7 +247,7 @@ CLUSTER_QUOTA_LIMITER = "cluster_limiter"
 DEFAULT_INGRESS_URL = "https://console.redhat.com/api/ingress/v1/upload"
 
 # a dummy model name to set model config if model list is not provided
-DUMMY_MODEL_NAME = "dummy-model-name"
+DEFAULT_MODEL_NAME = "dummy-model-name"
 
 # MCP transport types
 MCP_TRANSPORT_STDIO = "stdio"
