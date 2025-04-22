@@ -37,7 +37,7 @@ def provider_streaming_config():
                 }
             ],
             "fake_provider_config": {
-                "url": "http://example.com",  # dummy
+                "url": "http://example.com",  # some URL
                 "stream": True,
                 "response": "Hello",
                 "chunks": 30,

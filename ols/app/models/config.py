@@ -16,7 +16,7 @@ from pydantic import (
 )
 
 from ols import constants
-from ols.constants import DUMMY_MODEL_NAME, VectorStoreType
+from ols.constants import DEFAULT_MODEL_NAME, VectorStoreType
 from ols.utils import checks, tls
 from ols.utils.checks import InvalidConfigurationError
 
@@ -340,7 +340,7 @@ class ProviderConfig(BaseModel):
                     f"no models configured for provider {data['name']}"
                 )
             data["models"] = [
-                {"name": DUMMY_MODEL_NAME},
+                {"name": DEFAULT_MODEL_NAME},
             ]
         for m in data["models"]:
             if "name" not in m:
