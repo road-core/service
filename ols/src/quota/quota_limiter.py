@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 
 import psycopg2
 
-from ols.app.models.config import PostgresConfig
-
 
 class QuotaLimiter(ABC):
     """Abstract class that is parent for all quota limiter implementations."""
@@ -33,8 +31,9 @@ class QuotaLimiter(ABC):
         """Consume tokens by given user."""
 
     # pylint: disable=W0201
-    def connect(self, config: PostgresConfig) -> None:
+    def connect(self) -> None:
         """Initialize connection to database."""
+        config = self.connection_config
         self.connection = psycopg2.connect(
             host=config.host,
             port=config.port,
