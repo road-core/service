@@ -1,8 +1,12 @@
 """Abstract class that is parent for all quota limiter implementations."""
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
 
 import psycopg2
+
+if TYPE_CHECKING:
+    from ols.app.models.config import PostgresConfig
 
 
 class QuotaLimiter(ABC):
@@ -29,6 +33,11 @@ class QuotaLimiter(ABC):
         self, input_tokens: int, output_tokens: int, subject_id: str = ""
     ) -> None:
         """Consume tokens by given user."""
+
+    @abstractmethod
+    def __init__(self) -> None:
+        """Initialize connection config."""
+        self.connection_config: Optional[PostgresConfig] = None
 
     # pylint: disable=W0201
     def connect(self) -> None:
