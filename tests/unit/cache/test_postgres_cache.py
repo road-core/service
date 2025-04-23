@@ -61,9 +61,16 @@ def test_get_operation_on_empty_cache():
     # call the "get" operation
     conversation = cache.get(user_id, conversation_id)
     assert conversation == []
-    mock_cursor.execute.assert_called_once_with(
-        PostgresCache.SELECT_CONVERSATION_HISTORY_STATEMENT, (user_id, conversation_id)
-    )
+
+    # multiple DB operations must be performed
+    calls = [
+        call("SELECT 1"),
+        call(
+            PostgresCache.SELECT_CONVERSATION_HISTORY_STATEMENT,
+            (user_id, conversation_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=False)
     mock_cursor.fetchone.assert_called_once()
 
 
@@ -87,10 +94,15 @@ def test_get_operation_invalid_value():
         with pytest.raises(ValueError, match="Invalid value read from cache:"):
             cache.get(user_id, conversation_id)
 
-    # DB operation SELECT must be performed
-    mock_cursor.execute.assert_called_once_with(
-        PostgresCache.SELECT_CONVERSATION_HISTORY_STATEMENT, (user_id, conversation_id)
-    )
+    # multiple DB operations must be performed
+    calls = [
+        call("SELECT 1"),
+        call(
+            PostgresCache.SELECT_CONVERSATION_HISTORY_STATEMENT,
+            (user_id, conversation_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=False)
     mock_cursor.fetchone.assert_called_once()
 
 
@@ -121,10 +133,15 @@ def test_get_operation_valid_value():
     # unjsond history should be returned
     assert cache.get(user_id, conversation_id) == history
 
-    # DB operation SELECT must be performed
-    mock_cursor.execute.assert_called_once_with(
-        PostgresCache.SELECT_CONVERSATION_HISTORY_STATEMENT, (user_id, conversation_id)
-    )
+    # multiple DB operations must be performed
+    calls = [
+        call("SELECT 1"),
+        call(
+            PostgresCache.SELECT_CONVERSATION_HISTORY_STATEMENT,
+            (user_id, conversation_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=False)
     mock_cursor.fetchone.assert_called_once()
 
 
@@ -293,10 +310,13 @@ def test_list_operation():
     assert result == expected_result
 
     # Verify the query execution
-    mock_cursor.execute.assert_called_once_with(
-        PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,)
-    )
     mock_cursor.fetchall.assert_called_once()
+    # multiple DB operations must be performed
+    calls = [
+        call("SELECT 1"),
+        call(PostgresCache.LIST_CONVERSATIONS_STATEMENT, (user_id,)),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=False)
 
 
 def test_list_operation_on_exception():
@@ -343,9 +363,15 @@ def test_delete_operation():
     assert result is True
 
     # Verify the query execution
-    mock_cursor.execute.assert_called_once_with(
-        PostgresCache.DELETE_SINGLE_CONVERSATION_STATEMENT, (user_id, conversation_id)
-    )
+    # multiple DB operations must be performed
+    calls = [
+        call("SELECT 1"),
+        call(
+            PostgresCache.DELETE_SINGLE_CONVERSATION_STATEMENT,
+            (user_id, conversation_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=False)
     mock_cursor.fetchone.assert_called_once()
 
 
@@ -372,9 +398,15 @@ def test_delete_operation_not_found():
     assert result is False
 
     # Verify the query execution
-    mock_cursor.execute.assert_called_once_with(
-        PostgresCache.DELETE_SINGLE_CONVERSATION_STATEMENT, (user_id, conversation_id)
-    )
+    # multiple DB operations must be performed
+    calls = [
+        call("SELECT 1"),
+        call(
+            PostgresCache.DELETE_SINGLE_CONVERSATION_STATEMENT,
+            (user_id, conversation_id),
+        ),
+    ]
+    mock_cursor.execute.assert_has_calls(calls, any_order=False)
     mock_cursor.fetchone.assert_called_once()
 
 
@@ -395,7 +427,7 @@ def test_delete_operation_on_exception():
         cache = PostgresCache(config)
 
         # Verify that the exception is raised
-        with pytest.raises(CacheError, match="PLSQL error"):
+        with pytest.raises(psycopg2.DatabaseError, match="PLSQL error"):
             cache.delete(user_id, conversation_id)
 
 
