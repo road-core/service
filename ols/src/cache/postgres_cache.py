@@ -10,6 +10,7 @@ from ols.app.models.config import PostgresConfig
 from ols.app.models.models import CacheEntry, MessageDecoder, MessageEncoder
 from ols.src.cache.cache import Cache
 from ols.src.cache.cache_error import CacheError
+from ols.utils.connection_decorator import connection
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +125,20 @@ class PostgresCache(Cache):
         )
         self.connection.autocommit = True
 
+    def connected(self) -> bool:
+        """Check if connection to cache is alive."""
+        if self.connection is None:
+            logger.warning("Not connected, need to reconnect later")
+            return False
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+            logger.info("Connection to storage is ok")
+            return True
+        except psycopg2.OperationalError as e:
+            logger.error("Disconnected from storage: %s", e)
+            return False
+
     def initialize_cache(self) -> None:
         """Initialize cache - clean it up etc."""
         cur = self.connection.cursor()
@@ -132,6 +147,7 @@ class PostgresCache(Cache):
         cur.close()
         self.connection.commit()
 
+    @connection
     def get(
         self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
     ) -> list[CacheEntry]:
@@ -159,6 +175,7 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.get %s", e)
                 raise CacheError("PostgresCache.get", e) from e
 
+    @connection
     def insert_or_append(
         self,
         user_id: str,
@@ -203,6 +220,7 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.insert_or_append: %s", e)
                 raise CacheError("PostgresCache.insert_or_append", e) from e
 
+    @connection
     def delete(
         self, user_id: str, conversation_id: str, skip_user_id_check: bool = False
     ) -> bool:
@@ -224,6 +242,7 @@ class PostgresCache(Cache):
                 logger.error("PostgresCache.delete: %s", e)
                 raise CacheError("PostgresCache.delete", e) from e
 
+    @connection
     def list(
         self, user_id: str, skip_user_id_check: bool = False
     ) -> list[dict[str, str]]:
@@ -258,7 +277,7 @@ class PostgresCache(Cache):
         """
         # TODO: when the connection is closed and the database is back online,
         # we need to reestablish the connection => implement this
-        if not self.connection or self.connection.closed == 1:
+        if self.connection is None or self.connection.closed == 1:
             return False
         try:
             return self.connection.poll() == psycopg2.extensions.POLL_OK
