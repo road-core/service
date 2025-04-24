@@ -14,7 +14,7 @@ from ols.constants import SUBJECT_ALLOWED, SUBJECT_REJECTED
 # but that is not done as granite was adding role tags like `Human:` in the response.
 # With PromptTemplate, we have more control how we want to structure the prompt.
 
-ANSIBLE_LIGHTSPEED_PRODUCT_NAME = "Ansible Lightspeed intelligent assistant"
+ANSIBLE_LIGHTSPEED_PRODUCT_NAME = "Ansible Lightspeed Intelligent Assistant"
 
 # Default responses
 INVALID_QUERY_RESP = (
