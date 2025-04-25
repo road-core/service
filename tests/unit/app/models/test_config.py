@@ -4158,21 +4158,6 @@ def test_missing_lightspeed_url_attribute():
         config._parse_rhdh_lightspeed_config(data)
 
 
-def test_missing_lightspeed_models_attribute():
-    """Test if missing model name attribute is handled correctly."""
-    config = LLMProviders()
-    data = [
-        {
-            "id": "lightspeed-id",
-            "url": "lightspeed-url",
-            "type": "lightspeed-type",
-            "token": "lightspeed-token",
-        }
-    ]
-    with pytest.raises(KeyError, match="lightspeed models missing."):
-        config._parse_rhdh_lightspeed_config(data)
-
-
 def test_missing_lightspeed_token_attribute():
     """Test if missing token attribute is handled correctly."""
     config = LLMProviders()
@@ -4224,14 +4209,40 @@ def test_lightspeed_token_setting():
     )
 
 
+def test_lightspeed_model_check_disabled_setting():
+    """Test if the model check disabled field is properly set for a lightspeed provider."""
+    config = LLMProviders()
+    data = [
+        {
+            "id": "lightspeed-id",
+            "url": "lightspeed-url",
+            "models": [{"name": "lightspeed-model-name"}],
+            "token": "lightspeed-token",
+            "type": "openai",
+        },
+        {
+            "id": "lightspeed-id-two",
+            "url": "lightspeed-url-two",
+            "token": "lightspeed-token-two",
+            "type": "openai",
+        },
+    ]
+
+    parsed_providers = config._parse_rhdh_lightspeed_config(data)
+    assert (
+        parsed_providers[0].disable_model_check is False
+        and parsed_providers[1].disable_model_check is True
+    )
+
+
 def test_lightspeed_config_parsing():
     """Test if the parsing of lightspeed providers from an RHDH config file is handled properly."""
     provider_one = ProviderConfig(
         {
             "name": "ollama",
             "url": "http://localhost:11434/v1",
-            "models": [{"name": "model-one"}],
             "type": "openai",
+            "disable_model_check": True,
         },
         True,
     )
