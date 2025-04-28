@@ -276,7 +276,8 @@ class PostgresCache(Cache):
             True if the cache is ready, False otherwise.
         """
         # TODO: when the connection is closed and the database is back online,
-        # we need to reestablish the connection => implement this
+        # we need to reestablish the connection => implement this there?
+        # (it will be reconnected on any other DB operation anyway)
         if self.connection is None or self.connection.closed == 1:
             return False
         try:
