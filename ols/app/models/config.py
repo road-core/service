@@ -540,27 +540,28 @@ class LLMProviders(BaseModel):
         """Private helper for converting RHDH config file model data to RCS readable data."""
         all_converted_providers = []
         for server in data:
+            disable_model_check = False
             formatted_data = {}
             name = server.get("id")
             url = server.get("url")
-            models = server.get(
-                "models"
-            )  # OLS doesn't require model_name but is a requirement of road-core config.
+            models = server.get("models")
             model_type = server.get("type")
             token = server.get("token")
             if name is None:
                 raise KeyError("lightspeed id is missing.")
             if url is None:
                 raise KeyError("lightspeed url is missing.")
-            if models is None:
-                raise KeyError("lightspeed models missing.")
             if token is None:
                 raise KeyError("lightspeed token is missing.")
+            if models is None:
+                models = {}
+                disable_model_check = True
             if model_type is None:
                 model_type = "openai"  # Default to openai if type is unset.
             formatted_data["name"] = name
             formatted_data["url"] = url
             formatted_data["models"] = models
+            formatted_data["disable_model_check"] = disable_model_check
             formatted_data["type"] = model_type
             provider = ProviderConfig(formatted_data, True)
             provider.credentials = token

@@ -83,8 +83,6 @@ lightspeed:
     - id: ollama
       url: http://localhost:11434/v1
       token: placeholder-token
-      models:
-        - name: model-one
     - id: new-cluster
       url: http://localhost:8080
       token: my-token
