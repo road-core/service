@@ -363,7 +363,7 @@ def test_rag_question() -> None:
         print(vars(response))
         json_response = response.json()
         assert "conversation_id" in json_response
-        assert len(json_response["referenced_documents"]) > 1
+        assert len(json_response["referenced_documents"]) > 2
         assert "virt" in json_response["referenced_documents"][0]["doc_url"]
         assert "https://" in json_response["referenced_documents"][0]["doc_url"]
         assert json_response["referenced_documents"][0]["doc_title"]
