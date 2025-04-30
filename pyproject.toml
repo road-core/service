@@ -38,20 +38,11 @@ exclude_dirs = ["tests", "scripts"]
 [tool.pdm]
 distribution = true
 
-[project.optional-dependencies]
-evaluation = [
-    "scikit-learn>=1.6.1",
-    "pandas>=2.1.4",
-    "rouge-score>=0.1.2",
-    "fastparquet>=2024.11.0",
-    "tqdm>=4.67.1",
-]
-
 [dependency-groups]
 dev = [
     "black>=25.1.0",
     "pydocstyle>=6.3.0",
-    "mypy>=1.15.0",
+    "mypy>=1.15.0",  # Usually needs to be set to latest stable version available
     "packaging>=24.1",
     "pytest>=8.3.2",
     "pytest-cov>=5.0.0",
@@ -105,7 +96,6 @@ excludes = [
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
 
 [project]
 name = "road-core"
@@ -161,6 +151,16 @@ license = {file = "LICENSE"}
 [project.urls]
 Homepage = "https://github.com/road-core/service"
 Issues = "https://github.com/road-core/service/issues"
+
+[project.optional-dependencies]
+evaluation = [
+    "scikit-learn>=1.6.1",
+    "pandas>=2.1.4",
+    "rouge-score>=0.1.2",
+    "ragas>=0.2.14",
+    "fastparquet>=2024.11.0",
+    "tqdm>=4.67.1",
+]
 
 [tool.pdm.scripts]
 start = "pdm run make run"
