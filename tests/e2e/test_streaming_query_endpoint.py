@@ -26,7 +26,7 @@ def post_with_defaults(endpoint, **kwargs):
     return pytest.client.post(
         endpoint,
         headers={"Connection": "close"},
-        timeout=kwargs.pop("timeout", test_api.NON_LLM_REST_API_TIMEOUT),
+        timeout=kwargs.pop("timeout", test_api.LLM_REST_API_TIMEOUT),
         **kwargs,
     )
 
@@ -336,6 +336,7 @@ def test_token_counters_for_query_call_with_improper_payload() -> None:
         response_utils.check_content_type(response, constants.MEDIA_TYPE_JSON)
 
 
+@pytest.mark.introspection
 @pytest.mark.rag
 @retry(max_attempts=3, wait_between_runs=60)
 def test_rag_question() -> None:

@@ -1,5 +1,6 @@
 """Unit test for the index loader module."""
 
+import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -25,7 +26,10 @@ def test_index_loader_no_id():
     config.ols_config.reference_content = ReferenceContent(None)
     config.ols_config.reference_content.product_docs_index_path = Path("./some_dir")
 
-    with patch("llama_index.core.StorageContext.from_defaults"):
+    with (
+        patch("llama_index.core.StorageContext.from_defaults"),
+        patch.dict(os.environ, {"TRANSFORMERS_CACHE": "", "TRANSFORMERS_OFFLINE": ""}),
+    ):
         index_loader_obj = IndexLoader(config.ols_config.reference_content)
         index = index_loader_obj.vector_index
 
@@ -48,6 +52,7 @@ def test_index_loader():
             "llama_index.vector_stores.faiss.FaissVectorStore.from_persist_dir"
         ) as from_persist_dir,
         patch("llama_index.core.load_index_from_storage", new=MockLlamaIndex),
+        patch.dict(os.environ, {"TRANSFORMERS_CACHE": "", "TRANSFORMERS_OFFLINE": ""}),
     ):
         from_persist_dir.return_value = None
 
@@ -70,6 +75,7 @@ def test_index_loader_from_faiss():
             "llama_index.vector_stores.faiss.FaissVectorStore.from_persist_dir"
         ) as from_persist_dir,
         patch("llama_index.core.load_index_from_storage", new=MockLlamaIndex),
+        patch.dict(os.environ, {"TRANSFORMERS_CACHE": "", "TRANSFORMERS_OFFLINE": ""}),
     ):
         from_persist_dir.return_value = None
 
@@ -94,6 +100,7 @@ def test_index_loader_from_postgres():
         patch(
             "llama_index.core.VectorStoreIndex.from_vector_store", new=MockLlamaIndex
         ),
+        patch.dict(os.environ, {"TRANSFORMERS_CACHE": "", "TRANSFORMERS_OFFLINE": ""}),
     ):
         from_params.return_value = None
 
