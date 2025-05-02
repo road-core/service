@@ -29,7 +29,6 @@ ols_config:
   default_model: 'llama3.2'
   expire_llm_is_ready_persistent_state: -1
   enable_event_stream_format: true
-  query_validation_method: llm
 dev_config:
   # config options specific to dev environment - launching OLS in local
   enable_dev_ui: true

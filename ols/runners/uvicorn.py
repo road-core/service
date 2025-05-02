@@ -4,13 +4,13 @@ import logging
 
 import uvicorn
 
-import ols.app.models.config as config_model
+from ols import config as config_model
 from ols.utils import ssl
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
-def start_uvicorn(config: config_model.Config) -> None:
+def start_uvicorn(config: config_model.AppConfig) -> None:
     """Start Uvicorn-based REST API service."""
     logger.info("Starting Uvicorn")
 
