@@ -46,7 +46,6 @@ KEYWORDS = {
     "virtualization",
     "worker",
     "yaml",
-    
     # RHDH & Backstge
     "argocd",
     "backstage",
