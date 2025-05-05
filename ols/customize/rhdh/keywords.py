@@ -48,17 +48,19 @@ KEYWORDS = {
     "yaml",
     
     # RHDH & Backstge
-    "argocd"
+    "argocd",
     "backstage",
     "catalog",
     "ci/cd",
-    "component"
+    "component",
+    "developer hub",
     "gitops",
     "integration",
-    "jenkens",
+    "jenkins",
     "lightspeed",
     "plugin",
-    "software template",
+    "resource",
     "rhdh",
+    "software template",
     "tekton",
 }
