@@ -1102,6 +1102,7 @@ def test_config_file_without_logging_config():
 
     # test if default values have been set
     logging_config = config.ols_config.logging_config
+    assert logging_config is not None
     assert logging_config.app_log_level == logging.INFO
     assert logging_config.lib_log_level == logging.WARNING
     assert logging_config.uvicorn_log_level == logging.WARNING
@@ -1182,10 +1183,9 @@ def test_valid_config_with_azure_openai():
             }
         )
         assert config.config == expected_config
-        assert (
-            config.config.llm_providers.providers.get("p1").api_version
-            == constants.DEFAULT_AZURE_API_VERSION
-        )
+        provider_config = config.config.llm_providers.providers.get("p1")
+        assert provider_config is not None
+        assert provider_config.api_version == constants.DEFAULT_AZURE_API_VERSION
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")
@@ -1293,9 +1293,9 @@ def test_valid_config_with_azure_openai_api_version():
             }
         )
         assert config.config == expected_config
-        assert (
-            config.config.llm_providers.providers.get("p1").api_version == "2024-12-31"
-        )
+        provider_config = config.config.llm_providers.providers.get("p1")
+        assert provider_config is not None
+        assert provider_config.api_version == "2024-12-31"
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")
@@ -1346,7 +1346,9 @@ def test_valid_config_with_bam():
             }
         )
         assert config.config == expected_config
-        assert config.config.llm_providers.providers.get("p1").api_version is None
+        provider_config = config.config.llm_providers.providers.get("p1")
+        assert provider_config is not None
+        assert provider_config.api_version is None
     except Exception as e:
         print(traceback.format_exc())
         pytest.fail(f"loading valid configuration failed: {e}")
