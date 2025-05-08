@@ -362,7 +362,7 @@ class ResponseEvaluation:
         result_df = self._condense_eval_df(result_df)
         result_df.to_csv(f"{self._result_dir}/model_evaluation_result.csv")
 
-        result_df = result_df.groupby(level="query_id").max()
+        result_df = result_df.groupby(level="query_id").max(numeric_only=True)
 
         summary_score = {}
         for score_type in self._args.eval_metrics:
@@ -376,7 +376,7 @@ class ResponseEvaluation:
                 col.removesuffix(f"_{score_type}") for col in temp_result_df.columns
             ]
             plot_file = f"{self._result_dir}/model_evaluation_result-{score_type}.png"
-            plot_score(temp_result_df, score_type, plot_file)
+            plot_score(temp_result_df, SCORE_DESCRIPTION[score_type], plot_file)
             summary_score[score_type] = temp_result_df.describe().T.to_dict()
 
         summary_result = {
