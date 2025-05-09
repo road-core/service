@@ -2,9 +2,9 @@
 
 # Same Provider/Model combination must be used while launching OLS.
 INSCOPE_MODELS = {
-    "bam+ibm/granite-13b-chat-v2": ("bam", "ibm/granite-3-8b-instruct"),
     "watsonx+ibm/granite-3-2b-instruct": ("watsonx", "ibm/granite-3-2b-instruct"),
     "watsonx+ibm/granite-3-8b-instruct": ("watsonx", "ibm/granite-3-8b-instruct"),
+    "watsonx+ibm/granite-3-2-8b-instruct": ("watsonx", "ibm/granite-3-2-8b-instruct"),
     "openai+gpt-4o-mini": ("openai", "gpt-4o-mini"),
     "openai+gpt-4o": ("openai", "gpt-4o"),
     "azure_openai+gpt-4o-mini": ("azure_openai", "gpt-4o-mini"),
@@ -36,6 +36,7 @@ EVAL_MODES = {
 }
 
 DEFAULT_QNA_FILE = "question_answer_pair.json"
+PARQUET_QNA_FILE = "ocp_doc_qna-edited.parquet"
 DEFAULT_CONFIG_FILE = "rcsconfig.yaml"
 
 DEFAULT_INPUT_DIR = "eval_data"
