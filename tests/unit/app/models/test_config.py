@@ -4277,3 +4277,58 @@ def test_lightspeed_config_parsing_empty():
         with open("tests/config/invalid_rhdh_config.yaml", encoding="utf-8") as f:
             data = yaml.safe_load(f)
             config.add_lightspeed_providers(data)
+
+
+def test_lightspeed_config_parsing_disable_query_validation():
+    """Test if the parsing of disable query validation from an RHDH config file is handled properly."""
+    provider_one = ProviderConfig(
+        {
+            "name": "ollama",
+            "url": "http://localhost:11434/v1",
+            "type": "openai",
+            "disable_model_check": True,
+        },
+        True,
+    )
+    provider_one.credentials = "placeholder-token"
+
+    expected_providers = {"ollama": provider_one}
+
+    providerConfig = LLMProviders()
+    olsConfig = OLSConfig()
+    with open(
+        "tests/config/valid_rhdh_config_disable_query_validation.yaml", encoding="utf-8"
+    ) as f:
+        data = yaml.safe_load(f)
+        providerConfig.add_lightspeed_providers(data)
+        olsConfig.parse_query_validation(data)
+
+    assert providerConfig.providers == expected_providers
+    assert olsConfig.query_validation_method == constants.QueryValidationMethod.DISABLED
+
+def test_lightspeed_config_parsing_enable_query_validation():
+    """Test if the parsing of enable query validation from an RHDH config file is handled properly."""
+    provider_one = ProviderConfig(
+        {
+            "name": "ollama",
+            "url": "http://localhost:11434/v1",
+            "type": "openai",
+            "disable_model_check": True,
+        },
+        True,
+    )
+    provider_one.credentials = "placeholder-token"
+
+    expected_providers = {"ollama": provider_one}
+
+    providerConfig = LLMProviders()
+    olsConfig = OLSConfig()
+    with open(
+        "tests/config/valid_rhdh_config.yaml", encoding="utf-8"
+    ) as f:
+        data = yaml.safe_load(f)
+        providerConfig.add_lightspeed_providers(data)
+        olsConfig.parse_query_validation(data)
+
+    assert providerConfig.providers == expected_providers
+    assert olsConfig.query_validation_method == constants.QueryValidationMethod.LLM

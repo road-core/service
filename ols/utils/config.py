@@ -164,6 +164,7 @@ class AppConfig:
                 match file_type:
                     case "rhdh":
                         self.config.llm_providers.add_lightspeed_providers(data)
+                        self.config.ols_config.parse_query_validation(data)
                     case _:
                         raise ValueError(
                             f"Configuration file type '{file_type}' not recognized."
