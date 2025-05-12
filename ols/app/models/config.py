@@ -1206,7 +1206,7 @@ class OLSConfig(BaseModel):
                 f"Invalid query validation method: {self.query_validation_method}\n"
                 f"Available options are {valid_query_validation_methods}"
             )
-        
+
     def parse_query_validation(self, data: dict) -> None:
         """Load query_validation_method declared in a Red Hat Developer Hub configuration file."""
         if data is None:
@@ -1215,12 +1215,11 @@ class OLSConfig(BaseModel):
         if lightspeed is None:
             raise KeyError("No lightspeed configuration defined.")
         # default is enabled
-        disable_query_validation = lightspeed.get("disableQuestionValidation", False) 
+        disable_query_validation = lightspeed.get("disableQuestionValidation", False)
         if disable_query_validation:
             self.query_validation_method = constants.QueryValidationMethod.DISABLED
         else:
             self.query_validation_method = constants.QueryValidationMethod.LLM
-            
 
 
 class DevConfig(BaseModel):

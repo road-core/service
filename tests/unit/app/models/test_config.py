@@ -4306,6 +4306,7 @@ def test_lightspeed_config_parsing_disable_query_validation():
     assert providerConfig.providers == expected_providers
     assert olsConfig.query_validation_method == constants.QueryValidationMethod.DISABLED
 
+
 def test_lightspeed_config_parsing_enable_query_validation():
     """Test if the parsing of enable query validation from an RHDH config file is handled properly."""
     provider_one = ProviderConfig(
@@ -4323,9 +4324,7 @@ def test_lightspeed_config_parsing_enable_query_validation():
 
     providerConfig = LLMProviders()
     olsConfig = OLSConfig()
-    with open(
-        "tests/config/valid_rhdh_config.yaml", encoding="utf-8"
-    ) as f:
+    with open("tests/config/valid_rhdh_config.yaml", encoding="utf-8") as f:
         data = yaml.safe_load(f)
         providerConfig.add_lightspeed_providers(data)
         olsConfig.parse_query_validation(data)
