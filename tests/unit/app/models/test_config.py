@@ -4280,13 +4280,12 @@ def test_lightspeed_config_parsing_empty():
 
 
 def test_lightspeed_config_parsing_disable_query_validation():
-    """Test if the parsing of disable query validation from an RHDH config file is handled properly."""
+    """Test if disable query validation from an RHDH config file is handled properly."""
     provider_one = ProviderConfig(
         {
             "name": "ollama",
             "url": "http://localhost:11434/v1",
             "type": "openai",
-            "disable_model_check": True,
         },
         True,
     )
@@ -4294,27 +4293,28 @@ def test_lightspeed_config_parsing_disable_query_validation():
 
     expected_providers = {"ollama": provider_one}
 
-    providerConfig = LLMProviders()
-    olsConfig = OLSConfig()
+    provider_config = LLMProviders()
+    ols_config = OLSConfig()
     with open(
         "tests/config/valid_rhdh_config_disable_query_validation.yaml", encoding="utf-8"
     ) as f:
         data = yaml.safe_load(f)
-        providerConfig.add_lightspeed_providers(data)
-        olsConfig.parse_query_validation(data)
+        provider_config.add_lightspeed_providers(data)
+        ols_config.parse_query_validation(data)
 
-    assert providerConfig.providers == expected_providers
-    assert olsConfig.query_validation_method == constants.QueryValidationMethod.DISABLED
+    assert provider_config.providers == expected_providers
+    assert (
+        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
+    )
 
 
 def test_lightspeed_config_parsing_enable_query_validation():
-    """Test if the parsing of enable query validation from an RHDH config file is handled properly."""
+    """Test if enable query validation from an RHDH config file is handled properly."""
     provider_one = ProviderConfig(
         {
             "name": "ollama",
             "url": "http://localhost:11434/v1",
             "type": "openai",
-            "disable_model_check": True,
         },
         True,
     )
@@ -4322,12 +4322,12 @@ def test_lightspeed_config_parsing_enable_query_validation():
 
     expected_providers = {"ollama": provider_one}
 
-    providerConfig = LLMProviders()
-    olsConfig = OLSConfig()
+    provider_config = LLMProviders()
+    ols_config = OLSConfig()
     with open("tests/config/valid_rhdh_config.yaml", encoding="utf-8") as f:
         data = yaml.safe_load(f)
-        providerConfig.add_lightspeed_providers(data)
-        olsConfig.parse_query_validation(data)
+        provider_config.add_lightspeed_providers(data)
+        ols_config.parse_query_validation(data)
 
-    assert providerConfig.providers == expected_providers
-    assert olsConfig.query_validation_method == constants.QueryValidationMethod.LLM
+    assert provider_config.providers == expected_providers
+    assert ols_config.query_validation_method == constants.QueryValidationMethod.LLM
