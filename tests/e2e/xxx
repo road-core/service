@@ -1,0 +1,24 @@
+/home/ptisnovs/src/road-core-service/tests/e2e/__init__.py
+  /home/ptisnovs/src/road-core-service/tests/e2e/__init__.py:3:12 - warning: "test_api" is specified in __all__ but is not present in module (reportUnsupportedDunderAll)
+  /home/ptisnovs/src/road-core-service/tests/e2e/__init__.py:3:24 - warning: "test_attachments" is specified in __all__ but is not present in module (reportUnsupportedDunderAll)
+  /home/ptisnovs/src/road-core-service/tests/e2e/__init__.py:3:44 - warning: "test_query_endpoint" is specified in __all__ but is not present in module (reportUnsupportedDunderAll)
+/home/ptisnovs/src/road-core-service/tests/e2e/evaluation/test_evaluation.py
+  /home/ptisnovs/src/road-core-service/tests/e2e/evaluation/test_evaluation.py:15:39 - error: "split" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/ptisnovs/src/road-core-service/tests/e2e/evaluation/test_evaluation.py:16:33 - error: "split" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/ptisnovs/src/road-core-service/tests/e2e/evaluation/test_evaluation.py:21:56 - error: "client" is not a known attribute of module "pytest" (reportAttributeAccessIssue)
+  /home/ptisnovs/src/road-core-service/tests/e2e/evaluation/test_evaluation.py:32:54 - error: "client" is not a known attribute of module "pytest" (reportAttributeAccessIssue)
+/home/ptisnovs/src/road-core-service/tests/e2e/test_streaming_query_endpoint.py
+  /home/ptisnovs/src/road-core-service/tests/e2e/test_streaming_query_endpoint.py:440:65 - error: Argument of type "list[dict[Unknown, Unknown]]" cannot be assigned to parameter "events" of type "dict[Unknown, Unknown]" in function "construct_response_from_streamed_events"
+    "list[dict[Unknown, Unknown]]" is not assignable to "dict[Unknown, Unknown]" (reportArgumentType)
+  /home/ptisnovs/src/road-core-service/tests/e2e/test_streaming_query_endpoint.py:463:65 - error: Argument of type "list[dict[Unknown, Unknown]]" cannot be assigned to parameter "events" of type "dict[Unknown, Unknown]" in function "construct_response_from_streamed_events"
+    "list[dict[Unknown, Unknown]]" is not assignable to "dict[Unknown, Unknown]" (reportArgumentType)
+/home/ptisnovs/src/road-core-service/tests/e2e/utils/cluster.py
+  /home/ptisnovs/src/road-core-service/tests/e2e/utils/cluster.py:225:20 - error: Type "None" is not assignable to return type "list[str]"
+    "None" is not assignable to "list[str]" (reportReturnType)
+/home/ptisnovs/src/road-core-service/tests/e2e/utils/ols_installer.py
+  /home/ptisnovs/src/road-core-service/tests/e2e/utils/ols_installer.py:276:16 - error: Type "None" is not assignable to return type "tuple[str, str, str]"
+    "None" is not assignable to "tuple[str, str, str]" (reportReturnType)
+  /home/ptisnovs/src/road-core-service/tests/e2e/utils/ols_installer.py:283:24 - error: "split" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/ptisnovs/src/road-core-service/tests/e2e/utils/ols_installer.py:373:16 - error: Type "None" is not assignable to return type "tuple[str, str, str]"
+    "None" is not assignable to "tuple[str, str, str]" (reportReturnType)
+10 errors, 3 warnings, 0 informations 
