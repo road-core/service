@@ -4286,6 +4286,7 @@ def test_lightspeed_config_parsing_disable_query_validation():
             "name": "ollama",
             "url": "http://localhost:11434/v1",
             "type": "openai",
+            "disable_model_check": True,
         },
         True,
     )
@@ -4303,9 +4304,7 @@ def test_lightspeed_config_parsing_disable_query_validation():
         ols_config.parse_query_validation(data)
 
     assert provider_config.providers == expected_providers
-    assert (
-        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
-    )
+    assert ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
 
 
 def test_lightspeed_config_parsing_enable_query_validation():
@@ -4315,6 +4314,7 @@ def test_lightspeed_config_parsing_enable_query_validation():
             "name": "ollama",
             "url": "http://localhost:11434/v1",
             "type": "openai",
+            "disable_model_check": True,
         },
         True,
     )
