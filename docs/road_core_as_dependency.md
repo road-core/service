@@ -1,3 +1,8 @@
+---
+layout: page
+nav_order: 2
+---
+
 # Road-core service as a dependency for other projects
 
 It is possible to use road-core service as a dependency for other projects. In order to use it for a new project, the following steps needs to be taken:
