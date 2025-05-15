@@ -1,6 +1,6 @@
 ---
-layout: page
-nav_order: 8
+layout: default
+nav_order: 3
 ---
 # Lunch and Learn
 

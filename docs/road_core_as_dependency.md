@@ -1,6 +1,6 @@
 ---
-layout: page
-nav_order: 2
+layout: default
+nav_order: 4
 ---
 
 # Road-core service as a dependency for other projects
