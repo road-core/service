@@ -141,18 +141,13 @@ class PostgresCache(Cache):
 
     def initialize_cache(self) -> None:
         """Initialize cache - clean it up etc."""
-        # cursor as context manager is not used there on purpose
-        # any CREATE statement can raise it's own exception
-        # and it should not interfere with other statements
-        cursor = self.connection.cursor()
+        with self.connection.cursor() as cursor:
+            logger.info("Initializing table for cache")
+            cursor.execute(PostgresCache.CREATE_CACHE_TABLE)
 
-        logger.info("Initializing table for cache")
-        cursor.execute(PostgresCache.CREATE_CACHE_TABLE)
+            logger.info("Initializing index for cache")
+            cursor.execute(PostgresCache.CREATE_INDEX)
 
-        logger.info("Initializing index for cache")
-        cursor.execute(PostgresCache.CREATE_INDEX)
-
-        cursor.close()
         self.connection.commit()
 
     @connection
