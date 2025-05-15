@@ -1219,11 +1219,11 @@ class OLSConfig(BaseModel):
         if lightspeed is None:
             raise KeyError("No lightspeed configuration defined.")
         # in RHDH, default is enabled as llm validation
-        disable_query_validation = lightspeed.get("disableQuestionValidation", False)
-        if disable_query_validation:
-            self.query_validation_method = constants.QueryValidationMethod.DISABLED
-        else:
+        query_validation = lightspeed.get("questionValidation", True)
+        if query_validation:
             self.query_validation_method = constants.QueryValidationMethod.LLM
+        else:
+            self.query_validation_method = constants.QueryValidationMethod.DISABLED
 
 
 class DevConfig(BaseModel):
