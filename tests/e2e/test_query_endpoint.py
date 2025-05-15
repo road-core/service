@@ -1,5 +1,9 @@
 """End to end tests for the REST API endpoint /query."""
 
+# we add new attributes into pytest instance, which is not recognized
+# properly by linters
+# pyright: reportAttributeAccessIssue=false
+
 import re
 
 import pytest
@@ -497,7 +501,7 @@ def test_query_with_model_but_not_provider() -> None:
             json={
                 "conversation_id": "",
                 "query": "what is kubernetes?",
-                "model": "ibm/granite-3-8b-instruct",
+                "model": "model-name",
             },
             timeout=test_api.LLM_REST_API_TIMEOUT,
         )

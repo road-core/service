@@ -1,5 +1,9 @@
 """End to end tests for the REST API streming query endpoint."""
 
+# we add new attributes into pytest instance, which is not recognized
+# properly by linters
+# pyright: reportAttributeAccessIssue=false
+
 import json
 import re
 
@@ -501,7 +505,7 @@ def test_query_with_model_but_not_provider() -> None:
             json={
                 "conversation_id": "",
                 "query": "what is kubernetes?",
-                "model": "ibm/granite-3-8b-instruct",
+                "model": "model-name",
             },
         )
         assert response.status_code == requests.codes.unprocessable_entity
