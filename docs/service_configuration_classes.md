@@ -1,6 +1,6 @@
 ---
 layout: default
-nav_order: 8
+nav_order: 5
 ---
 # Service configuration class hierarchy
 
