@@ -79,6 +79,7 @@ catalog:
     - allow: [Component, System, API, Resource, Location]
 
 lightspeed:
+  questionValidation: false
   servers:
     - id: ollama
       url: http://localhost:11434/v1

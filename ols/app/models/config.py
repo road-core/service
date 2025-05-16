@@ -1211,6 +1211,20 @@ class OLSConfig(BaseModel):
                 f"Available options are {valid_query_validation_methods}"
             )
 
+    def parse_query_validation(self, data: dict) -> None:
+        """Load query_validation_method declared in a Red Hat Developer Hub configuration file."""
+        if data is None:
+            return
+        lightspeed = data.get("lightspeed")
+        if lightspeed is None:
+            raise KeyError("No lightspeed configuration defined.")
+        # in RHDH, default is enabled as llm validation
+        query_validation = lightspeed.get("questionValidation", True)
+        if query_validation:
+            self.query_validation_method = constants.QueryValidationMethod.LLM
+        else:
+            self.query_validation_method = constants.QueryValidationMethod.DISABLED
+
 
 class DevConfig(BaseModel):
     """Developer-mode-only configuration options."""
