@@ -127,16 +127,12 @@ configure model, and connect to it.
 
 # Installation
 
-## 1. Clone the repo
-   ```sh
-   git clone https://github.com/road-core/service.git
-   cd service
-   ```
-## 2. Install python packages
-   ```sh
-   make install-deps
-   ```
-## 3. Get API keys
+Installation steps depends on operation system. Please look at instructions for your system:
+
+- [Linux installation](https://road-core.github.io/service/linux_installation)
+- [macOS installation](https://road-core.github.io/service/macos_installation)
+
+## API keys for LLM provider(s)
 
    This step depends on provider type
 
