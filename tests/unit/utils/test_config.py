@@ -1066,8 +1066,12 @@ def test_valid_config_file_with_redis():
                 ],
                 "ols_config": {
                     "reference_content": {
-                        "product_docs_index_path": "tests/config",
-                        "product_docs_index_id": "product",
+                        "indexes": [
+                            {
+                                "product_docs_index_path": "tests/config",
+                                "product_docs_index_id": "product",
+                            },
+                        ],
                     },
                     "conversation_cache": {
                         "type": "redis",
