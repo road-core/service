@@ -128,8 +128,8 @@ configure model, and connect to it.
 
 Installation steps depends on operation system. Please look at instructions for your system:
 
-- [Linux installation](https://road-core.github.io/service/linux_installation)
-- [macOS installation](https://road-core.github.io/service/macos_installation)
+- [Linux installation](https://road-core.github.io/service/installation_linux)
+- [macOS installation](https://road-core.github.io/service/installation_macos)
 
 ## API keys for LLM provider(s)
 
