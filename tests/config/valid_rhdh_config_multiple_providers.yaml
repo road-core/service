@@ -86,5 +86,3 @@ lightspeed:
     - id: new-cluster
       url: http://localhost:8080
       token: my-token
-      models:
-        - name: model-one

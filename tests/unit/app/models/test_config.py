@@ -3910,7 +3910,6 @@ def test_missing_lightspeed_id_attribute():
     data = [
         {
             "url": "lightspeed-url",
-            "models": [{"name": "lightspeed-model-name"}],
             "type": "lightspeed-type",
             "token": "lightspeed-token",
         }
@@ -3926,7 +3925,6 @@ def test_missing_lightspeed_url_attribute():
     data = [
         {
             "id": "lightspeed-id",
-            "models": [{"name": "lightspeed-model-name"}],
             "type": "lightspeed-type",
             "token": "lightspeed-token",
         }
@@ -3942,7 +3940,6 @@ def test_missing_lightspeed_token_attribute():
         {
             "id": "lightspeed-id",
             "url": "lightspeed-url",
-            "models": [{"name": "lightspeed-model-name"}],
             "type": "lightspeed-type",
         }
     ]
@@ -3957,7 +3954,6 @@ def test_missing_lightspeed_type_attribute():
         {
             "id": "lightspeed-id",
             "url": "lightspeed-url",
-            "models": [{"name": "lightspeed-model-name"}],
             "token": "lightspeed-token",
         }
     ]
@@ -3973,7 +3969,6 @@ def test_lightspeed_token_setting():
         {
             "id": "lightspeed-id",
             "url": "lightspeed-url",
-            "models": [{"name": "lightspeed-model-name"}],
             "token": "lightspeed-token",
             "type": "openai",
         }
@@ -3993,7 +3988,6 @@ def test_lightspeed_model_check_disabled_setting():
         {
             "id": "lightspeed-id",
             "url": "lightspeed-url",
-            "models": [{"name": "lightspeed-model-name"}],
             "token": "lightspeed-token",
             "type": "openai",
         },
@@ -4007,7 +4001,7 @@ def test_lightspeed_model_check_disabled_setting():
 
     parsed_providers = config._parse_rhdh_lightspeed_config(data)
     assert (
-        parsed_providers[0].disable_model_check is False
+        parsed_providers[0].disable_model_check is True
         and parsed_providers[1].disable_model_check is True
     )
 
@@ -4027,8 +4021,8 @@ def test_lightspeed_config_parsing():
         {
             "name": "new-cluster",
             "url": "http://localhost:8080",
-            "models": [{"name": "model-one"}],
             "type": "openai",
+            "disable_model_check": True,
         },
         True,
     )
