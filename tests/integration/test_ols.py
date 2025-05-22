@@ -497,6 +497,7 @@ def test_post_query_for_conversation_history(_setup, endpoint) -> None:
             actual_returned_history[0].query.content
             == chat_history_expected[0].query.content
         )
+        assert chat_history_expected[0].response is not None
         assert (
             actual_returned_history[0].response.content
             == chat_history_expected[0].response.content
