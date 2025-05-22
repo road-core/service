@@ -5,7 +5,7 @@
 groups = ["default", "dev", "evaluation"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:454f0b2f9d8df3c8726715fdb7a70a851ae57b697dd4fddaae8f009fbe871814"
+content_hash = "sha256:b951af6e1c382c5fec18d885f159682df7db349decbdde2837e6c06dd138761c"
 
 [[metadata.targets]]
 requires_python = ">=3.11.1,<=3.12.10"
@@ -3969,13 +3969,13 @@ files = [
 
 [[package]]
 name = "setuptools"
-version = "80.0.1"
+version = "80.8.0"
 requires_python = ">=3.9"
 summary = "Easily download, build, install, upgrade, and uninstall Python packages"
 groups = ["default", "dev"]
 files = [
-    {file = "setuptools-80.0.1-py3-none-any.whl", hash = "sha256:f4b49d457765b3aae7cbbeb1c71f6633a61b729408c2d1a837dae064cca82ef2"},
-    {file = "setuptools-80.0.1.tar.gz", hash = "sha256:20fe373a22ef9f3925512650d1db90b1b8de01cdb6df91ab1788263139cbf9a2"},
+    {file = "setuptools-80.8.0-py3-none-any.whl", hash = "sha256:95a60484590d24103af13b686121328cc2736bee85de8936383111e421b9edc0"},
+    {file = "setuptools-80.8.0.tar.gz", hash = "sha256:49f7af965996f26d43c8ae34539c8d99c5042fbff34302ea151eaa9c207cd257"},
 ]
 
 [[package]]
