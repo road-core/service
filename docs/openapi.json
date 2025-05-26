@@ -3,7 +3,7 @@
     "info": {
         "title": "Swagger Road-core service - OpenAPI",
         "description": "Road-core service API specification.",
-        "version": "0.3.3"
+        "version": "0.3.4"
     },
     "paths": {
         "/v1/query": {
