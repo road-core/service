@@ -155,11 +155,11 @@ def test_retrieve_attachments_on_proper_input():
         query="Tell me about Kubernetes",
         conversation_id=conversation_id,
         attachments=[
-            {
-                "attachment_type": "log",
-                "content_type": "text/plain",
-                "content": "this is attachment",
-            },
+            Attachment(
+                attachment_type="log",
+                content_type="text/plain",
+                content="this is attachment",
+            ),
         ],
     )
     attachments = ols.retrieve_attachments(llm_request)
@@ -181,11 +181,11 @@ def test_retrieve_attachments_on_improper_attachment_type():
         query="Tell me about Kubernetes",
         conversation_id=conversation_id,
         attachments=[
-            {
-                "attachment_type": "not-correct-one",
-                "content_type": "text/plain",
-                "content": "this is attachment",
-            },
+            Attachment(
+                attachment_type="not-correct-one",
+                content_type="text/plain",
+                content="this is attachment",
+            ),
         ],
     )
     with pytest.raises(
@@ -202,11 +202,11 @@ def test_retrieve_attachments_on_improper_content_type():
         query="Tell me about Kubernetes",
         conversation_id=conversation_id,
         attachments=[
-            {
-                "attachment_type": "log",
-                "content_type": "not/known",
-                "content": "this is attachment",
-            },
+            Attachment(
+                attachment_type="log",
+                content_type="not/known",
+                content="this is attachment",
+            ),
         ],
     )
     with pytest.raises(
@@ -232,7 +232,7 @@ def test_store_conversation_history():
             llm_request,
             response,
             [],
-            [],
+            {},
             topic_summary,
         )
 
@@ -259,7 +259,7 @@ def test_store_conversation_history_some_response():
 
     with patch("ols.config.conversation_cache.insert_or_append") as insert_or_append:
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, response, [], [], topic_summary
+            user_id, conversation_id, llm_request, response, [], {}, topic_summary
         )
 
         expected_history = CacheEntry(
@@ -331,11 +331,11 @@ def test_store_conversation_history_empty_user_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, "", [], [], ""
+            user_id, conversation_id, llm_request, "", [], {}, ""
         )
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, None, [], [], ""
+            user_id, conversation_id, llm_request, None, [], {}, ""
         )
 
 
@@ -347,7 +347,7 @@ def test_store_conversation_history_improper_user_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, "", [], [], ""
+            user_id, conversation_id, llm_request, "", [], {}, ""
         )
 
 
@@ -358,7 +358,7 @@ def test_store_conversation_history_improper_conversation_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid conversation ID"):
         ols.store_conversation_history(
-            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], [], ""
+            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], {}, ""
         )
 
 
@@ -527,6 +527,7 @@ def test_query_filter_with_one_redact_filter():
     llm_request = LLMRequest(query=query, conversation_id=conversation_id)
 
     # use one custom filter
+    assert config.ols_config.query_filters is not None
     q = Redactor(config.ols_config.query_filters)
     q.regex_filters = [
         RegexFilter(
@@ -550,6 +551,7 @@ def test_query_filter_with_two_redact_filters():
     llm_request = LLMRequest(query=query, conversation_id=conversation_id)
 
     # use two custom filters
+    assert config.ols_config.query_filters is not None
     q = Redactor(config.ols_config.query_filters)
     q.regex_filters = [
         RegexFilter(
@@ -624,6 +626,7 @@ def test_attachments_redact_with_one_filter_defined():
     ]
 
     # use two custom filters
+    assert config.ols_config.query_filters is not None
     q = Redactor(config.ols_config.query_filters)
     q.regex_filters = [
         RegexFilter(
@@ -670,6 +673,7 @@ def test_attachments_redact_with_two_filters_defined():
     ]
 
     # use two custom filters
+    assert config.ols_config.query_filters is not None
     q = Redactor(config.ols_config.query_filters)
     q.regex_filters = [
         RegexFilter(
