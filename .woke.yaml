@@ -7,6 +7,10 @@ ignore_files:
   - '.*'                 # Exclude all files starting with .
   - 'ols/utils/keywords.py' # Exclude all keywords
   - 'ols/customize/ols/keywords.py'
+  - 'ols/customize/rhdh/keywords.py'
+  - 'docs/plugin/**/*'
+  - 'docs/js/**/*'
+  - 'docs/css/**/*'
 
 rules:
   - name: abort
