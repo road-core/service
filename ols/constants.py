@@ -61,6 +61,10 @@ class GenericLLMParameters:
     TEMPERATURE = "temperature"
 
 
+# Max Iteration for tool calling
+MAX_ITERATIONS = 5
+
+
 # Token related constants
 
 # It is important to set correct context window, otherwise there will be potential
@@ -248,3 +252,6 @@ SSE_TRANSPORT_DEFAULT_READ_TIMEOUT = 10
 STDIO_TRANSPORT_DEFAULT_ENCODING = "utf-8"
 STDIO_TRANSPORT_DEFAULT_ENV: dict[str, str | int] = {}
 STDIO_TRANSPORT_DEFAULT_CWD = "."
+
+# timeout value for a single llm with tools round
+TOOL_CALL_ROUND_TIMEOUT = 30
