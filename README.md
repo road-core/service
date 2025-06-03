@@ -1,7 +1,7 @@
 # About The Project
 
 [![GitHub Pages](https://img.shields.io/badge/%20-GitHub%20Pages-informational)](https://road-core.github.io/service/)
-[![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/road-core/service/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/road-core/service?color=blue&label=License)](https://github.com/road-core/service/blob/main/LICENSE)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
 
@@ -281,7 +281,7 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 
    It is possible to configure the service to use local *ollama* server.
    Please look into an
-   [examples/olsconfig-local-ollama.yaml](examples/olsconfig-local-ollama.yaml)
+   [examples/rcsconfig-local-ollama.yaml](examples/rcsconfig-local-ollama.yaml)
    file that describes all required steps.
 
    1. Common providers configuration options
@@ -319,8 +319,8 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 
 ## 3. Configure RCS Authentication
 
-   [!NOTE]
-   Currently, only K8S-based authentication and the so called no-op authentication can be used. It is possible to configure which mechanism should be used. The K8S-based authentication is selected by default if the auth. method is not specified in configuration.
+   > [!NOTE]
+   > Currently, only K8S-based authentication and the so called no-op authentication can be used. It is possible to configure which mechanism should be used. The K8S-based authentication is selected by default if the auth. method is not specified in configuration.
 
 ### 3.1. K8S-based auth mechanism
 
@@ -380,8 +380,8 @@ Depends on configuration, but usually it is not needed to generate or use API ke
 
       In this case it is possible to pass `user-id` optional parameter when calling REST API query endpoints. If the `user-id` won't be passed, the default one will be used: `00000000-0000-0000-0000-000000000000`
 
-      [!NOTE]
-      The value of `user-id` parameter is not checked. This means it is possible to pass non-UUID value, which might not be appropriate for some use cases.
+      > [!NOTE]
+      > The value of `user-id` parameter is not checked. This means it is possible to pass non-UUID value, which might not be appropriate for some use cases.
 
 ## 4. Configure RCS TLS communication
 
@@ -522,8 +522,8 @@ llm_providers:
       minTLSVersion: VersionTLS13
 ```
 
-[!NOTE]
-The `tlsSecurityProfile` is fully optional. When it is not specified, the LLM call won't be affected by specific SSL/TLS settings.
+> [!NOTE]
+> The `tlsSecurityProfile` is fully optional. When it is not specified, the LLM call won't be affected by specific SSL/TLS settings.
 
 
 
@@ -619,8 +619,8 @@ RCS service can be started locally. In this case GradIO web UI is used to
 interact with the service. Alternatively the service can be accessed through
 REST API.
 
-[!TIP]
-To enable GradIO web UI you need to have the following `dev_config` section in your configuration file:
+> [!TIP]
+> To enable GradIO web UI you need to have the following `dev_config` section in your configuration file:
 
 ```yaml
 dev_config:
