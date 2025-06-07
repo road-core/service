@@ -1,5 +1,7 @@
 """Prometheus metrics that are exposed by REST API."""
 
+import logging
+
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
@@ -11,11 +13,14 @@ from prometheus_client import (
     Histogram,
     disable_created_metrics,
     generate_latest,
+    REGISTRY
 )
 
 from ols import config
 from ols.src.auth.auth import get_auth_dependency
 from ols.utils.config import AppConfig
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["metrics"])
 auth_dependency = get_auth_dependency(
@@ -23,6 +28,37 @@ auth_dependency = get_auth_dependency(
 )
 
 disable_created_metrics()  # type: ignore [no-untyped-call]
+
+
+_DEFAULT_METRICS_LIST = [
+    "rest_api_calls_total",
+    "response_duration_seconds",
+    "llm_calls_total",
+    "llm_calls_failures_total",
+    "llm_calls_validation_errors_total",
+    "llm_token_sent_total",
+    "llm_token_received_total",
+    "provider_model_configuration"
+]
+
+# Helper object to keep API compatibility with disabled metrics
+class NoopMetric():
+    def inc(self, *args, **kwargs):
+        pass
+
+    def labels(self, *args, **kwargs):
+        return self
+
+    def set(self, *args, **kwargs):
+        pass
+
+    def time(self, *args, **kwargs):
+        class NoopTimer():
+            def __enter__(self):
+                pass
+            def __exit__(self, typ, value, traceback):
+                pass
+        return NoopTimer()
 
 rest_api_calls_total = Counter(
     "ols_rest_api_calls_total", "REST API calls counter", ["path", "status_code"]
@@ -46,7 +82,6 @@ llm_token_sent_total = Counter(
 llm_token_received_total = Counter(
     "ols_llm_token_received_total", "LLM tokens received", ["provider", "model"]
 )
-
 # metric that indicates what provider + model customers are using so we can
 # understand what is popular/important
 provider_model_configuration = Gauge(
@@ -54,6 +89,56 @@ provider_model_configuration = Gauge(
     "LLM provider/models combinations defined in configuration",
     ["provider", "model"],
 )
+
+
+def setup_metrics(config):
+    # TODO better comments
+    # Disable metrics not configured in config file.
+    # Metrics initialization does not work in a class/function.
+    global rest_api_calls_total
+    global response_duration_seconds
+    global llm_calls_total
+    global llm_calls_failures_total
+    global llm_calls_validation_errors_total
+    global llm_token_sent_total
+    global llm_token_received_total
+    global provider_model_configuration
+
+    if not config.ols_config.metrics:
+        # No metrics configured - keep all enabled.
+        return
+    # Metrics to disable
+    disabled_metrics = set(_DEFAULT_METRICS_LIST) - set(config.ols_config.metrics)
+
+    for m in disabled_metrics:
+        match m:
+            case "rest_api_calls_total":
+                REGISTRY.unregister(rest_api_calls_total)
+                rest_api_calls_total = NoopMetric()
+            case "response_duration_seconds":
+                REGISTRY.unregister(response_duration_seconds)
+                response_duration_seconds = NoopMetric()
+            case "llm_calls_total":
+                REGISTRY.unregister(llm_calls_total)
+                llm_calls_total = NoopMetric()
+            case "llm_calls_failures_total":
+                REGISTRY.unregister(llm_calls_failures_total)
+                llm_calls_failures_total = NoopMetric()
+            case "llm_calls_validation_errors_total":
+                REGISTRY.unregister(llm_calls_validation_errors_total)
+                llm_calls_validation_errors_total = NoopMetric()
+            case "llm_token_sent_total":
+                REGISTRY.unregister(llm_token_sent_total)
+                llm_token_sent_total = NoopMetric()
+            case "llm_token_received_total":
+                REGISTRY.unregister(llm_token_received_total)
+                llm_token_received_total = NoopMetric()
+            case "provider_model_configuration":
+                REGISTRY.unregister(provider_model_configuration)
+                provider_model_configuration = NoopMetric()
+            case _:
+                logger.warning(f"Metric `{m}` does not exit. Check the `ols_config`"
+                                "section of the configuration file.")
 
 
 @router.get("/metrics", response_class=PlainTextResponse)
