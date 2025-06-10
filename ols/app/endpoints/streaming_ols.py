@@ -24,6 +24,7 @@ from ols.app.endpoints.ols import (
     process_request,
     store_conversation_history,
     store_transcript,
+    build_referenced_docs,
 )
 from ols.app.models.models import (
     Attachment,
@@ -191,18 +192,6 @@ def stream_end_event(
     return f"\n\n---\n\n{ref_docs_string}" if ref_docs_string else ""
 
 
-def build_referenced_docs(rag_chunks: list[RagChunk]) -> list[dict]:
-    """Build a list of unique referenced documents."""
-    referenced_documents = ReferencedDocument.from_rag_chunks(rag_chunks)
-    return [
-        {
-            "doc_title": document.doc_title,
-            "doc_url": document.doc_url,
-        }
-        for document in referenced_documents
-    ]
-
-
 def prompt_too_long_error(error: PromptTooLongError, media_type: str) -> str:
     """Return error representation for long prompts.
 
@@ -311,6 +300,7 @@ def store_data(
         conversation_id,
         llm_request,
         response,
+        rag_chunks,
         attachments,
         timestamps,
         topic_summary,
