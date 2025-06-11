@@ -13,7 +13,7 @@ from prometheus_client import (
     Histogram,
     disable_created_metrics,
     generate_latest,
-    REGISTRY
+    REGISTRY,
 )
 
 from ols import config
@@ -64,12 +64,10 @@ def setup_metrics(config):
     """Update list of metrics exposed in /metrics end point."""
     # Metrics are global module-level variables.
     # `global` ensures module-level variables are updated.
-    global rest_api_calls_total, response_duration_seconds, llm_calls_total, \
-           llm_calls_failures_total, llm_calls_validation_errors_total, \
-           llm_token_sent_total, llm_token_received_total, provider_model_configuration
+    global rest_api_calls_total, response_duration_seconds, llm_calls_total, llm_calls_failures_total, llm_calls_validation_errors_total, llm_token_sent_total, llm_token_received_total, provider_model_configuration
 
     # Helper object to keep API compatibility for disabled metrics
-    class NoopMetric():
+    class NoopMetric:
         def inc(self, *args, **kwargs):
             pass
 
@@ -80,11 +78,13 @@ def setup_metrics(config):
             pass
 
         def time(self, *args, **kwargs):
-            class NoopTimer():
+            class NoopTimer:
                 def __enter__(self):
                     pass
+
                 def __exit__(self, typ, value, traceback):
                     pass
+
             return NoopTimer()
 
     default_metrics = {
@@ -95,7 +95,7 @@ def setup_metrics(config):
         "llm_calls_validation_errors_total": llm_calls_validation_errors_total,
         "llm_token_sent_total": llm_token_sent_total,
         "llm_token_received_total": llm_token_received_total,
-        "provider_model_configuration": provider_model_configuration
+        "provider_model_configuration": provider_model_configuration,
     }
 
     if config.ols_config.metrics:
@@ -107,8 +107,10 @@ def setup_metrics(config):
                     REGISTRY.unregister(m_obj)
                     default_metrics[m_name] = NoopMetric()
             else:
-                logger.warning(f"Metric `{m_name}` does not exit. Check the `ols_config`"
-                                "section of the configuration file.")
+                logger.warning(
+                    f"Metric `{m_name}` does not exit. Check the `ols_config`"
+                    "section of the configuration file."
+                )
     else:
         logger.info("No metrics configuration provided; all metrics are enabled.")
 

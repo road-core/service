@@ -2206,7 +2206,7 @@ def test_ols_config_with_metrics(tmpdir):
             "metrics": [
                 "metric_name_1",
                 "metric_name_2",
-            ]
+            ],
         }
     )
     assert ols_config.default_provider == "test_default_provider"

@@ -38,7 +38,9 @@ missing_counters = (
 @pytest.fixture(scope="function", autouse=True)
 def _setup():
     """Setups the test client."""
-    config.reload_from_yaml_file("tests/config/config_for_integration_tests_metrics.yaml")
+    config.reload_from_yaml_file(
+        "tests/config/config_for_integration_tests_metrics.yaml"
+    )
 
     # we need to patch the config file path to point to the test
     # config file before we import anything from main.py
