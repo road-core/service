@@ -35,8 +35,8 @@ missing_counters = (
 )
 
 
-@pytest.fixture(scope="function", autouse=True)
-def _setup():
+@pytest.fixture(scope="function")
+def client_for_testing():
     """Setups the test client."""
     config.reload_from_yaml_file(
         "tests/config/config_for_integration_tests_metrics.yaml"
@@ -50,15 +50,32 @@ def _setup():
             CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests_metrics.yaml"
         },
     ):
+        # Save original values of disabled metric counters.
+        import ols.app.metrics as metrics
+        saved_metric_1 = metrics.provider_model_configuration
+        saved_metric_2 = metrics.llm_calls_total
+
         # app.main need to be imported after the configuration is read
         from ols.app.main import app  # pylint: disable=C0415
 
-        pytest.client = TestClient(app)
+        yield TestClient(app)
+
+        # Restore original metric counters to avoid
+        # failures of other metrics integration tests
+        from prometheus_client import REGISTRY
+        # 1. register metrics again
+        REGISTRY.register(saved_metric_1)
+        REGISTRY.register(saved_metric_2)
+        # 2. restore global variables in the module
+        metrics.provider_model_configuration = saved_metric_1
+        metrics.llm_calls_total = saved_metric_2
+        # 3. setup again the provider_model_configuration metric
+        metrics.setup_model_metrics(config)
 
 
 def retrieve_metrics(client):
     """Retrieve all service metrics."""
-    response = pytest.client.get("/metrics")
+    response = client.get("/metrics")
 
     # check that the /metrics endpoint is correct and we got
     # some response
@@ -69,9 +86,9 @@ def retrieve_metrics(client):
     return response.text
 
 
-def test_metrics_missing():
+def test_metrics_missing(client_for_testing: TestClient):
     """Check if service provides metrics endpoint with some expected counters."""
-    response_text = retrieve_metrics(pytest.client)
+    response_text = retrieve_metrics(client_for_testing)
 
     # check if expected counters are present
     for expected_counter in expected_counters:
