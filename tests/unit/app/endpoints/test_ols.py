@@ -322,7 +322,7 @@ def test_store_conversation_history_store_metadata():
                     "provider": provider,
                 },
                 additional_kwargs={
-                    "reference_documents": [
+                    "referenced_documents": [
                         {
                             "doc_title": "title-b",
                             "doc_url": "url-b"

@@ -587,7 +587,7 @@ def store_conversation_history(
             if llm_request.model:
                 response_message.response_metadata["model"] = llm_request.model
             if rag_chunks:
-                response_message.additional_kwargs["reference_documents"] = build_referenced_docs(rag_chunks)
+                response_message.additional_kwargs["referenced_documents"] = build_referenced_docs(rag_chunks)
 
             cache_entry = CacheEntry(
                 query=query_message,
