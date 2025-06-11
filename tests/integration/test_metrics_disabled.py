@@ -30,8 +30,8 @@ expected_counters = (
 
 missing_counters = (
     # This metric is disabled
-    "ols_provider_model_configuration",
     "ols_llm_calls_total",
+    "ols_provider_model_configuration",
 )
 
 
@@ -50,6 +50,9 @@ def _setup():
             CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests_metrics.yaml"
         },
     ):
+        # Setup metrics based on config with disabled metrics.
+        from ols.app.metrics import setup_metrics
+        setup_metrics(config)
         # app.main need to be imported after the configuration is read
         from ols.app.main import app  # pylint: disable=C0415
 
