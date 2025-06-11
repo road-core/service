@@ -9,8 +9,8 @@ from .metrics import (
     provider_model_configuration,
     response_duration_seconds,
     rest_api_calls_total,
-    setup_model_metrics,
     setup_metrics,
+    setup_model_metrics,
 )
 from .token_counter import GenericTokenCounter, TokenMetricUpdater
 
@@ -25,6 +25,6 @@ __all__ = [
     "provider_model_configuration",
     "response_duration_seconds",
     "rest_api_calls_total",
-    "setup_model_metrics",
     "setup_metrics",
+    "setup_model_metrics",
 ]

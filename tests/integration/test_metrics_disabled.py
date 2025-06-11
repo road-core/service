@@ -4,9 +4,7 @@
 # properly by linters
 # pyright: reportAttributeAccessIssue=false
 
-import logging
 import os
-import re
 from unittest.mock import patch
 
 import pytest
@@ -14,9 +12,7 @@ import requests
 from fastapi.testclient import TestClient
 
 from ols import config
-from ols.app.models.config import LoggingConfig
 from ols.constants import CONFIGURATION_FILE_NAME_ENV_VARIABLE
-from ols.utils.logging_configurator import configure_logging
 
 # counters that are expected to be part of metrics
 expected_counters = (
@@ -47,11 +43,12 @@ def _setup():
     with patch.dict(
         os.environ,
         {
-            CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests_metrics.yaml"
+            CONFIGURATION_FILE_NAME_ENV_VARIABLE: "tests/config/config_for_integration_tests_metrics.yaml"  # noqa: E501
         },
     ):
         # Setup metrics based on config with disabled metrics.
-        from ols.app.metrics import setup_metrics
+        from ols.app.metrics import setup_metrics  # pylint: disable=C0415
+
         setup_metrics(config)
         # app.main need to be imported after the configuration is read
         from ols.app.main import app  # pylint: disable=C0415
