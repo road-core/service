@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 
 from ols import config, constants
 from ols.app.endpoints.ols import (
+    build_referenced_docs,
     calc_input_tokens,
     calc_output_tokens,
     consume_tokens,
@@ -24,7 +25,6 @@ from ols.app.endpoints.ols import (
     process_request,
     store_conversation_history,
     store_transcript,
-    build_referenced_docs,
 )
 from ols.app.models.models import (
     Attachment,
@@ -32,7 +32,6 @@ from ols.app.models.models import (
     ForbiddenResponse,
     LLMRequest,
     RagChunk,
-    ReferencedDocument,
     SummarizerResponse,
     TokenCounter,
     UnauthorizedResponse,

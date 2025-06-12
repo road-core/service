@@ -286,12 +286,10 @@ def test_store_conversation_history_store_metadata():
     llm_request = LLMRequest(query=query, provider=provider, model=model)
     response = "*response*"
     mock_rag_chunk = [
-            RagChunk(text="text1", doc_url="url-b", doc_title="title-b"),
-            RagChunk(
-                text="text2", doc_url="url-b", doc_title="title-b"
-            ),  # duplicate doc
-            RagChunk(text="text3", doc_url="url-a", doc_title="title-a"),
-        ]
+        RagChunk(text="text1", doc_url="url-b", doc_title="title-b"),
+        RagChunk(text="text2", doc_url="url-b", doc_title="title-b"),  # duplicate doc
+        RagChunk(text="text3", doc_url="url-a", doc_title="title-a"),
+    ]
     skip_user_id_check = False
     start_time = time.time()
     response_time = time.time()
@@ -323,14 +321,8 @@ def test_store_conversation_history_store_metadata():
                 },
                 additional_kwargs={
                     "referenced_documents": [
-                        {
-                            "doc_title": "title-b",
-                            "doc_url": "url-b"
-                        },
-                        {
-                            "doc_title": "title-a",
-                            "doc_url": "url-a"
-                        }
+                        {"doc_title": "title-b", "doc_url": "url-b"},
+                        {"doc_title": "title-a", "doc_url": "url-a"},
                     ]
                 },
             ),
@@ -1469,7 +1461,7 @@ def test_get_available_quotas_two_quota_limiters():
         "MockQuotaLimiter1": 10,
         "MockQuotaLimiter2": 20,
     }
-    
+
 
 def test_build_referenced_docs():
     """Test build_referenced_docs."""

@@ -18,7 +18,7 @@ from ols.app.endpoints.streaming_ols import (  # noqa:E402
     stream_end_event,
     stream_start_event,
 )
-from ols.app.models.models import RagChunk, TokenCounter  # noqa:E402
+from ols.app.models.models import TokenCounter  # noqa:E402
 from ols.customize import prompts  # noqa:E402
 from ols.utils import suid  # noqa:E402
 
