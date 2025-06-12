@@ -10,7 +10,6 @@ from ols import config, constants
 config.ols_config.authentication_config.module = "k8s"
 
 from ols.app.endpoints.streaming_ols import (  # noqa:E402
-    build_referenced_docs,
     build_yield_item,
     format_stream_data,
     generic_llm_error,
@@ -19,7 +18,7 @@ from ols.app.endpoints.streaming_ols import (  # noqa:E402
     stream_end_event,
     stream_start_event,
 )
-from ols.app.models.models import RagChunk, TokenCounter  # noqa:E402
+from ols.app.models.models import TokenCounter  # noqa:E402
 from ols.customize import prompts  # noqa:E402
 from ols.utils import suid  # noqa:E402
 
@@ -166,17 +165,3 @@ def test_stream_end_event():
             "available_quotas": {"limiter1": 10, "limiter2": 20},
         }
     )
-
-
-def test_build_referenced_docs():
-    """Test build_referenced_docs."""
-    rag_chunks = [
-        RagChunk("bla", "url_1", "title_1"),
-        RagChunk("bla", "url_2", "title_2"),
-        RagChunk("bla", "url_1", "title_1"),  # duplicate
-    ]
-
-    assert build_referenced_docs(rag_chunks) == [
-        {"doc_title": "title_1", "doc_url": "url_1"},
-        {"doc_title": "title_2", "doc_url": "url_2"},
-    ]

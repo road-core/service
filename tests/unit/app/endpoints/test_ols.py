@@ -232,6 +232,7 @@ def test_store_conversation_history():
             llm_request,
             response,
             [],
+            [],
             {},
             topic_summary,
         )
@@ -259,7 +260,7 @@ def test_store_conversation_history_some_response():
 
     with patch("ols.config.conversation_cache.insert_or_append") as insert_or_append:
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, response, [], {}, topic_summary
+            user_id, conversation_id, llm_request, response, [], [], {}, topic_summary
         )
 
         expected_history = CacheEntry(
@@ -284,6 +285,11 @@ def test_store_conversation_history_store_metadata():
     model = "some-model"
     llm_request = LLMRequest(query=query, provider=provider, model=model)
     response = "*response*"
+    mock_rag_chunk = [
+        RagChunk(text="text1", doc_url="url-b", doc_title="title-b"),
+        RagChunk(text="text2", doc_url="url-b", doc_title="title-b"),  # duplicate doc
+        RagChunk(text="text3", doc_url="url-a", doc_title="title-a"),
+    ]
     skip_user_id_check = False
     start_time = time.time()
     response_time = time.time()
@@ -296,6 +302,7 @@ def test_store_conversation_history_store_metadata():
             conversation_id,
             llm_request,
             response,
+            mock_rag_chunk,
             [],
             timestamps,
             topic_summary,
@@ -311,6 +318,12 @@ def test_store_conversation_history_store_metadata():
                     "created_at": response_time,
                     "model": model,
                     "provider": provider,
+                },
+                additional_kwargs={
+                    "referenced_documents": [
+                        {"doc_title": "title-b", "doc_url": "url-b"},
+                        {"doc_title": "title-a", "doc_url": "url-a"},
+                    ]
                 },
             ),
         )
@@ -331,11 +344,11 @@ def test_store_conversation_history_empty_user_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, "", [], {}, ""
+            user_id, conversation_id, llm_request, "", [], [], {}, ""
         )
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, None, [], {}, ""
+            user_id, conversation_id, llm_request, None, [], [], {}, ""
         )
 
 
@@ -347,7 +360,7 @@ def test_store_conversation_history_improper_user_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid user ID"):
         ols.store_conversation_history(
-            user_id, conversation_id, llm_request, "", [], {}, ""
+            user_id, conversation_id, llm_request, "", [], [], {}, ""
         )
 
 
@@ -358,7 +371,7 @@ def test_store_conversation_history_improper_conversation_id():
     llm_request = LLMRequest(query="Tell me about Kubernetes")
     with pytest.raises(HTTPException, match="Invalid conversation ID"):
         ols.store_conversation_history(
-            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], {}, ""
+            constants.DEFAULT_USER_UID, conversation_id, llm_request, "", [], [], {}, ""
         )
 
 
@@ -1448,3 +1461,17 @@ def test_get_available_quotas_two_quota_limiters():
         "MockQuotaLimiter1": 10,
         "MockQuotaLimiter2": 20,
     }
+
+
+def test_build_referenced_docs():
+    """Test build_referenced_docs."""
+    rag_chunks = [
+        RagChunk("bla", "url_1", "title_1"),
+        RagChunk("bla", "url_2", "title_2"),
+        RagChunk("bla", "url_1", "title_1"),  # duplicate
+    ]
+
+    assert ols.build_referenced_docs(rag_chunks) == [
+        {"doc_title": "title_1", "doc_url": "url_1"},
+        {"doc_title": "title_2", "doc_url": "url_2"},
+    ]

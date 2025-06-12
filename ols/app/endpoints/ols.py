@@ -125,6 +125,7 @@ def conversation_request(
         processed_request.conversation_id,
         llm_request,
         summarizer_response.response,
+        summarizer_response.rag_chunks,
         processed_request.attachments,
         processed_request.timestamps,
         topic_summary,
@@ -556,6 +557,7 @@ def store_conversation_history(
     conversation_id: str,
     llm_request: LLMRequest,
     response: Optional[str],
+    rag_chunks: list[RagChunk],
     attachments: list[Attachment],
     timestamps: dict[str, float],
     topic_summary: str,
@@ -584,6 +586,10 @@ def store_conversation_history(
                 response_message.response_metadata["provider"] = llm_request.provider
             if llm_request.model:
                 response_message.response_metadata["model"] = llm_request.model
+            if rag_chunks:
+                response_message.additional_kwargs["referenced_documents"] = (
+                    build_referenced_docs(rag_chunks)
+                )
 
             cache_entry = CacheEntry(
                 query=query_message,
@@ -760,6 +766,18 @@ def construct_transcripts_path(user_id: str, conversation_id: str) -> Path:
         uid,
         cid,
     )
+
+
+def build_referenced_docs(rag_chunks: list[RagChunk]) -> list[dict]:
+    """Build a list of unique referenced documents."""
+    referenced_documents = ReferencedDocument.from_rag_chunks(rag_chunks)
+    return [
+        {
+            "doc_title": document.doc_title,
+            "doc_url": document.doc_url,
+        }
+        for document in referenced_documents
+    ]
 
 
 def store_transcript(
