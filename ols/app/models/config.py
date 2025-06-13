@@ -1015,6 +1015,8 @@ class OLSConfig(BaseModel):
 
     quota_handlers: Optional[QuotaHandlersConfig] = None
 
+    metrics: Optional[list[str]] = []
+
     def __init__(
         self, data: Optional[dict] = None, ignore_missing_certs: bool = False
     ) -> None:
@@ -1066,6 +1068,7 @@ class OLSConfig(BaseModel):
             data.get("tlsSecurityProfile", None)
         )
         self.quota_handlers = QuotaHandlersConfig(data.get("quota_handlers", None))
+        self.metrics = data.get("metrics", [])
 
     def __eq__(self, other: object) -> bool:
         """Compare two objects for equality."""

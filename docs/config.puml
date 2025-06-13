@@ -29,7 +29,6 @@ class "Config" as ols.app.models.config.Config {
 class "ConversationCacheConfig" as ols.app.models.config.ConversationCacheConfig {
   memory : Optional[InMemoryCacheConfig]
   postgres : Optional[PostgresConfig]
-  redis : Optional[RedisConfig]
   type : Optional[str]
   validate_yaml() -> None
 }
@@ -110,6 +109,7 @@ class "OLSConfig" as ols.app.models.config.OLSConfig {
   extra_ca : list[FilePath]
   logging_config : Optional[LoggingConfig]
   max_workers : Optional[int]
+  metrics : Optional[list[str]]
   query_filters : Optional[list[QueryFilter]]
   query_validation_method : Optional[str]
   quota_handlers : Optional[QuotaHandlersConfig]
@@ -119,6 +119,7 @@ class "OLSConfig" as ols.app.models.config.OLSConfig {
   tls_config
   tls_security_profile : Optional[TLSSecurityProfile]
   user_data_collection
+  parse_query_validation(data: dict) -> None
   validate_yaml(disable_tls: bool) -> None
 }
 class "OpenAIConfig" as ols.app.models.config.OpenAIConfig {
@@ -185,18 +186,6 @@ class "RHELAIVLLMConfig" as ols.app.models.config.RHELAIVLLMConfig {
 }
 class "RHOAIVLLMConfig" as ols.app.models.config.RHOAIVLLMConfig {
   credentials_path : str
-}
-class "RedisConfig" as ols.app.models.config.RedisConfig {
-  ca_cert_path : Optional[FilePath]
-  host : Optional[str]
-  max_memory : Optional[str]
-  max_memory_policy : Optional[str]
-  number_of_retries : Optional[int]
-  password : Optional[str]
-  port : Optional[int]
-  retry_on_error : Optional[bool]
-  retry_on_timeout : Optional[bool]
-  validate_yaml() -> None
 }
 class "ReferenceContent" as ols.app.models.config.ReferenceContent {
   embeddings_model_path : Optional[FilePath]
@@ -286,7 +275,6 @@ ols.app.models.config.PostgresConfig --* ols.app.models.config.ReferenceContent 
 ols.app.models.config.QuotaHandlersConfig --* ols.app.models.config.OLSConfig : quota_handlers
 ols.app.models.config.RHELAIVLLMConfig --* ols.app.models.config.ProviderConfig : rhelai_vllm_config
 ols.app.models.config.RHOAIVLLMConfig --* ols.app.models.config.ProviderConfig : rhoai_vllm_config
-ols.app.models.config.RedisConfig --* ols.app.models.config.ConversationCacheConfig : redis
 ols.app.models.config.ReferenceContent --* ols.app.models.config.OLSConfig : reference_content
 ols.app.models.config.SchedulerConfig --* ols.app.models.config.QuotaHandlersConfig : scheduler
 ols.app.models.config.TLSConfig --* ols.app.models.config.OLSConfig : tls_config

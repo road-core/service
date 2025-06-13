@@ -1,11 +1,14 @@
 """Prometheus metrics that are exposed by REST API."""
 
+import logging
+from types import TracebackType
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import PlainTextResponse
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
+    REGISTRY,
     Counter,
     Gauge,
     Histogram,
@@ -16,6 +19,8 @@ from prometheus_client import (
 from ols import config
 from ols.src.auth.auth import get_auth_dependency
 from ols.utils.config import AppConfig
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["metrics"])
 auth_dependency = get_auth_dependency(
@@ -46,7 +51,6 @@ llm_token_sent_total = Counter(
 llm_token_received_total = Counter(
     "ols_llm_token_received_total", "LLM tokens received", ["provider", "model"]
 )
-
 # metric that indicates what provider + model customers are using so we can
 # understand what is popular/important
 provider_model_configuration = Gauge(
@@ -54,6 +58,80 @@ provider_model_configuration = Gauge(
     "LLM provider/models combinations defined in configuration",
     ["provider", "model"],
 )
+
+
+# Helper object to keep API compatibility for disabled metrics
+class _NoopMetric:
+    """A no-operation metric class used as a placeholder for disabled metrics.
+
+    This class mimics the interface of Prometheus metrics but does nothing when methods are called.
+    """
+
+    def inc(self, *args: Any, **kwargs: Any) -> None:
+        """Do nothing."""
+        pass  # pylint: disable=W0107
+
+    def labels(self, *args: Any, **kwargs: Any) -> None:
+        """Do nothing."""
+        return self
+
+    def set(self, *args: Any, **kwargs: Any) -> None:
+        """Do nothing."""
+        pass  # pylint: disable=W0107
+
+    def time(self, *args: Any, **kwargs: Any) -> None:
+        """Do nothing."""
+
+        class NoopTimer:
+            """Do nothing."""
+
+            def __enter__(self) -> None:
+                return self
+
+            def __exit__(
+                self,
+                exc_type: type[BaseException],
+                value: BaseException,
+                traceback: TracebackType,
+            ) -> None:
+                pass
+
+        return NoopTimer()
+
+
+def setup_metrics(config: AppConfig) -> None:
+    """Update list of metrics exposed in /metrics end point."""
+    # Metrics are global module-level variables.
+    # `global` ensures module-level variables are updated.
+    global rest_api_calls_total, response_duration_seconds, llm_calls_total, llm_calls_failures_total, llm_calls_validation_errors_total, llm_token_sent_total, llm_token_received_total, provider_model_configuration  # noqa: E501  # pylint: disable=W0602
+
+    default_metrics = {
+        "rest_api_calls_total": rest_api_calls_total,
+        "response_duration_seconds": response_duration_seconds,
+        "llm_calls_total": llm_calls_total,
+        "llm_calls_failures_total": llm_calls_failures_total,
+        "llm_calls_validation_errors_total": llm_calls_validation_errors_total,
+        "llm_token_sent_total": llm_token_sent_total,
+        "llm_token_received_total": llm_token_received_total,
+        "provider_model_configuration": provider_model_configuration,
+    }
+
+    if config.ols_config.metrics:
+        # Disable metrics not configured in config file.
+        configured_metrics = set(config.ols_config.metrics)
+        for m_name, m_obj in default_metrics.items():
+            if m_name in default_metrics:
+                if m_name not in configured_metrics:
+                    REGISTRY.unregister(m_obj)
+                    default_metrics[m_name] = _NoopMetric()  # type: ignore  # noqa:  PGH003
+            else:
+                logger.warning(
+                    "Metric %s does not exit. Check the `ols_config`"
+                    "section of the configuration file.",
+                    m_name,
+                )
+    else:
+        logger.info("No metrics configuration provided; all metrics are enabled.")
 
 
 @router.get("/metrics", response_class=PlainTextResponse)

@@ -598,15 +598,28 @@ Activate token quota limits for the service by adding a new configuration struct
 <5> Defines the number of seconds that the scheduler waits and then checks if the period interval is over. When the period interval is over, the scheduler stores the timestamp and resets or increases the quota limit. 300 seconds or even 600 seconds are good values.
 
 
+## 13. (Optional) Configurable Prometheus metric counters
+
+All metrics are enabled and exposed by default at the endpoint `/metrics`. It is possible to
+configure which metrics are exposed and which are disabled. This configuration is optional. To
+enable only certain metrics, update the rcsconfig.yaml file with a list of the desired metrics.
+This list should contain metric names without the `ols_` prefix. An example of such a configuration is:
+
+```
+ols_config:
+    metrics:
+        - llm_calls_total
+        - llm_calls_failures_total
+        - metric_name_3
+        - metric_name_4
+```
 
 
-
-## 13. Configuration dump
+## 14. Configuration dump
 
 It is possible to dump the actual configuration into a JSON file for further processing. The generated configuration file will contain all the configuration attributes, including keys etc., so keep the output file in a secret.
 
 In order to dump the configuration, pass `--dump-config` command line option.
-
 
 
 # Usage

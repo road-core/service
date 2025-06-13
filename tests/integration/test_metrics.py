@@ -21,6 +21,7 @@ from ols.utils.logging_configurator import configure_logging
 # counters that are expected to be part of metrics
 expected_counters = (
     "ols_rest_api_calls_total",
+    "ols_response_duration_seconds",
     "ols_llm_calls_total",
     "ols_llm_calls_failures_total",
     "ols_llm_validation_errors_total",
