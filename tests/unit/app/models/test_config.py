@@ -2185,6 +2185,49 @@ def test_ols_config(tmpdir):
     assert ols_config.system_prompt_path is None
     assert ols_config.system_prompt is None
     assert ols_config.tls_security_profile == TLSSecurityProfile()
+    assert ols_config.metrics == []
+
+
+def test_ols_config_with_metrics(tmpdir):
+    """Test the OLSConfig model with metrics."""
+    ols_config = OLSConfig(
+        {
+            "default_provider": "test_default_provider",
+            "default_model": "test_default_model",
+            "conversation_cache": {
+                "type": "memory",
+                "memory": {
+                    "max_entries": 100,
+                },
+            },
+            "logging_config": {
+                "logging_level": "INFO",
+            },
+            "metrics": [
+                "metric_name_1",
+                "metric_name_2",
+            ],
+        }
+    )
+    assert ols_config.default_provider == "test_default_provider"
+    assert ols_config.default_model == "test_default_model"
+    assert ols_config.conversation_cache.type == "memory"
+    assert ols_config.conversation_cache.memory.max_entries == 100
+    assert ols_config.logging_config.app_log_level == logging.INFO
+    assert (
+        ols_config.query_validation_method == constants.QueryValidationMethod.DISABLED
+    )
+    assert ols_config.user_data_collection == UserDataCollection()
+    assert ols_config.reference_content is None
+    assert ols_config.authentication_config == AuthenticationConfig(
+        module=constants.DEFAULT_AUTHENTICATION_MODULE
+    )
+    assert ols_config.extra_ca == []
+    assert ols_config.certificate_directory == constants.DEFAULT_CERTIFICATE_DIRECTORY
+    assert ols_config.system_prompt_path is None
+    assert ols_config.system_prompt is None
+    assert ols_config.tls_security_profile == TLSSecurityProfile()
+    assert ols_config.metrics == ["metric_name_1", "metric_name_2"]
 
 
 def test_ols_config_with_auth_config(tmpdir):
@@ -2221,6 +2264,7 @@ def test_ols_config_with_auth_config(tmpdir):
     assert ols_config.system_prompt_path is None
     assert ols_config.system_prompt is None
     assert ols_config.tls_security_profile == TLSSecurityProfile()
+    assert ols_config.metrics == []
 
 
 def test_ols_config_with_tls_security_profile(tmpdir):
@@ -2276,6 +2320,7 @@ def test_ols_config_with_tls_security_profile(tmpdir):
         "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
         in ols_config.tls_security_profile.ciphers
     )
+    assert ols_config.metrics == []
 
 
 def get_ols_configs():
@@ -3604,6 +3649,7 @@ def test_ols_config_with_system_prompt(tmpdir):
     assert ols_config.certificate_directory == constants.DEFAULT_CERTIFICATE_DIRECTORY
     assert ols_config.system_prompt_path is None
     assert ols_config.system_prompt == "This is test system prompt!"
+    assert ols_config.metrics == []
 
 
 def test_ols_config_with_non_existing_system_prompt(tmpdir):
