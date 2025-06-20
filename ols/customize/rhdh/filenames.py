@@ -1,3 +1,3 @@
 """Specific filenames."""
 
-magic_file = "rhds.json"
+DATA_COLLECTION_MAGIC_FILE_NAME = "rhds.json"

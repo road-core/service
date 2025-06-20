@@ -31,12 +31,12 @@ from ols.constants import (  # pylint: disable=C0413
     CONFIGURATION_FILE_NAME_ENV_VARIABLE,
     DEFAULT_CONFIGURATION_FILE,
 )
-from ols.customize import filenames
+from ols.customize import filenames  # pylint: disable=C0413
 
 # pylint: disable-next=C0413
 from ols.src.auth.k8s import K8sClientSingleton
 
-magic_file = filenames.magic_file
+data_collection_magic_file_name = filenames.DATA_COLLECTION_MAGIC_FILE_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ def package_files_into_tarball(
                 )
 
         # add magic file for identification of our archive on the CCX side
-        empty_file = tarfile.TarInfo(magic_file)
+        empty_file = tarfile.TarInfo(data_collection_magic_file_name)
         empty_file.size = 0
         tar.addfile(empty_file)
 

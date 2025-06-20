@@ -1,3 +1,3 @@
 """Specific filenames."""
 
-magic_file = "openshift_lightspeed.json"
+DATA_COLLECTION_MAGIC_FILE_NAME = "openshift_lightspeed.json"
