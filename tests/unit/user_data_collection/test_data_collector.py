@@ -45,6 +45,12 @@ def create_file_with_size(filename, size):
         f.write(os.urandom(size))
 
 
+def test_magic_filename_is_set():
+    """Test that the magic filename is set."""
+    # the filename can have any custom value, but need to be initialized
+    assert data_collector.data_collection_magic_file_name is not None
+
+
 def test_collect_ols_data_from(tmp_path):
     """Test the collect_ols_data_from function."""
     with open(tmp_path / "root.json", "w") as f:  # should be ignored
