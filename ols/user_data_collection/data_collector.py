@@ -31,9 +31,12 @@ from ols.constants import (  # pylint: disable=C0413
     CONFIGURATION_FILE_NAME_ENV_VARIABLE,
     DEFAULT_CONFIGURATION_FILE,
 )
+from ols.customize import filenames
 
 # pylint: disable-next=C0413
 from ols.src.auth.k8s import K8sClientSingleton
+
+magic_file = filenames.magic_file
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +153,7 @@ def package_files_into_tarball(
                 )
 
         # add magic file for identification of our archive on the CCX side
-        empty_file = tarfile.TarInfo("openshift_lightspeed.json")
+        empty_file = tarfile.TarInfo(magic_file)
         empty_file.size = 0
         tar.addfile(empty_file)
 
