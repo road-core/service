@@ -1,6 +1,5 @@
 """Utility function for retrieving SSL version and list of ciphers for TLS secutiry profile."""
 
-
 import logging
 from typing import Optional
 
