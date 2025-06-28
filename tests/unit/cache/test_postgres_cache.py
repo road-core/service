@@ -497,6 +497,25 @@ def test_delete_operation():
     mock_cursor.fetchone.assert_called_once()
 
 
+def test_delete_operation_raises_if_no_returning():
+    """Test the Cache.delete operation when delete query without RETURNING clause."""
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.side_effect = psycopg2.DatabaseError("no results to fetch")
+
+    with patch("psycopg2.connect") as mock_connect:
+        mock_connect.return_value.cursor.return_value.__enter__.return_value = (
+            mock_cursor
+        )
+
+        config = PostgresConfig()
+        cache = PostgresCache(config)
+
+        with pytest.raises(Exception) as exc_info:
+            cache.delete(user_id, conversation_id)
+
+    assert "no results to fetch" in str(exc_info.value)
+
+
 def test_delete_operation_not_found():
     """Test the Cache.delete operation when the conversation is not found."""
     # Mock the database cursor behavior to simulate no row found
