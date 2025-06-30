@@ -11,7 +11,9 @@ from ols.utils import tls
 logger = logging.getLogger(__name__)
 
 
-def get_ssl_version(sec_profile: Optional[TLSSecurityProfile]) -> Optional[ssl.TLSVersion]:
+def get_ssl_version(
+    sec_profile: Optional[TLSSecurityProfile],
+) -> Optional[ssl.TLSVersion]:
     """Get SSL version to be used. It can be configured in tls_security_profile section."""
     # if security profile is not set, use default SSL version
     # as specified in SSL library
