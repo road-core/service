@@ -537,7 +537,7 @@ def validate_requested_provider_model(llm_request: LLMRequest) -> None:
     """Validate provider/model; if provided in request payload."""
     provider = llm_request.provider
     model = llm_request.model
-    if provider is None and model is None:
+    if provider is None or model is None:
         # no validation, when provider & model are not sent with request
         return
 
