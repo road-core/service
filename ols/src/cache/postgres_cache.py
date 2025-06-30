@@ -82,6 +82,7 @@ class PostgresCache(Cache):
     DELETE_SINGLE_CONVERSATION_STATEMENT = """
         DELETE FROM cache
          WHERE user_id=%s AND conversation_id=%s
+         RETURNING conversation_id
         """
 
     LIST_CONVERSATIONS_STATEMENT = """
