@@ -1,6 +1,7 @@
 """Utility function for retrieving SSL version and list of ciphers for TLS secutiry profile."""
 
 import logging
+import ssl
 from typing import Optional
 
 from ols import constants
@@ -10,7 +11,9 @@ from ols.utils import tls
 logger = logging.getLogger(__name__)
 
 
-def get_ssl_version(sec_profile: Optional[TLSSecurityProfile]) -> str:
+def get_ssl_version(
+    sec_profile: Optional[TLSSecurityProfile],
+) -> Optional[ssl.TLSVersion]:
     """Get SSL version to be used. It can be configured in tls_security_profile section."""
     # if security profile is not set, use default SSL version
     # as specified in SSL library
