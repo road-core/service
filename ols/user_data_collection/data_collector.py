@@ -194,7 +194,7 @@ def upload_data_to_ingress(
                 logger.debug("using CP offline token to generate refresh token")
                 token = access_token_from_offline_token(
                     udc_config.cp_offline_token,
-                    udc_config.ingress_url,
+                    str(udc_config.ingress_url),
                     udc_config.access_token_generation_timeout,
                 )
                 # when authenticating with token, user-agent is not accepted
@@ -213,7 +213,7 @@ def upload_data_to_ingress(
                 s.headers = headers
                 logger.debug("posting payload to %s", udc_config.ingress_url)
                 response = s.post(
-                    url=udc_config.ingress_url,
+                    url=str(udc_config.ingress_url),
                     files=payload,
                     timeout=udc_config.ingress_timeout,
                 )
